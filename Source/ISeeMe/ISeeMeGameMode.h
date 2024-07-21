@@ -13,6 +13,7 @@ class AISeeMeGameMode : public AGameModeBase
 
 public:
 	AISeeMeGameMode();
+	void SwapCamera();
 };
 
 
