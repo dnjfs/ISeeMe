@@ -18,7 +18,7 @@ void AISMPlayerController::OnPossess(APawn* aPawn)
 {
 	Super::OnPossess(aPawn);
 
-	if (GetNetMode() == ENetMode::NM_DedicatedServer)
+	if (HasAuthority())
 		if (AISeeMeGameMode* GM = Cast<AISeeMeGameMode>(GetWorld()->GetAuthGameMode()))
 			GM->SwapCamera();
 }
