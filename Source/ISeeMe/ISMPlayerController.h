@@ -18,6 +18,7 @@ class ISEEME_API AISMPlayerController : public APlayerController
 	AISMPlayerController();
 
 protected:
+	virtual void BeginPlay() override;
 	virtual void OnPossess(APawn* aPawn) override;
 	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 

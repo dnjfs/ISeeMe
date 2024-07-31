@@ -14,6 +14,14 @@ AISMPlayerController::AISMPlayerController()
 	bAutoManageActiveCameraTarget = false;
 }
 
+void AISMPlayerController::BeginPlay()
+{
+	Super::BeginPlay();
+
+	SetInputMode(FInputModeGameOnly());
+	SetShowMouseCursor(false);
+}
+
 void AISMPlayerController::OnPossess(APawn* aPawn)
 {
 	Super::OnPossess(aPawn);
