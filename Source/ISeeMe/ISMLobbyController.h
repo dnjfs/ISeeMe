@@ -12,6 +12,8 @@
 		GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT(Format), ##__VA_ARGS__))
 
 DECLARE_DELEGATE_TwoParams(FOnCreateSessionCompleteDelegate, FName /*SessionName*/, bool /*bWasSuccessful*/);
+DECLARE_DELEGATE_OneParam(FOnFindSessionsCompleteDelegate, bool /*bWasSuccessful*/);
+DECLARE_DELEGATE_TwoParams(FOnJoinSessionCompleteDelegate, FName /*SessionName*/, EOnJoinSessionCompleteResult::Type /*Result*/);
 
 /**
  * 
@@ -39,11 +41,18 @@ protected:
 
 	UFUNCTION(BlueprintCallable)
 	void CreateSession();
+	UFUNCTION(BlueprintCallable)
+	void JoinSession();
 
 	void OnCreateSessionComplete(FName SessionName, bool bWasSuccessful);
+	void OnFindSessionComplete(bool bWasSuccessful);
+	void OnJoinSessionComplate(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
 
 private:
 	IOnlineSessionPtr OnlineSessionInterface;
+	TSharedPtr<FOnlineSessionSearch> SessionSearch;
 
 	FOnCreateSessionCompleteDelegate CreateSessionComplete;
+	FOnFindSessionsCompleteDelegate FindSessionComplete;
+	FOnJoinSessionCompleteDelegate JoinSessionComplete;
 };
