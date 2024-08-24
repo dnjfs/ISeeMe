@@ -85,6 +85,7 @@ void AISMLobbyController::CreateSession()
 	SessionSettings->bAllowJoinViaPresence = true;	// Presence를 통해 참여 허용
 	SessionSettings->bUseLobbiesIfAvailable = true; // 플랫폼이 지원하는 경우 로비 API 사용
 
+	// FOnlineSessionSettings() 코드 참고
 	// 세션의 MatchType을 모두에게 열림, 온라인 서비스와 핑 데이터를 통해 세션 홍보 옵션으로 설정
 	SessionSettings->Set(FName("MatchType"), FString("FreeForAll"), EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
 
