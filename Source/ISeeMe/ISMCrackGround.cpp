@@ -48,6 +48,7 @@ void AISMCrackGround::OnStep(UPrimitiveComponent* HitComp, AActor* OtherActor, U
 	UE_LOG(LogTemp, Warning, TEXT("On Step!"));
 
 	SetActorTickEnabled(true);
+	MulticastSetClacking(true);
 }
 
 void AISMCrackGround::OnCracked()
@@ -65,6 +66,7 @@ void AISMCrackGround::ResetTimer()
 	SetActorTickEnabled(false);
 
 	MulticastAwake(true);
+	MulticastSetClacking(false);
 }
 
 void AISMCrackGround::MulticastAwake_Implementation(bool bInAwake)
@@ -74,4 +76,10 @@ void AISMCrackGround::MulticastAwake_Implementation(bool bInAwake)
 		GroundMesh->SetVisibility(bInAwake);
 		GroundMesh->SetCollisionEnabled(bInAwake ? ECollisionEnabled::QueryOnly : ECollisionEnabled::NoCollision);
 	}
+}
+
+void AISMCrackGround::MulticastSetClacking_Implementation(bool bInCracking)
+{
+	if (GroundMesh)
+		GroundMesh->SetMaterial(0, bInCracking ? CrackingMaterial : BaseMaterial);
 }

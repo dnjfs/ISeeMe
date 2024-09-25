@@ -27,12 +27,20 @@ protected:
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastAwake(bool bInAwake);
 
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastSetClacking(bool bInCracking);
+
 public:
 	virtual void Tick(float DeltaTime) override;
 
 private:
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UStaticMeshComponent> GroundMesh;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UMaterialInterface> BaseMaterial;
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UMaterialInterface> CrackingMaterial;
 
 	UPROPERTY(EditInstanceOnly, Category = GroundOption)
 	float CrackTime = 3.f;
