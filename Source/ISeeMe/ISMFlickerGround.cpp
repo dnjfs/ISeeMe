@@ -39,9 +39,9 @@ void AISMFlickerGround::BeginPlay()
 	ResetTimer();
 }
 
-void AISMFlickerGround::Tick(float DeltaSeconds)
+void AISMFlickerGround::Tick(float DeltaTime)
 {
-	Super::Tick(DeltaSeconds);
+	Super::Tick(DeltaTime);
 
 	if (!HasAuthority())
 		return;
@@ -49,7 +49,7 @@ void AISMFlickerGround::Tick(float DeltaSeconds)
 	if (bIsDormancy)
 		return;
 
-	RemainTime -= DeltaSeconds;
+	RemainTime -= DeltaTime;
 
 	// 남은시간 30% 남을 때부터 투명도 세팅
 	if (RemainTime/FlickerInterval < 0.3f)
