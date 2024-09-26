@@ -53,6 +53,10 @@ void AISeeMeCharacter::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
+
+	// 내 캐릭터 강조를 위해 '커스텀 뎁스 패스 렌더(bRenderCustomDepth)' 켜기
+	if (GetController() && GetController()->IsLocalController())
+		GetMesh()->SetRenderCustomDepth(true);
 }
 
 //////////////////////////////////////////////////////////////////////////
