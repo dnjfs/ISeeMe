@@ -19,8 +19,6 @@ AISeeMeGameMode::AISeeMeGameMode()
 void AISeeMeGameMode::SwapCamera()
 {
 	int32 CurrentPlayers = GetNumPlayers();
-	if (CurrentPlayers != 2)
-		return;
 
 	TArray<AISMPlayerController*> PCs;
 	TArray<ACharacter*> Characters;
@@ -31,22 +29,19 @@ void AISeeMeGameMode::SwapCamera()
 		if (PC == nullptr)
 			continue;
 
-		PCs.Add(PC);
-
 		ACharacter* Character = PC->GetCharacter();
 		if (Character == nullptr)
 			continue;
 
+		PCs.Add(PC);
 		Characters.Add(Character);
 	}
 
-
-	// 2인 플레이인지 확인
-	check(Characters.Num() == 2);
-
-	PCs[0]->SetViewTarget(Characters[1]);
-	PCs[0]->SetOtherCharacter(Characters[1]);
-
-	PCs[1]->SetViewTarget(Characters[0]);
-	PCs[1]->SetOtherCharacter(Characters[0]);
+	// 카메라 스왑
+	int PlayerNum = PCs.Num();
+	for (int i = 0; i < PlayerNum; i++)
+	{
+		PCs[i]->SetViewTarget(Characters[(i+1 < PlayerNum) ? i+1 : 0]);
+		PCs[i]->SetOtherCharacter(Characters[(i+1 < PlayerNum) ? i+1 : 0]);
+	}
 }

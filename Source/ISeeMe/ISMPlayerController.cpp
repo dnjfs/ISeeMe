@@ -24,10 +24,6 @@ void AISMPlayerController::BeginPlay()
 
 void AISMPlayerController::OnPossess(APawn* aPawn)
 {
-	// 에디터에서 Standalone으로 1인 플레이 시 기본 카메라로 사용
-	if (GetWorld()->IsPlayInEditor() && GetNetMode() == ENetMode::NM_Standalone)
-		bAutoManageActiveCameraTarget = true;
-
 	Super::OnPossess(aPawn);
 
 	if (HasAuthority())
