@@ -24,6 +24,7 @@ protected:
 
 public:
 	void SetOtherCharacter(ACharacter* NewCharacter) { OtherCharacter = NewCharacter; }
+	ACharacter* GetOtherCharacter() { return OtherCharacter; }
 
 	UFUNCTION()
 	void OnRep_SwapCamera();

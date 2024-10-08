@@ -10,6 +10,8 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "ISMPlayerController.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -86,6 +88,8 @@ void AISeeMeCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AISeeMeCharacter::Look);
+
+		EnhancedInputComponent->BindAction(FocusAction, ETriggerEvent::Triggered, this, &AISeeMeCharacter::Focus);
 	}
 	else
 	{
@@ -127,4 +131,11 @@ void AISeeMeCharacter::Look(const FInputActionValue& Value)
 		AddControllerYawInput(LookAxisVector.X);
 		//AddControllerPitchInput(LookAxisVector.Y); // 너무 어려움
 	}
+}
+
+void AISeeMeCharacter::Focus()
+{
+	auto OtherCharacter = Cast<AISMPlayerController>(GetController())->GetOtherCharacter();
+	float NewYaw = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), OtherCharacter->GetActorLocation()).Yaw;
+	GetController()->SetControlRotation(FRotator(0.f, NewYaw, 0.f));
 }
