@@ -135,7 +135,12 @@ void AISeeMeCharacter::Look(const FInputActionValue& Value)
 
 void AISeeMeCharacter::Focus()
 {
-	auto OtherCharacter = Cast<AISMPlayerController>(GetController())->GetOtherCharacter();
-	float NewYaw = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), OtherCharacter->GetActorLocation()).Yaw;
-	GetController()->SetControlRotation(FRotator(0.f, NewYaw, 0.f));
+	if (AISMPlayerController* ISMPlayerController = Cast<AISMPlayerController>(GetController()))
+	{
+		if (ACharacter* OtherCharacter = ISMPlayerController->GetOtherCharacter())
+		{
+			float NewYaw = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), OtherCharacter->GetActorLocation()).Yaw;
+			GetController()->SetControlRotation(FRotator(0.f, NewYaw, 0.f));
+		}
+	}
 }
