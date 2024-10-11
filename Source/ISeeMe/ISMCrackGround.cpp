@@ -15,19 +15,17 @@ AISMCrackGround::AISMCrackGround()
 	RootComponent = GroundMesh;
 
 	CrackGeometry = CreateDefaultSubobject<UGeometryCollectionComponent>(TEXT("CrackGeometry"));
-	CrackGeometry->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepWorldTransform);
+	CrackGeometry->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 
-	CrackGeometry->SetSimulatePhysics(false);
-	CrackGeometry->SetEnableGravity(false);
-	CrackGeometry->SetVisibility(false);
+	MulticastCrackAwake(false);
 }
 
 void AISMCrackGround::BeginPlay()
 {
 	Super::BeginPlay();
 
-	CrackGeometry->SetWorldLocation(RootComponent->GetComponentLocation());
-	CrackGeometry->SetWorldRotation(RootComponent->GetComponentRotation());
+	CrackGeometry->SetRelativeScale3D(FVector(1.0 / GroundMesh->GetComponentScale().X, 1.0 / GroundMesh->GetComponentScale().Y,
+		1.0 / GroundMesh->GetComponentScale().Z));
 
 	ResetTimer();
 }
@@ -36,23 +34,24 @@ void AISMCrackGround::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	RemainTime -= DeltaTime;
-
-	// [TODO] 점점 부서지는 연출
-	if (RemainTime <= 0.f)
+	if (!isCrack)
 	{
-		OnCracked();
+		RemainTime -= DeltaTime;
 
-		FTimerHandle TimerHandle;
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]() {
-			this->ResetTimer();
-		}, DormantTime, false);
-	}
-	else if (RemainTime / CrackTime <= 0.5f)
-	{
-		MulticastSetClack(RemainTime / CrackTime);
-	}
+		if (RemainTime <= 0.f)
+		{
+			OnCracked();
 
+			FTimerHandle TimerHandle;
+			GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]() {
+				this->ResetTimer();
+				}, DormantTime, false);
+		}
+		else if (RemainTime / CrackTime <= 0.5f)
+		{
+			MulticastSetClack(RemainTime / CrackTime);
+		}
+	}
 }
 
 void AISMCrackGround::OnStep(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
@@ -68,19 +67,25 @@ void AISMCrackGround::OnStep(UPrimitiveComponent* HitComp, AActor* OtherActor, U
 
 void AISMCrackGround::OnCracked()
 {
-	// [TODO] 완전히 부서지는 연출
-	CrackGeometry->SetVisibility(true);
-	CrackGeometry->SetEnableGravity(true);
-	CrackGeometry->SetSimulatePhysics(true);
-	CrackGeometry->AddRadialImpulse(GroundMesh->GetComponentLocation(), 1000, 11250.0, RIF_Constant, false);
+	MulticastCrackAwake(true);
+	CrackGeometry->AddRadialImpulse(GetActorLocation(), 1000, 25000.0, RIF_Constant, false);
 
+	/*FVector Location = FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z + 10);
+	FRotator Rotation = FRotator::ZeroRotator;  // 원하는 회전값 설정 (기본값으로 0도)
+
+	// BP_CrackPart 스폰
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	ACrackPart* SpawnedCrackPart = GetWorld()->SpawnActor<ACrackPart>(CrackPartClass, Location, Rotation, SpawnParams);
+	*/
+	isCrack = true;
 	FTimerHandle TimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]() {
 		this->CrackTimer();
 		}, CrackTime, false);
 
 
-	SetActorTickEnabled(false);
+	SetActorTickEnabled(true);
 	MulticastAwake(false);
 }
 
@@ -98,33 +103,27 @@ void AISMCrackGround::CrackTimer()
 {
 	if (CrackGeometry)
 	{
-		// 기존 컴포넌트의 Transform 저장
-		FTransform OriginalTransform = CrackGeometry->GetComponentTransform();
 		TObjectPtr<UGeometryCollection> SavedRestCollection = DuplicateObject<UGeometryCollection>(CrackGeometry->RestCollection, nullptr);
 
-		// 기존 컴포넌트 파괴
 		CrackGeometry->DestroyComponent();
 		CrackGeometry = nullptr;
 
 		UGeometryCollectionComponent* NewGeometryCollectionComponent = NewObject<UGeometryCollectionComponent>(this);
 		CrackGeometry = NewGeometryCollectionComponent;
 
-		// 새로운 컴포넌트 생성
-		CrackGeometry->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepWorldTransform);
-		CrackGeometry->SetWorldTransform(OriginalTransform);
+		CrackGeometry->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+		CrackGeometry->SetRelativeScale3D(FVector(1.0 / GroundMesh->GetComponentScale().X, 1.0 / GroundMesh->GetComponentScale().Y,
+			1.0 / GroundMesh->GetComponentScale().Z));
 
-		// RestCollection 설정
 		if (SavedRestCollection)
 		{
 			CrackGeometry->SetRestCollection(SavedRestCollection);
 		}
-
 		CrackGeometry->RegisterComponent();
 
-		CrackGeometry->SetSimulatePhysics(false);
-		CrackGeometry->SetEnableGravity(false);
-		CrackGeometry->SetVisibility(false);
-		GroundMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		MulticastCrackAwake(false);
+		SetActorTickEnabled(false);
+		isCrack = false;
 	}
 }
 
@@ -134,6 +133,17 @@ void AISMCrackGround::MulticastAwake_Implementation(bool bInAwake)
 	{
 		GroundMesh->SetVisibility(bInAwake);
 		GroundMesh->SetCollisionEnabled(bInAwake ? ECollisionEnabled::QueryOnly : ECollisionEnabled::NoCollision);
+	}
+}
+
+void AISMCrackGround::MulticastCrackAwake_Implementation(bool bInAwake)
+{
+	if (CrackGeometry)
+	{
+		CrackGeometry->SetSimulatePhysics(bInAwake);
+		CrackGeometry->SetEnableGravity(bInAwake);
+		CrackGeometry->SetVisibility(bInAwake);
+		CrackGeometry->SetCollisionEnabled(bInAwake ? ECollisionEnabled::QueryAndPhysics : ECollisionEnabled::NoCollision);
 	}
 }
 

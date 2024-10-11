@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "GeometryCollection/GeometryCollectionComponent.h"
+#include "Components/SphereComponent.h"
 #include "ISMCrackGround.generated.h"
 
 UCLASS()
@@ -14,6 +15,9 @@ class ISEEME_API AISMCrackGround : public AActor
 	
 public:	
 	AISMCrackGround();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool isCrack = false;
 
 protected:
 	virtual void BeginPlay() override;
@@ -29,6 +33,9 @@ protected:
 
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastAwake(bool bInAwake);
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastCrackAwake(bool bInAwake);
 
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastSetClack(float crackState);
