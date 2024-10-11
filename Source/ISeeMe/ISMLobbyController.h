@@ -42,17 +42,24 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void CreateSession();
 	UFUNCTION(BlueprintCallable)
-	void JoinSession();
+	void FindSession();
 
 	void OnCreateSessionComplete(FName SessionName, bool bWasSuccessful);
 	void OnFindSessionComplete(bool bWasSuccessful);
 	void OnJoinSessionComplate(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
+	
+	void OnFindFriendSessionComplete(int32 LocalUserNum, bool bWasSuccessful, const TArray<FOnlineSessionSearchResult>&);
+	void OnSessionUserInviteAccepted(const bool bWasSuccessful, const int32 ControllerId, FUniqueNetIdPtr UserId, const FOnlineSessionSearchResult& InviteResult);
+	void JoinSession(const FOnlineSessionSearchResult& Result);
 
 private:
 	IOnlineSessionPtr OnlineSessionInterface;
 	TSharedPtr<FOnlineSessionSearch> SessionSearch;
 
-	FOnCreateSessionCompleteDelegate CreateSessionComplete;
-	FOnFindSessionsCompleteDelegate FindSessionComplete;
-	FOnJoinSessionCompleteDelegate JoinSessionComplete;
+	FOnCreateSessionCompleteDelegate CreateSessionCompleteDelegate;
+	FOnFindSessionsCompleteDelegate FindSessionCompleteDelegate;
+	FOnJoinSessionCompleteDelegate JoinSessionCompleteDelegate;
+
+	FOnFindFriendSessionCompleteDelegate FindFriendSessionCompleteDelegate;
+	FOnSessionUserInviteAcceptedDelegate SessionUserInviteAcceptedDelegate;
 };

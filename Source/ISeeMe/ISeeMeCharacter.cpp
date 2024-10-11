@@ -135,6 +135,9 @@ void AISeeMeCharacter::Look(const FInputActionValue& Value)
 
 void AISeeMeCharacter::Focus()
 {
+	if (GetController() == nullptr)
+		return;
+
 	if (AISMPlayerController* ISMPlayerController = Cast<AISMPlayerController>(GetController()))
 	{
 		if (ACharacter* OtherCharacter = ISMPlayerController->GetOtherCharacter())

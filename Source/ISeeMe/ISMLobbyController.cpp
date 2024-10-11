@@ -10,9 +10,11 @@
 #include "Kismet/GameplayStatics.h"
 
 AISMLobbyController::AISMLobbyController()
-	: CreateSessionComplete(FOnCreateSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnCreateSessionComplete))
-	, FindSessionComplete(FOnFindSessionsCompleteDelegate::CreateUObject(this, &ThisClass::OnFindSessionComplete))
-	, JoinSessionComplete(FOnJoinSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnJoinSessionComplate))
+	: CreateSessionCompleteDelegate(FOnCreateSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnCreateSessionComplete))
+	, FindSessionCompleteDelegate(FOnFindSessionsCompleteDelegate::CreateUObject(this, &ThisClass::OnFindSessionComplete))
+	, JoinSessionCompleteDelegate(FOnJoinSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnJoinSessionComplate))
+	, FindFriendSessionCompleteDelegate(FOnFindFriendSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnFindFriendSessionComplete))
+	, SessionUserInviteAcceptedDelegate(FOnSessionUserInviteAcceptedDelegate::CreateUObject(this, &ThisClass::OnSessionUserInviteAccepted))
 {
 }
 
@@ -53,6 +55,14 @@ bool AISMLobbyController::GetSessionInterface()
 	if (OnlineSessionInterface.IsValid() == false)
 		return false;
 
+
+	// 델리게이트 등록
+	if (const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController())
+		OnlineSessionInterface->AddOnFindFriendSessionCompleteDelegate_Handle(LocalPlayer->GetControllerId(), FindFriendSessionCompleteDelegate);
+	else
+		return false;
+	OnlineSessionInterface->AddOnSessionUserInviteAcceptedDelegate_Handle(SessionUserInviteAcceptedDelegate);
+
 	return true;
 }
 
@@ -73,7 +83,7 @@ void AISMLobbyController::CreateSession()
 	}
 
 	// 델리게이트 연결
-	OnlineSessionInterface->AddOnCreateSessionCompleteDelegate_Handle(CreateSessionComplete);
+	OnlineSessionInterface->AddOnCreateSessionCompleteDelegate_Handle(CreateSessionCompleteDelegate);
 
 	TSharedPtr<FOnlineSessionSettings> SessionSettings = MakeShareable(new FOnlineSessionSettings());
 	SessionSettings->NumPublicConnections = 2;		// 허용되는 플레이어 수
@@ -107,7 +117,7 @@ void AISMLobbyController::OnCreateSessionComplete(FName SessionName, bool bWasSu
 	UGameplayStatics::OpenLevel(this, TEXT("ThirdPersonMap"), true, "Listen");
 }
 
-void AISMLobbyController::JoinSession()
+void AISMLobbyController::FindSession()
 {
 	if (OnlineSessionInterface.IsValid() == false)
 	{
@@ -116,7 +126,7 @@ void AISMLobbyController::JoinSession()
 	}
 
 	// 델리게이트 연결
-	OnlineSessionInterface->AddOnFindSessionsCompleteDelegate_Handle(FindSessionComplete);
+	OnlineSessionInterface->AddOnFindSessionsCompleteDelegate_Handle(FindSessionCompleteDelegate);
 
 	// Find Game Session
 	SessionSearch = MakeShareable(new FOnlineSessionSearch());
@@ -163,7 +173,7 @@ void AISMLobbyController::OnFindSessionComplete(bool bWasSuccessful)
 			LOG_SCREEN("Joining Match Type: %s", *MatchType);
 
 			// 델리게이트 연결
-			OnlineSessionInterface->AddOnJoinSessionCompleteDelegate_Handle(JoinSessionComplete);
+			OnlineSessionInterface->AddOnJoinSessionCompleteDelegate_Handle(JoinSessionCompleteDelegate);
 
 			// 세션 참가
 			if (const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController())
@@ -195,4 +205,64 @@ void AISMLobbyController::OnJoinSessionComplate(FName SessionName, EOnJoinSessio
 		if (APlayerController* PlayerController = GetGameInstance()->GetFirstLocalPlayerController())
 			PlayerController->ClientTravel(Address, ETravelType::TRAVEL_Absolute);
 	}
+}
+
+void AISMLobbyController::OnFindFriendSessionComplete(int32 LocalUserNum, bool bWasSuccessful, const TArray<FOnlineSessionSearchResult>& SearchResult)
+{
+	LOG_SCREEN("OnFindFriendSessionComplete called");
+
+	if (OnlineSessionInterface.IsValid() == false)
+	{
+		LOG_SCREEN("Session Interface is Invalid");
+		return;
+	}
+		
+	if (!bWasSuccessful)
+	{
+		LOG_SCREEN("Failed to find friend session");
+		return;
+	}
+
+	LOG_SCREEN("======== Search Result ========");
+
+	check(SearchResult.Num() == 1); // 세션이 1개여야 정상
+
+	FOnlineSessionSearchResult Result = SearchResult[0];
+	JoinSession(Result);
+}
+
+
+void AISMLobbyController::OnSessionUserInviteAccepted(const bool bWasSuccessful, const int32 ControllerId, FUniqueNetIdPtr UserId, const FOnlineSessionSearchResult& InviteResult)
+{
+	LOG_SCREEN("OnSessionUserInviteAccepted called");
+
+	if (OnlineSessionInterface.IsValid() == false)
+	{
+		LOG_SCREEN("Session Interface is Invalid");
+		return;
+	}
+
+	if (!bWasSuccessful)
+	{
+		LOG_SCREEN("Failed to find friend session");
+		return;
+	}
+
+	JoinSession(InviteResult);
+}
+
+void AISMLobbyController::JoinSession(const FOnlineSessionSearchResult& Result)
+{
+	if (!Result.IsValid())
+	{
+		LOG_SCREEN("Session is invalid");
+		return;
+	}
+
+	// 델리게이트 연결
+	OnlineSessionInterface->AddOnJoinSessionCompleteDelegate_Handle(JoinSessionCompleteDelegate);
+
+	// 세션 참가
+	if (const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController())
+		OnlineSessionInterface->JoinSession(*LocalPlayer->GetPreferredUniqueNetId(), NAME_GameSession, Result);
 }
