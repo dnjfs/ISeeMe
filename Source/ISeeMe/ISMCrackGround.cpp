@@ -49,7 +49,7 @@ void AISMCrackGround::Tick(float DeltaTime)
 		}
 		else if (RemainTime / CrackTime <= 0.5f)
 		{
-			MulticastSetClack(RemainTime / CrackTime);
+			MulticastChangeCrack(RemainTime / CrackTime);
 		}
 	}
 }
@@ -62,26 +62,18 @@ void AISMCrackGround::OnStep(UPrimitiveComponent* HitComp, AActor* OtherActor, U
 	UE_LOG(LogTemp, Warning, TEXT("On Step!"));
 
 	SetActorTickEnabled(true);
-	MulticastSetClacking(true);
+	MulticastSetCracking(true);
 }
 
 void AISMCrackGround::OnCracked()
 {
 	MulticastCrackAwake(true);
-	CrackGeometry->AddRadialImpulse(GetActorLocation(), 1000, 25000.0, RIF_Constant, false);
+	MulticastSpawnCrackPart();
 
-	/*FVector Location = FVector(GetActorLocation().X, GetActorLocation().Y, GetActorLocation().Z + 10);
-	FRotator Rotation = FRotator::ZeroRotator;  // 원하는 회전값 설정 (기본값으로 0도)
-
-	// BP_CrackPart 스폰
-	FActorSpawnParameters SpawnParams;
-	SpawnParams.Owner = this;
-	ACrackPart* SpawnedCrackPart = GetWorld()->SpawnActor<ACrackPart>(CrackPartClass, Location, Rotation, SpawnParams);
-	*/
 	isCrack = true;
 	FTimerHandle TimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]() {
-		this->CrackTimer();
+		this->RegenerateTimer();
 		}, CrackTime, false);
 
 
@@ -96,10 +88,10 @@ void AISMCrackGround::ResetTimer()
 	SetActorTickEnabled(false);
 
 	MulticastAwake(true);
-	MulticastSetClacking(false);
+	MulticastSetCracking(false);
 }
 
-void AISMCrackGround::CrackTimer()
+void AISMCrackGround::RegenerateTimer()
 {
 	if (CrackGeometry)
 	{
@@ -147,13 +139,13 @@ void AISMCrackGround::MulticastCrackAwake_Implementation(bool bInAwake)
 	}
 }
 
-void AISMCrackGround::MulticastSetClacking_Implementation(bool bInCracking)
+void AISMCrackGround::MulticastSetCracking_Implementation(bool bInCracking)
 {
 	if (GroundMesh)
 		GroundMesh->SetMaterial(0, bInCracking ? CrackingMaterial : BaseMaterial);
 }
 
-void AISMCrackGround::MulticastSetClack_Implementation(float crackState)
+void AISMCrackGround::MulticastChangeCrack_Implementation(float crackState)
 {
 	if (GroundMesh)
 	{
@@ -166,4 +158,15 @@ void AISMCrackGround::MulticastSetClack_Implementation(float crackState)
 			GroundMesh->SetMaterial(0, HalfCrackMaterial);
 		}
 	}
+}
+
+void AISMCrackGround::MulticastSpawnCrackPart_Implementation()
+{
+	FVector Location = GetActorLocation() + FVector(0.0f, 0.0f, 59.0f);  
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	FRotator Rotation = FRotator::ZeroRotator;
+
+	GetWorld()->SpawnActor<AFieldSystemActor>(CrackPartClass, Location, Rotation, SpawnParams);
 }

@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "GeometryCollection/GeometryCollectionComponent.h"
 #include "Components/SphereComponent.h"
+#include "Field/FieldSystemComponent.h"
 #include "ISMCrackGround.generated.h"
 
 UCLASS()
@@ -29,7 +30,7 @@ protected:
 
 	void ResetTimer();
 
-	void CrackTimer();
+	void RegenerateTimer();
 
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastAwake(bool bInAwake);
@@ -38,10 +39,13 @@ protected:
 	void MulticastCrackAwake(bool bInAwake);
 
 	UFUNCTION(NetMulticast, Unreliable)
-	void MulticastSetClack(float crackState);
+	void MulticastChangeCrack(float crackState);
 
 	UFUNCTION(NetMulticast, Unreliable)
-	void MulticastSetClacking(bool bInCracking);
+	void MulticastSetCracking(bool bInCracking);
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastSpawnCrackPart();
 
 public:
 	virtual void Tick(float DeltaTime) override;
@@ -67,6 +71,9 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UMaterialInterface> MostCrackMaterial;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AFieldSystemActor> CrackPartClass;
 
 
 	UPROPERTY(EditInstanceOnly, Category = GroundOption)
