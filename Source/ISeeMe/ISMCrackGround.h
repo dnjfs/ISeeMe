@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "GeometryCollection/GeometryCollectionComponent.h"
 #include "ISMCrackGround.generated.h"
 
 UCLASS()
@@ -24,8 +25,13 @@ protected:
 
 	void ResetTimer();
 
+	void CrackTimer();
+
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastAwake(bool bInAwake);
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastSetClack(float crackState);
 
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastSetClacking(bool bInCracking);
@@ -38,9 +44,23 @@ private:
 	TObjectPtr<UStaticMeshComponent> GroundMesh;
 
 	UPROPERTY(EditAnywhere)
+	TObjectPtr<UGeometryCollectionComponent> CrackGeometry;
+
+	UPROPERTY(EditAnywhere)
 	TObjectPtr<UMaterialInterface> BaseMaterial;
+
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UMaterialInterface> CrackingMaterial;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UMaterialInterface> FirstCrackMaterial;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UMaterialInterface> HalfCrackMaterial;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UMaterialInterface> MostCrackMaterial;
+
 
 	UPROPERTY(EditInstanceOnly, Category = GroundOption)
 	float CrackTime = 3.f;
