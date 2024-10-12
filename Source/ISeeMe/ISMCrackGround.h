@@ -4,6 +4,9 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+#include "GeometryCollection/GeometryCollectionComponent.h"
+#include "Components/SphereComponent.h"
+#include "Field/FieldSystemComponent.h"
 #include "ISMCrackGround.generated.h"
 
 UCLASS()
@@ -13,6 +16,9 @@ class ISEEME_API AISMCrackGround : public AActor
 	
 public:	
 	AISMCrackGround();
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	bool isCrack = false;
 
 protected:
 	virtual void BeginPlay() override;
@@ -24,11 +30,22 @@ protected:
 
 	void ResetTimer();
 
+	void RegenerateTimer();
+
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastAwake(bool bInAwake);
 
 	UFUNCTION(NetMulticast, Unreliable)
-	void MulticastSetClacking(bool bInCracking);
+	void MulticastCrackAwake(bool bInAwake);
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastChangeCrack(float crackState);
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastSetCracking(bool bInCracking);
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastSpawnCrackPart();
 
 public:
 	virtual void Tick(float DeltaTime) override;
@@ -38,9 +55,26 @@ private:
 	TObjectPtr<UStaticMeshComponent> GroundMesh;
 
 	UPROPERTY(EditAnywhere)
+	TObjectPtr<UGeometryCollectionComponent> CrackGeometry;
+
+	UPROPERTY(EditAnywhere)
 	TObjectPtr<UMaterialInterface> BaseMaterial;
+
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UMaterialInterface> CrackingMaterial;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UMaterialInterface> FirstCrackMaterial;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UMaterialInterface> HalfCrackMaterial;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UMaterialInterface> MostCrackMaterial;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<AFieldSystemActor> CrackPartClass;
+
 
 	UPROPERTY(EditInstanceOnly, Category = GroundOption)
 	float CrackTime = 3.f;
