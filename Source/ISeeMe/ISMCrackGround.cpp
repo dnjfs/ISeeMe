@@ -13,10 +13,8 @@ AISMCrackGround::AISMCrackGround()
 	GroundMesh->OnComponentHit.AddDynamic(this, &AISMCrackGround::OnStep);
 
 	RootComponent = GroundMesh;
-	
-	CrackGeometry = CreateDefaultSubobject<UGeometryCollectionComponent>(TEXT("CrackGeometry"));
-	CrackGeometry->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 
+	CrackGeometry = CreateDefaultSubobject<UGeometryCollectionComponent>(TEXT("CrackGeometry"));
 	MulticastCrackAwake(false);
 }
 
@@ -24,8 +22,12 @@ void AISMCrackGround::BeginPlay()
 {
 	Super::BeginPlay();
 
-	CrackGeometry->SetRelativeScale3D(FVector(1.0 / GroundMesh->GetComponentScale().X, 1.0 / GroundMesh->GetComponentScale().Y,
-		1.0 / GroundMesh->GetComponentScale().Z));
+	if (CrackGeometry)
+	{
+		CrackGeometry->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+		CrackGeometry->SetRelativeScale3D(FVector(1.0 / GroundMesh->GetComponentScale().X, 1.0 / GroundMesh->GetComponentScale().Y,
+			1.0 / GroundMesh->GetComponentScale().Z));
+	}
 
 	ResetTimer();
 }
@@ -38,7 +40,7 @@ void AISMCrackGround::Tick(float DeltaTime)
 	{
 		RemainTime -= DeltaTime;
 
-		if (RemainTime <= 0.f && crackStep == 3)
+		if (RemainTime <= 0.f)
 		{
 			OnCracked();
 
@@ -47,17 +49,13 @@ void AISMCrackGround::Tick(float DeltaTime)
 				this->ResetTimer();
 				}, DormantTime, false);
 		}
-		else if (RemainTime / CrackTime <= 0.2f && crackStep == 2)
+		else if (RemainTime / CrackTime <= 0.2f && GroundMesh->GetMaterial(0) == HalfCrackMaterial)
 		{
-			crackStep++;
 			MulticastChangeCrack(MostCrackMaterial);
-			UE_LOG(LogTemp, Warning, TEXT("Most!"));
 		}
-		else if (RemainTime / CrackTime <= 0.5f && crackStep == 1)
+		else if (RemainTime / CrackTime <= 0.5f && GroundMesh->GetMaterial(0) == FirstCrackMaterial)
 		{
-			crackStep++;
 			MulticastChangeCrack(HalfCrackMaterial);
-			UE_LOG(LogTemp, Warning, TEXT("Half!"));
 		}
 	}
 }
