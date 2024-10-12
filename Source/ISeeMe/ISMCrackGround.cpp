@@ -8,12 +8,12 @@
 AISMCrackGround::AISMCrackGround()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
+	
 	GroundMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Ground"));
 	GroundMesh->OnComponentHit.AddDynamic(this, &AISMCrackGround::OnStep);
 
 	RootComponent = GroundMesh;
-
+	
 	CrackGeometry = CreateDefaultSubobject<UGeometryCollectionComponent>(TEXT("CrackGeometry"));
 	CrackGeometry->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 
@@ -34,11 +34,11 @@ void AISMCrackGround::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (!isCrack)
+	if (!bIsCrack)
 	{
 		RemainTime -= DeltaTime;
 
-		if (RemainTime <= 0.f)
+		if (RemainTime <= 0.f && crackStep == 3)
 		{
 			OnCracked();
 
@@ -47,9 +47,17 @@ void AISMCrackGround::Tick(float DeltaTime)
 				this->ResetTimer();
 				}, DormantTime, false);
 		}
-		else if (RemainTime / CrackTime <= 0.5f)
+		else if (RemainTime / CrackTime <= 0.2f && crackStep == 2)
 		{
-			MulticastChangeCrack(RemainTime / CrackTime);
+			crackStep++;
+			MulticastChangeCrack(MostCrackMaterial);
+			UE_LOG(LogTemp, Warning, TEXT("Most!"));
+		}
+		else if (RemainTime / CrackTime <= 0.5f && crackStep == 1)
+		{
+			crackStep++;
+			MulticastChangeCrack(HalfCrackMaterial);
+			UE_LOG(LogTemp, Warning, TEXT("Half!"));
 		}
 	}
 }
@@ -70,11 +78,11 @@ void AISMCrackGround::OnCracked()
 	MulticastCrackAwake(true);
 	MulticastSpawnCrackPart();
 
-	isCrack = true;
+	bIsCrack = true;
 	FTimerHandle TimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]() {
-		this->RegenerateTimer();
-		}, CrackTime, false);
+		this->CrackDestroyTimer();
+		}, CrackLifeTime, false);
 
 
 	SetActorTickEnabled(true);
@@ -89,11 +97,13 @@ void AISMCrackGround::ResetTimer()
 
 	MulticastAwake(true);
 	MulticastSetCracking(false);
+
+	crackStep = 1;
 }
 
-void AISMCrackGround::RegenerateTimer()
+void AISMCrackGround::CrackDestroyTimer()
 {
-	if (CrackGeometry)
+	if (CrackGeometry && GroundMesh)
 	{
 		TObjectPtr<UGeometryCollection> SavedRestCollection = DuplicateObject<UGeometryCollection>(CrackGeometry->RestCollection, nullptr);
 
@@ -115,48 +125,41 @@ void AISMCrackGround::RegenerateTimer()
 
 		MulticastCrackAwake(false);
 		SetActorTickEnabled(false);
-		isCrack = false;
+		bIsCrack = false;
 	}
 }
 
-void AISMCrackGround::MulticastAwake_Implementation(bool bInAwake)
+void AISMCrackGround::MulticastAwake_Implementation(bool BInAwake)
 {
 	if (GroundMesh)
 	{
-		GroundMesh->SetVisibility(bInAwake);
-		GroundMesh->SetCollisionEnabled(bInAwake ? ECollisionEnabled::QueryOnly : ECollisionEnabled::NoCollision);
+		GroundMesh->SetVisibility(BInAwake);
+		GroundMesh->SetCollisionEnabled(BInAwake ? ECollisionEnabled::QueryOnly : ECollisionEnabled::NoCollision);
 	}
 }
 
-void AISMCrackGround::MulticastCrackAwake_Implementation(bool bInAwake)
+void AISMCrackGround::MulticastCrackAwake_Implementation(bool BInAwake)
 {
 	if (CrackGeometry)
 	{
-		CrackGeometry->SetSimulatePhysics(bInAwake);
-		CrackGeometry->SetEnableGravity(bInAwake);
-		CrackGeometry->SetVisibility(bInAwake);
-		CrackGeometry->SetCollisionEnabled(bInAwake ? ECollisionEnabled::QueryAndPhysics : ECollisionEnabled::NoCollision);
+		CrackGeometry->SetSimulatePhysics(BInAwake);
+		CrackGeometry->SetEnableGravity(BInAwake);
+		CrackGeometry->SetVisibility(BInAwake);
+		CrackGeometry->SetCollisionEnabled(BInAwake ? ECollisionEnabled::QueryAndPhysics : ECollisionEnabled::NoCollision);
 	}
 }
 
-void AISMCrackGround::MulticastSetCracking_Implementation(bool bInCracking)
+void AISMCrackGround::MulticastSetCracking_Implementation(bool BInCracking)
 {
 	if (GroundMesh)
-		GroundMesh->SetMaterial(0, bInCracking ? CrackingMaterial : BaseMaterial);
+		GroundMesh->SetMaterial(0, BInCracking ? FirstCrackMaterial : BaseMaterial);
 }
 
-void AISMCrackGround::MulticastChangeCrack_Implementation(float crackState)
+void AISMCrackGround::MulticastChangeCrack_Implementation(UMaterialInterface* ChangeMaterial)
 {
 	if (GroundMesh)
 	{
-		if (crackState < 0.2f)
-		{
-			GroundMesh->SetMaterial(0, MostCrackMaterial);
-		}
-		else if (crackState < 0.5f)
-		{
-			GroundMesh->SetMaterial(0, HalfCrackMaterial);
-		}
+		GroundMesh->SetMaterial(0, ChangeMaterial);
 	}
 }
 
