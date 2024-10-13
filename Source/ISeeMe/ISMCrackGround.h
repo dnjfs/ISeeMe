@@ -30,16 +30,16 @@ protected:
 	void CrackDestroyTimer();
 
 	UFUNCTION(NetMulticast, Unreliable)
-	void MulticastAwake(bool BInAwake);
+	void MulticastAwake(bool bInAwake);
 
 	UFUNCTION(NetMulticast, Unreliable)
-	void MulticastCrackAwake(bool BInAwake);
+	void MulticastCrackAwake(bool bInAwake);
 
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastChangeCrack(UMaterialInterface* ChangeMaterial);
 
 	UFUNCTION(NetMulticast, Unreliable)
-	void MulticastSetCracking(bool BInCracking);
+	void MulticastSetCracking(bool bInCracking);
 
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastSpawnCrackPart();
@@ -69,12 +69,13 @@ private:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AFieldSystemActor> CrackPartClass;
 
-
 	UPROPERTY(EditInstanceOnly, Category = GroundOption)
 	float CrackTime = 3.f;
 
 	UPROPERTY(EditInstanceOnly, Category = GroundOption)
 	float DormantTime = 10.f;
+
+	AFieldSystemActor* CrackPartActor;
 
 	float RemainTime = 0.f;
 

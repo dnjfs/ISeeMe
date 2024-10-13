@@ -127,30 +127,30 @@ void AISMCrackGround::CrackDestroyTimer()
 	}
 }
 
-void AISMCrackGround::MulticastAwake_Implementation(bool BInAwake)
+void AISMCrackGround::MulticastAwake_Implementation(bool bInAwake)
 {
 	if (GroundMesh)
 	{
-		GroundMesh->SetVisibility(BInAwake);
-		GroundMesh->SetCollisionEnabled(BInAwake ? ECollisionEnabled::QueryOnly : ECollisionEnabled::NoCollision);
+		GroundMesh->SetVisibility(bInAwake);
+		GroundMesh->SetCollisionEnabled(bInAwake ? ECollisionEnabled::QueryOnly : ECollisionEnabled::NoCollision);
 	}
 }
 
-void AISMCrackGround::MulticastCrackAwake_Implementation(bool BInAwake)
+void AISMCrackGround::MulticastCrackAwake_Implementation(bool bInAwake)
 {
 	if (CrackGeometry)
 	{
-		CrackGeometry->SetSimulatePhysics(BInAwake);
-		CrackGeometry->SetEnableGravity(BInAwake);
-		CrackGeometry->SetVisibility(BInAwake);
-		CrackGeometry->SetCollisionEnabled(BInAwake ? ECollisionEnabled::QueryAndPhysics : ECollisionEnabled::NoCollision);
+		CrackGeometry->SetSimulatePhysics(bInAwake);
+		CrackGeometry->SetEnableGravity(bInAwake);
+		CrackGeometry->SetVisibility(bInAwake);
+		CrackGeometry->SetCollisionEnabled(bInAwake ? ECollisionEnabled::QueryAndPhysics : ECollisionEnabled::NoCollision);
 	}
 }
 
-void AISMCrackGround::MulticastSetCracking_Implementation(bool BInCracking)
+void AISMCrackGround::MulticastSetCracking_Implementation(bool bInCracking)
 {
 	if (GroundMesh)
-		GroundMesh->SetMaterial(0, BInCracking ? FirstCrackMaterial : BaseMaterial);
+		GroundMesh->SetMaterial(0, bInCracking ? FirstCrackMaterial : BaseMaterial);
 }
 
 void AISMCrackGround::MulticastChangeCrack_Implementation(UMaterialInterface* ChangeMaterial)
@@ -169,5 +169,13 @@ void AISMCrackGround::MulticastSpawnCrackPart_Implementation()
 	SpawnParams.Owner = this;
 	FRotator Rotation = FRotator::ZeroRotator;
 
-	GetWorld()->SpawnActor<AFieldSystemActor>(CrackPartClass, Location, Rotation, SpawnParams);
+	CrackPartActor = GetWorld()->SpawnActor<AFieldSystemActor>(CrackPartClass, Location, Rotation, SpawnParams);
+	FTimerHandle TimerHandle;
+
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]() {
+		if (CrackPartActor)
+		{
+			CrackPartActor->Destroy();
+		}
+		}, 1, false);
 }
