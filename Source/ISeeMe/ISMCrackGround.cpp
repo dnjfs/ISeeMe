@@ -8,15 +8,13 @@
 AISMCrackGround::AISMCrackGround()
 {
 	PrimaryActorTick.bCanEverTick = true;
-
+	
 	GroundMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Ground"));
 	GroundMesh->OnComponentHit.AddDynamic(this, &AISMCrackGround::OnStep);
 
 	RootComponent = GroundMesh;
 
 	CrackGeometry = CreateDefaultSubobject<UGeometryCollectionComponent>(TEXT("CrackGeometry"));
-	CrackGeometry->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
-
 	MulticastCrackAwake(false);
 }
 
@@ -24,8 +22,12 @@ void AISMCrackGround::BeginPlay()
 {
 	Super::BeginPlay();
 
-	CrackGeometry->SetRelativeScale3D(FVector(1.0 / GroundMesh->GetComponentScale().X, 1.0 / GroundMesh->GetComponentScale().Y,
-		1.0 / GroundMesh->GetComponentScale().Z));
+	if (CrackGeometry)
+	{
+		CrackGeometry->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+		CrackGeometry->SetRelativeScale3D(FVector(1.0 / GroundMesh->GetComponentScale().X, 1.0 / GroundMesh->GetComponentScale().Y,
+			1.0 / GroundMesh->GetComponentScale().Z));
+	}
 
 	ResetTimer();
 }
@@ -34,7 +36,7 @@ void AISMCrackGround::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if (!isCrack)
+	if (!bIsCrack)
 	{
 		RemainTime -= DeltaTime;
 
@@ -47,9 +49,13 @@ void AISMCrackGround::Tick(float DeltaTime)
 				this->ResetTimer();
 				}, DormantTime, false);
 		}
-		else if (RemainTime / CrackTime <= 0.5f)
+		else if (RemainTime / CrackTime <= 0.2f && GroundMesh->GetMaterial(0) == HalfCrackMaterial)
 		{
-			MulticastChangeCrack(RemainTime / CrackTime);
+			MulticastChangeCrack(MostCrackMaterial);
+		}
+		else if (RemainTime / CrackTime <= 0.5f && GroundMesh->GetMaterial(0) == FirstCrackMaterial)
+		{
+			MulticastChangeCrack(HalfCrackMaterial);
 		}
 	}
 }
@@ -70,11 +76,11 @@ void AISMCrackGround::OnCracked()
 	MulticastCrackAwake(true);
 	MulticastSpawnCrackPart();
 
-	isCrack = true;
+	bIsCrack = true;
 	FTimerHandle TimerHandle;
 	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]() {
-		this->RegenerateTimer();
-		}, CrackTime, false);
+		this->CrackDestroyTimer();
+		}, CrackLifeTime, false);
 
 
 	SetActorTickEnabled(true);
@@ -89,11 +95,13 @@ void AISMCrackGround::ResetTimer()
 
 	MulticastAwake(true);
 	MulticastSetCracking(false);
+
+	crackStep = 1;
 }
 
-void AISMCrackGround::RegenerateTimer()
+void AISMCrackGround::CrackDestroyTimer()
 {
-	if (CrackGeometry)
+	if (CrackGeometry && GroundMesh)
 	{
 		TObjectPtr<UGeometryCollection> SavedRestCollection = DuplicateObject<UGeometryCollection>(CrackGeometry->RestCollection, nullptr);
 
@@ -115,7 +123,7 @@ void AISMCrackGround::RegenerateTimer()
 
 		MulticastCrackAwake(false);
 		SetActorTickEnabled(false);
-		isCrack = false;
+		bIsCrack = false;
 	}
 }
 
@@ -142,21 +150,14 @@ void AISMCrackGround::MulticastCrackAwake_Implementation(bool bInAwake)
 void AISMCrackGround::MulticastSetCracking_Implementation(bool bInCracking)
 {
 	if (GroundMesh)
-		GroundMesh->SetMaterial(0, bInCracking ? CrackingMaterial : BaseMaterial);
+		GroundMesh->SetMaterial(0, bInCracking ? FirstCrackMaterial : BaseMaterial);
 }
 
-void AISMCrackGround::MulticastChangeCrack_Implementation(float crackState)
+void AISMCrackGround::MulticastChangeCrack_Implementation(UMaterialInterface* ChangeMaterial)
 {
 	if (GroundMesh)
 	{
-		if (crackState < 0.2f)
-		{
-			GroundMesh->SetMaterial(0, MostCrackMaterial);
-		}
-		else if (crackState < 0.5f)
-		{
-			GroundMesh->SetMaterial(0, HalfCrackMaterial);
-		}
+		GroundMesh->SetMaterial(0, ChangeMaterial);
 	}
 }
 
@@ -168,5 +169,13 @@ void AISMCrackGround::MulticastSpawnCrackPart_Implementation()
 	SpawnParams.Owner = this;
 	FRotator Rotation = FRotator::ZeroRotator;
 
-	GetWorld()->SpawnActor<AFieldSystemActor>(CrackPartClass, Location, Rotation, SpawnParams);
+	CrackPartActor = GetWorld()->SpawnActor<AFieldSystemActor>(CrackPartClass, Location, Rotation, SpawnParams);
+	FTimerHandle TimerHandle;
+
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]() {
+		if (CrackPartActor)
+		{
+			CrackPartActor->Destroy();
+		}
+		}, 1, false);
 }

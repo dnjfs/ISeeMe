@@ -17,9 +17,6 @@ class ISEEME_API AISMCrackGround : public AActor
 public:	
 	AISMCrackGround();
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	bool isCrack = false;
-
 protected:
 	virtual void BeginPlay() override;
 
@@ -30,7 +27,7 @@ protected:
 
 	void ResetTimer();
 
-	void RegenerateTimer();
+	void CrackDestroyTimer();
 
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastAwake(bool bInAwake);
@@ -39,7 +36,7 @@ protected:
 	void MulticastCrackAwake(bool bInAwake);
 
 	UFUNCTION(NetMulticast, Unreliable)
-	void MulticastChangeCrack(float crackState);
+	void MulticastChangeCrack(UMaterialInterface* ChangeMaterial);
 
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastSetCracking(bool bInCracking);
@@ -61,9 +58,6 @@ private:
 	TObjectPtr<UMaterialInterface> BaseMaterial;
 
 	UPROPERTY(EditAnywhere)
-	TObjectPtr<UMaterialInterface> CrackingMaterial;
-
-	UPROPERTY(EditAnywhere)
 	TObjectPtr<UMaterialInterface> FirstCrackMaterial;
 
 	UPROPERTY(EditAnywhere)
@@ -75,12 +69,19 @@ private:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<AFieldSystemActor> CrackPartClass;
 
-
 	UPROPERTY(EditInstanceOnly, Category = GroundOption)
 	float CrackTime = 3.f;
 
 	UPROPERTY(EditInstanceOnly, Category = GroundOption)
 	float DormantTime = 10.f;
 
+	AFieldSystemActor* CrackPartActor;
+
 	float RemainTime = 0.f;
+
+	float CrackLifeTime = 3.f;
+
+	bool bIsCrack = false;
+
+	int8 crackStep = 1;
 };
