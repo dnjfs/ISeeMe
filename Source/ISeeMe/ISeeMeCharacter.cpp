@@ -12,8 +12,14 @@
 #include "InputActionValue.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "ISMPlayerController.h"
+#include "OnlineSubsystem.h"
+#include "OnlineSubsystemUtils.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
+
+#define	LOG_SCREEN(Format, ...) \
+	if (GEngine)\
+		GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT(Format), ##__VA_ARGS__))
 
 //////////////////////////////////////////////////////////////////////////
 // AISeeMeCharacter
@@ -60,6 +66,33 @@ void AISeeMeCharacter::BeginPlay()
 	if (GetController() && GetController()->IsLocalController())
 		if (GetMesh())
 			GetMesh()->SetRenderCustomDepth(true);
+
+	if (InitVoiceChat())
+	{
+		LOG_SCREEN("Init voice chat success");
+	}
+	else
+	{
+		LOG_SCREEN("Init voice chat fail");
+	}
+}
+
+bool AISeeMeCharacter::InitVoiceChat()
+{
+	if (IOnlineSubsystem* OSS = IOnlineSubsystem::Get())
+	{
+		if (OnlineVoicePtr = OSS->GetVoiceInterface())
+		{
+			if (const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController())
+			{
+				if (OnlineVoicePtr->RegisterRemoteTalker(*LocalPlayer->GetPreferredUniqueNetId()))
+				{
+					return true;
+				}
+			}
+		}
+	}
+	return false;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -89,7 +122,12 @@ void AISeeMeCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		// Looking
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AISeeMeCharacter::Look);
 
+		// Focus
 		EnhancedInputComponent->BindAction(FocusAction, ETriggerEvent::Triggered, this, &AISeeMeCharacter::Focus);
+
+		// ToggleVoice
+		EnhancedInputComponent->BindAction(ToggleVoiceAction, ETriggerEvent::Started, this, &AISeeMeCharacter::EnableVoice);
+		EnhancedInputComponent->BindAction(ToggleVoiceAction, ETriggerEvent::Triggered, this, &AISeeMeCharacter::DisableVoice);
 	}
 	else
 	{
@@ -144,6 +182,28 @@ void AISeeMeCharacter::Focus()
 		{
 			float NewYaw = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), OtherCharacter->GetActorLocation()).Yaw;
 			GetController()->SetControlRotation(FRotator(0.f, NewYaw, 0.f));
+		}
+	}
+}
+
+void AISeeMeCharacter::EnableVoice()
+{
+	if (OnlineVoicePtr)
+	{
+		if (const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController())
+		{
+			OnlineVoicePtr->StartNetworkedVoice(LocalPlayer->GetLocalPlayerIndex());
+		}
+	}
+}
+
+void AISeeMeCharacter::DisableVoice()
+{
+	if (OnlineVoicePtr)
+	{
+		if (const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController())
+		{
+			OnlineVoicePtr->StopNetworkedVoice(LocalPlayer->GetLocalPlayerIndex());
 		}
 	}
 }
