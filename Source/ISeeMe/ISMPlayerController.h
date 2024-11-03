@@ -29,6 +29,12 @@ public:
 	UFUNCTION()
 	void OnRep_SwapCamera();
 
+	UFUNCTION()
+	void SwapCamera();
+
+	UFUNCTION(Server, Reliable)
+	void ServerCallSwapCamera();
+
 private:
 	UPROPERTY(ReplicatedUsing = OnRep_SwapCamera)
 	TObjectPtr<class ACharacter> OtherCharacter;

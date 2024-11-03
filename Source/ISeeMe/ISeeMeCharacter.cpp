@@ -14,6 +14,9 @@
 #include "ISMPlayerController.h"
 #include "OnlineSubsystem.h"
 #include "OnlineSubsystemUtils.h"
+#include <GameFramework/GameMode.h>
+#include <Kismet/GameplayStatics.h>
+#include "ISeeMeGameMode.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -128,6 +131,10 @@ void AISeeMeCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		// ToggleVoice
 		EnhancedInputComponent->BindAction(ToggleVoiceAction, ETriggerEvent::Started, this, &AISeeMeCharacter::EnableVoice);
 		EnhancedInputComponent->BindAction(ToggleVoiceAction, ETriggerEvent::Triggered, this, &AISeeMeCharacter::DisableVoice);
+	
+		EnhancedInputComponent->BindAction(SwapCameraAction, ETriggerEvent::Started, this, &AISeeMeCharacter::SwapCamera);
+
+		EnhancedInputComponent->BindAction(SwapAspectAction, ETriggerEvent::Started, this, &AISeeMeCharacter::SwapAspect);
 	}
 	else
 	{
@@ -207,3 +214,42 @@ void AISeeMeCharacter::DisableVoice()
 		}
 	}
 }
+
+void AISeeMeCharacter::SwapCamera()
+{
+	if (HasAuthority())
+	{
+		if (AISeeMeGameMode* GM = Cast<AISeeMeGameMode>(GetWorld()->GetAuthGameMode()))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Server Swap Camera"));
+			GM->SwapCamera();
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Client Swap Camera"));
+
+		AISMPlayerController* PC = Cast<AISMPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+		ACharacter* Character = PC->GetCharacter();
+		PC->ServerCallSwapCamera();
+	}
+}
+
+void AISeeMeCharacter::SwapAspect()
+{
+	if (bFirstAspect)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Third Aspect"));
+		CameraBoom->TargetArmLength = 400.0f;
+		FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
+	}
+	else
+	{
+		CameraBoom->TargetArmLength = 0;
+		FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
+		FollowCamera->AttachToComponent(GetMesh(), AttachmentRules, FName("headSocket"));
+
+	}
+	bFirstAspect = !bFirstAspect;
+}
+

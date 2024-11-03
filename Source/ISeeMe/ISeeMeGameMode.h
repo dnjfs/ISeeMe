@@ -14,6 +14,8 @@ class AISeeMeGameMode : public AGameModeBase
 public:
 	AISeeMeGameMode();
 	void SwapCamera();
+
+	bool bSwapCamera = true;
 };
 
 

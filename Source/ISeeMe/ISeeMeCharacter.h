@@ -43,6 +43,10 @@ protected:
 
 	void DisableVoice();
 
+	void SwapCamera();
+
+	void SwapAspect();
+
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
@@ -50,6 +54,8 @@ protected:
 	virtual void BeginPlay();
 
 	bool InitVoiceChat();
+
+	bool bFirstAspect = false;
 
 private:
 	/* Voice Chat */
@@ -84,5 +90,11 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* ToggleVoiceAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* SwapCameraAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* SwapAspectAction;
 };
 

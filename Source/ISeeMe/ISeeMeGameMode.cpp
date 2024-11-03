@@ -39,9 +39,21 @@ void AISeeMeGameMode::SwapCamera()
 
 	// 카메라 스왑
 	int PlayerNum = PCs.Num();
-	for (int i = 0; i < PlayerNum; i++)
+	if (bSwapCamera)
 	{
-		PCs[i]->SetViewTarget(Characters[(i+1 < PlayerNum) ? i+1 : 0]);
-		PCs[i]->SetOtherCharacter(Characters[(i+1 < PlayerNum) ? i+1 : 0]);
+		for (int i = 0; i < PlayerNum; i++)
+		{
+			PCs[i]->SetViewTarget(Characters[i]);
+			PCs[i]->SetOtherCharacter(Characters[i]);
+		}
 	}
+	else
+	{
+		for (int i = 0; i < PlayerNum; i++)
+		{
+			PCs[i]->SetViewTarget(Characters[(i + 1 < PlayerNum) ? i + 1 : 0]);
+			PCs[i]->SetOtherCharacter(Characters[(i + 1 < PlayerNum) ? i + 1 : 0]);
+		}
+	}
+	bSwapCamera = !bSwapCamera;
 }

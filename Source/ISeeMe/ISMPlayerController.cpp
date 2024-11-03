@@ -27,8 +27,7 @@ void AISMPlayerController::OnPossess(APawn* aPawn)
 	Super::OnPossess(aPawn);
 
 	if (HasAuthority())
-		if (AISeeMeGameMode* GM = Cast<AISeeMeGameMode>(GetWorld()->GetAuthGameMode()))
-			GM->SwapCamera();
+		SwapCamera();
 }
 
 void AISMPlayerController::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
@@ -46,4 +45,15 @@ void AISMPlayerController::OnRep_SwapCamera()
 	SetViewTarget(OtherCharacter);
 
 	UE_LOG(LogTemp, Warning, TEXT("Camera Swap Success!"));
+}
+
+void AISMPlayerController::SwapCamera()
+{
+	if (AISeeMeGameMode* GM = Cast<AISeeMeGameMode>(GetWorld()->GetAuthGameMode()))
+		GM->SwapCamera();
+}
+
+void AISMPlayerController::ServerCallSwapCamera_Implementation()
+{
+	SwapCamera();
 }
