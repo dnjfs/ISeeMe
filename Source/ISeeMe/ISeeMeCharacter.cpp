@@ -217,6 +217,11 @@ void AISeeMeCharacter::DisableVoice()
 
 void AISeeMeCharacter::SwapCamera()
 {
+	AISMPlayerController* PC = Cast<AISMPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	
+	if (PC->OtherCharacter)
+		PC->OtherCharacter->GetMesh()->UnHideBoneByName(FName("neck_01"));
+
 	if (HasAuthority())
 	{
 		if (AISeeMeGameMode* GM = Cast<AISeeMeGameMode>(GetWorld()->GetAuthGameMode()))
@@ -226,35 +231,18 @@ void AISeeMeCharacter::SwapCamera()
 	}
 	else
 	{
-		AISMPlayerController* PC = Cast<AISMPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 		PC->ServerCallSwapCamera();
 	}
 }
 
 void AISeeMeCharacter::SwapAspect()
 {
-	if (AISMPlayerController* PC = Cast<AISMPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0)))
+	AISMPlayerController* PC = Cast<AISMPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
+	if (PC->OtherCharacter && PC->OtherCharacter->GetMesh())
 	{
+		PC->OtherCharacter->GetMesh()->UnHideBoneByName(FName("neck_01"));
+		UE_LOG(LogTemp, Warning, TEXT("%s : UnHide"), *this->GetName());
 		PC->SwapAspect();
 	}
-	/*if (bFirstAspect)
-	{
-		if (AISMPlayerController* PC = Cast<AISMPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0)))
-		{
-			PC->SwapAspect();
-		}
-		//CameraBoom->TargetArmLength = 400.0f;
-		//FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
-		//FollowCamera->AttachToComponent(CameraBoom, AttachmentRules, USpringArmComponent::SocketName);
-	}
-	else
-	{
-		if (AISMPlayerController* PC = Cast<AISMPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0)))
-		{
-			PC->SwapAspect();
-		}
-		//FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
-		//FollowCamera->AttachToComponent(GetMesh(), AttachmentRules, FName("headSocket"));
-	}*/
 }
 
