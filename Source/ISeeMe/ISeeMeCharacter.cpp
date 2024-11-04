@@ -222,14 +222,12 @@ void AISeeMeCharacter::SwapCamera()
 		if (AISeeMeGameMode* GM = Cast<AISeeMeGameMode>(GetWorld()->GetAuthGameMode()))
 		{
 			GM->SwapCamera();
-			CurrentAspect();
 		}
 	}
 	else
 	{
 		AISMPlayerController* PC = Cast<AISMPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 		PC->ServerCallSwapCamera();
-		CurrentAspect();
 	}
 }
 
