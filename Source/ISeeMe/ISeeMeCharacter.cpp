@@ -219,9 +219,6 @@ void AISeeMeCharacter::SwapCamera()
 {
 	AISMPlayerController* PC = Cast<AISMPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
 	
-	if (PC->OtherCharacter)
-		PC->OtherCharacter->GetMesh()->UnHideBoneByName(FName("neck_01"));
-
 	if (HasAuthority())
 	{
 		if (AISeeMeGameMode* GM = Cast<AISeeMeGameMode>(GetWorld()->GetAuthGameMode()))
@@ -241,7 +238,6 @@ void AISeeMeCharacter::SwapAspect()
 	if (PC->OtherCharacter && PC->OtherCharacter->GetMesh())
 	{
 		PC->OtherCharacter->GetMesh()->UnHideBoneByName(FName("neck_01"));
-		UE_LOG(LogTemp, Warning, TEXT("%s : UnHide"), *this->GetName());
 		PC->SwapAspect();
 	}
 }

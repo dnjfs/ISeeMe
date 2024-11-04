@@ -73,11 +73,6 @@ void AISMPlayerController::SwapAspect()
 			if (OtherCharacter && OtherCharacter->GetMesh())
 			{
 				OtherCharacter->GetMesh()->HideBoneByName(FName("neck_01"), EPhysBodyOp::PBO_None);
-				UE_LOG(LogTemp, Warning, TEXT("OtherCharacter or its mesh is exist"));
-			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("OtherCharacter or its mesh is null"));
 			}
 		}
 	}
@@ -102,10 +97,6 @@ void AISMPlayerController::CurrentAspect()
 			{
 				OtherCharacter->GetMesh()->HideBoneByName(FName("neck_01"), EPhysBodyOp::PBO_None);
 			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("OtherCharacter or its mesh is null"));
-			}
 		}
 	}
 }
@@ -115,7 +106,7 @@ void AISMPlayerController::ServerCallSwapCamera_Implementation()
 	SwapCamera();
 }
 
-void AISMPlayerController::ClientCallSwapAspect_Implementation()
+void AISMPlayerController::RecoverAspect_Implementation()
 {
 	if (OtherCharacter)
 		OtherCharacter->GetMesh()->UnHideBoneByName(FName("neck_01"));

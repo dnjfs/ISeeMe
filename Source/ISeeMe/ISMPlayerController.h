@@ -36,8 +36,8 @@ public:
 	UFUNCTION(Server, Reliable)
 	void ServerCallSwapCamera();
 
-	UFUNCTION(Client, UnReliable)
-	void ClientCallSwapAspect();
+	UFUNCTION(NetMulticast, Reliable)
+	void RecoverAspect();
 
 	UFUNCTION()
 	void SwapAspect();

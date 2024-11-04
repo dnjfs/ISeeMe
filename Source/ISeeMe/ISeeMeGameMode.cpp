@@ -48,29 +48,17 @@ void AISeeMeGameMode::SwapCamera()
 	{
 		for (int i = 0; i < PlayerNum; i++)
 		{
-			if (PCs[i]->OtherCharacter)
-			{
-				PCs[i]->ClientCallSwapAspect();
-				PCs[i]->OtherCharacter->GetMesh()->UnHideBoneByName(FName("neck_01"));
-			}
+			PCs[i]->RecoverAspect();
 			PCs[i]->SetViewTarget(Characters[i]);
 			PCs[i]->SetOtherCharacter(Characters[i]);
 			PCs[i]->CurrentAspect();
-			if (PCs[i]->OtherCharacter)
-			{
-				UE_LOG(LogTemp, Warning, TEXT("%s : %s"), *PCs[i]->GetName(), *PCs[i]->OtherCharacter.GetName());
-			}
 		}
 	}
 	else
 	{
 		for (int i = 0; i < PlayerNum; i++)
 		{
-			if (PCs[i]->OtherCharacter)
-			{
-				PCs[i]->ClientCallSwapAspect();
-				PCs[i]->OtherCharacter->GetMesh()->UnHideBoneByName(FName("neck_01"));
-			}
+			PCs[i]->RecoverAspect();
 			PCs[i]->SetViewTarget(Characters[(i + 1 < PlayerNum) ? i + 1 : 0]);
 			PCs[i]->SetOtherCharacter(Characters[(i + 1 < PlayerNum) ? i + 1 : 0]);
 			PCs[i]->CurrentAspect();
