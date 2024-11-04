@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "ISeeMeCharacter.h"
 #include "ISMPlayerController.generated.h"
 
 class ACharacter;
@@ -23,8 +24,8 @@ protected:
 	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 
 public:
-	void SetOtherCharacter(ACharacter* NewCharacter) { OtherCharacter = NewCharacter; }
-	ACharacter* GetOtherCharacter() { return OtherCharacter; }
+	void SetOtherCharacter(AISeeMeCharacter* NewCharacter) { OtherCharacter = NewCharacter; }
+	AISeeMeCharacter* GetOtherCharacter() { return OtherCharacter; }
 
 	UFUNCTION()
 	void OnRep_SwapCamera();
@@ -35,7 +36,15 @@ public:
 	UFUNCTION(Server, Reliable)
 	void ServerCallSwapCamera();
 
-private:
+	UFUNCTION()
+	void SwapAspect();
+
+	UFUNCTION()
+	void CurrentAspect();
+
 	UPROPERTY(ReplicatedUsing = OnRep_SwapCamera)
-	TObjectPtr<class ACharacter> OtherCharacter;
+	TObjectPtr<class AISeeMeCharacter> OtherCharacter;
+
+private:
+	bool bFirstAspect = false;
 };

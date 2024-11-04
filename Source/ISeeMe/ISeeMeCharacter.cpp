@@ -221,35 +221,42 @@ void AISeeMeCharacter::SwapCamera()
 	{
 		if (AISeeMeGameMode* GM = Cast<AISeeMeGameMode>(GetWorld()->GetAuthGameMode()))
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Server Swap Camera"));
 			GM->SwapCamera();
+			CurrentAspect();
 		}
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Client Swap Camera"));
-
 		AISMPlayerController* PC = Cast<AISMPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0));
-		ACharacter* Character = PC->GetCharacter();
 		PC->ServerCallSwapCamera();
+		CurrentAspect();
 	}
 }
 
 void AISeeMeCharacter::SwapAspect()
 {
-	if (bFirstAspect)
+	if (AISMPlayerController* PC = Cast<AISMPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0)))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Third Aspect"));
-		CameraBoom->TargetArmLength = 400.0f;
-		FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName);
+		PC->SwapAspect();
+	}
+	/*if (bFirstAspect)
+	{
+		if (AISMPlayerController* PC = Cast<AISMPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0)))
+		{
+			PC->SwapAspect();
+		}
+		//CameraBoom->TargetArmLength = 400.0f;
+		//FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
+		//FollowCamera->AttachToComponent(CameraBoom, AttachmentRules, USpringArmComponent::SocketName);
 	}
 	else
 	{
-		CameraBoom->TargetArmLength = 0;
-		FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
-		FollowCamera->AttachToComponent(GetMesh(), AttachmentRules, FName("headSocket"));
-
-	}
-	bFirstAspect = !bFirstAspect;
+		if (AISMPlayerController* PC = Cast<AISMPlayerController>(UGameplayStatics::GetPlayerController(GetWorld(), 0)))
+		{
+			PC->SwapAspect();
+		}
+		//FAttachmentTransformRules AttachmentRules(EAttachmentRule::SnapToTarget, true);
+		//FollowCamera->AttachToComponent(GetMesh(), AttachmentRules, FName("headSocket"));
+	}*/
 }
 

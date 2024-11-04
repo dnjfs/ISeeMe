@@ -21,7 +21,7 @@ void AISeeMeGameMode::SwapCamera()
 	int32 CurrentPlayers = GetNumPlayers();
 
 	TArray<AISMPlayerController*> PCs;
-	TArray<ACharacter*> Characters;
+	TArray<AISeeMeCharacter*> Characters;
 
 	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 	{
@@ -29,12 +29,17 @@ void AISeeMeGameMode::SwapCamera()
 		if (PC == nullptr)
 			continue;
 
-		ACharacter* Character = PC->GetCharacter();
-		if (Character == nullptr)
+		ACharacter* BaseCharacter = PC->GetCharacter();
+
+		if (BaseCharacter == nullptr)
 			continue;
 
-		PCs.Add(PC);
-		Characters.Add(Character);
+		if (BaseCharacter && BaseCharacter->IsA(AISeeMeCharacter::StaticClass()))
+		{
+			AISeeMeCharacter* Character = Cast<AISeeMeCharacter>(BaseCharacter);
+			PCs.Add(PC);
+			Characters.Add(Character);
+		}
 	}
 
 	// 카메라 스왑
@@ -45,6 +50,7 @@ void AISeeMeGameMode::SwapCamera()
 		{
 			PCs[i]->SetViewTarget(Characters[i]);
 			PCs[i]->SetOtherCharacter(Characters[i]);
+			PCs[i]->CurrentAspect();
 		}
 	}
 	else
@@ -53,6 +59,7 @@ void AISeeMeGameMode::SwapCamera()
 		{
 			PCs[i]->SetViewTarget(Characters[(i + 1 < PlayerNum) ? i + 1 : 0]);
 			PCs[i]->SetOtherCharacter(Characters[(i + 1 < PlayerNum) ? i + 1 : 0]);
+			PCs[i]->CurrentAspect();
 		}
 	}
 	bSwapCamera = !bSwapCamera;

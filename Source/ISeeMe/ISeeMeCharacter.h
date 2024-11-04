@@ -30,6 +30,8 @@ public:
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
+	void CurrentAspect();
+
 protected:
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
@@ -54,8 +56,6 @@ protected:
 	virtual void BeginPlay();
 
 	bool InitVoiceChat();
-
-	bool bFirstAspect = false;
 
 private:
 	/* Voice Chat */
