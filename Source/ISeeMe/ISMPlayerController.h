@@ -30,24 +30,42 @@ public:
 	UFUNCTION()
 	void OnRep_SwapCamera();
 
+	/** Swap camera for Game Mode */
 	UFUNCTION()
 	void SwapCamera();
 
+	/** Client call for Server swap camera*/
 	UFUNCTION(Server, Reliable)
 	void ServerCallSwapCamera();
 
+	/** Called ChangeUnHideBone() for server, client */
 	UFUNCTION(NetMulticast, Reliable)
 	void RecoverAspect();
 
+	/** Swap aspect */
 	UFUNCTION()
 	void SwapAspect();
 
+	/** Stay current aspect */
 	UFUNCTION()
 	void CurrentAspect();
+
+	/** To unhide all bones */
+	UFUNCTION()
+	void ChangeUnHideBone(AISeeMeCharacter* OtherCharacter);
 
 	UPROPERTY(ReplicatedUsing = OnRep_SwapCamera)
 	TObjectPtr<class AISeeMeCharacter> OtherCharacter;
 
 private:
 	bool bFirstAspect = false;
+
+	/** Update Aspect */
+	void UpdateAspect();
+
+	/** Change First Aspect */
+	void ChangeFirstAspect();
+
+	/** Change Third Aspect */
+	void ChangeThirdAspect();
 };

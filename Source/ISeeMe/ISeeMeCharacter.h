@@ -30,6 +30,9 @@ public:
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
+	/** When first perspective, hide bone name */
+	UPROPERTY(EditAnywhere, Category = "Bone")
+	FName HideBoneName;
 protected:
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
@@ -37,14 +40,19 @@ protected:
 	/** Called for looking input */
 	void Look(const FInputActionValue& Value);
 
+	/** Called for focus input */
 	void Focus();
 
+	/** Called for enable voice */
 	void EnableVoice();
 
+	/** Called for disable voice */
 	void DisableVoice();
 
+	/** Called for swap camera */
 	void SwapCamera();
 
+	/** Called for swap aspect */
 	void SwapAspect();
 
 	// APawn interface
@@ -83,15 +91,19 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* LookAction;
 
+	/** Focus Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* FocusAction;
 
+	/** Toggle Voice Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* ToggleVoiceAction;
 
+	/** Swap Camera Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* SwapCameraAction;
 
+	/** Swap Aspect Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* SwapAspectAction;
 };

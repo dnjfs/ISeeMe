@@ -5,6 +5,7 @@
 
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "Camera/CameraComponent.h"
 #include "ISeeMeGameMode.h"
 #include "ISeeMeCharacter.h"
 
@@ -48,6 +49,11 @@ void AISMPlayerController::OnRep_SwapCamera()
 	UE_LOG(LogTemp, Warning, TEXT("Camera Swap Success!"));
 }
 
+void AISMPlayerController::ServerCallSwapCamera_Implementation()
+{
+	SwapCamera();
+}
+
 void AISMPlayerController::SwapCamera()
 {
 	if (AISeeMeGameMode* GM = Cast<AISeeMeGameMode>(GetWorld()->GetAuthGameMode()))
@@ -56,58 +62,73 @@ void AISMPlayerController::SwapCamera()
 	}
 }
 
+void AISMPlayerController::RecoverAspect_Implementation()
+{
+	ChangeUnHideBone(OtherCharacter);
+}
+
 void AISMPlayerController::SwapAspect()
 {
-	if (bFirstAspect)
-	{
-		if (class USpringArmComponent* OtherCameraBoom = OtherCharacter->GetCameraBoom())
-		{
-			OtherCameraBoom->TargetArmLength = 400.0f;
-		}
-	}
-	else
-	{
-		if (class USpringArmComponent* OtherCameraBoom = OtherCharacter->GetCameraBoom())
-		{
-			OtherCameraBoom->TargetArmLength = 0;
-			if (OtherCharacter && OtherCharacter->GetMesh())
-			{
-				OtherCharacter->GetMesh()->HideBoneByName(FName("neck_01"), EPhysBodyOp::PBO_None);
-			}
-		}
-	}
-	bFirstAspect = !bFirstAspect;
+	bFirstAspect = !bFirstAspect;  
+	UpdateAspect();               
 }
 
 void AISMPlayerController::CurrentAspect()
 {
-	if (!bFirstAspect)
+	UpdateAspect(); 
+}
+
+void AISMPlayerController::UpdateAspect()
+{
+	if (bFirstAspect)
 	{
-		if (class USpringArmComponent* OtherCameraBoom = OtherCharacter->GetCameraBoom())
-		{
-			OtherCameraBoom->TargetArmLength = 400.0f;
-		}
+		ChangeFirstAspect();
 	}
-	else if (bFirstAspect)
+	else
 	{
-		if (class USpringArmComponent* OtherCameraBoom = OtherCharacter->GetCameraBoom())
+		ChangeThirdAspect();
+	}
+}
+
+void AISMPlayerController::ChangeThirdAspect()
+{
+	if (class USpringArmComponent* OtherCameraBoom = OtherCharacter->GetCameraBoom())
+	{
+		OtherCameraBoom->SetRelativeLocation(FVector(0,0,100));
+		OtherCameraBoom->TargetArmLength = 400.0f;
+
+		if (class UCameraComponent* OtherFollowCamera = OtherCharacter->GetFollowCamera())
 		{
-			OtherCameraBoom->TargetArmLength = 0;
-			if (OtherCharacter && OtherCharacter->GetMesh())
-			{
-				OtherCharacter->GetMesh()->HideBoneByName(FName("neck_01"), EPhysBodyOp::PBO_None);
-			}
+			OtherFollowCamera->SetRelativeRotation(FRotator(-15,0,0));
 		}
 	}
 }
 
-void AISMPlayerController::ServerCallSwapCamera_Implementation()
+void AISMPlayerController::ChangeFirstAspect()
 {
-	SwapCamera();
+	if (class USpringArmComponent* OtherCameraBoom = OtherCharacter->GetCameraBoom())
+	{
+		AISeeMeCharacter* SelfCharacter = Cast<AISeeMeCharacter>(GetPawn());
+		OtherCameraBoom->SetRelativeLocation(FVector(0, 0, 75));
+		OtherCameraBoom->TargetArmLength = 0;
+
+		if (class UCameraComponent* OtherFollowCamera = OtherCharacter->GetFollowCamera())
+		{
+			OtherFollowCamera->SetRelativeRotation(FRotator(0, 0, 0));
+		}
+		if (OtherCharacter && OtherCharacter->GetMesh())
+		{
+			OtherCharacter->GetMesh()->HideBoneByName(SelfCharacter->HideBoneName, EPhysBodyOp::PBO_None);
+		}
+	}
 }
 
-void AISMPlayerController::RecoverAspect_Implementation()
+void AISMPlayerController::ChangeUnHideBone(AISeeMeCharacter* UnHideCharacter)
 {
-	if (OtherCharacter)
-		OtherCharacter->GetMesh()->UnHideBoneByName(FName("neck_01"));
+	AISeeMeCharacter* SelfCharacter = Cast<AISeeMeCharacter>(GetPawn());
+	if (UnHideCharacter && bFirstAspect)
+	{
+		UnHideCharacter->GetMesh()->UnHideBoneByName(SelfCharacter->HideBoneName);
+	}
 }
+
