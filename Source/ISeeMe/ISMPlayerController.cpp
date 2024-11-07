@@ -57,9 +57,7 @@ void AISMPlayerController::ServerCallSwapCamera_Implementation()
 void AISMPlayerController::SwapCamera()
 {
 	if (AISeeMeGameMode* GM = Cast<AISeeMeGameMode>(GetWorld()->GetAuthGameMode()))
-	{
 		GM->SwapCamera();
-	}
 }
 
 void AISMPlayerController::RecoverAspect_Implementation()
@@ -98,9 +96,7 @@ void AISMPlayerController::ChangeThirdAspect()
 		OtherCameraBoom->TargetArmLength = 400.0f;
 
 		if (class UCameraComponent* OtherFollowCamera = OtherCharacter->GetFollowCamera())
-		{
-			OtherFollowCamera->SetRelativeRotation(FRotator(-15,0,0));
-		}
+			OtherFollowCamera->SetRelativeRotation(FRotator(-15, 0, 0));
 	}
 }
 
@@ -109,26 +105,25 @@ void AISMPlayerController::ChangeFirstAspect()
 	if (class USpringArmComponent* OtherCameraBoom = OtherCharacter->GetCameraBoom())
 	{
 		AISeeMeCharacter* SelfCharacter = Cast<AISeeMeCharacter>(GetPawn());
+
 		OtherCameraBoom->SetRelativeLocation(FVector(0, 0, 75));
 		OtherCameraBoom->TargetArmLength = 0;
 
 		if (class UCameraComponent* OtherFollowCamera = OtherCharacter->GetFollowCamera())
-		{
 			OtherFollowCamera->SetRelativeRotation(FRotator(0, 0, 0));
-		}
-		if (OtherCharacter && OtherCharacter->GetMesh())
-		{
-			OtherCharacter->GetMesh()->HideBoneByName(SelfCharacter->HideBoneName, EPhysBodyOp::PBO_None);
-		}
+
+		if (OtherCharacter && OtherCharacter->GetMesh() && SelfCharacter)
+			if (OtherCharacter->GetMesh()->GetBoneIndex(SelfCharacter->HideBoneName) != INDEX_NONE)
+				OtherCharacter->GetMesh()->HideBoneByName(SelfCharacter->HideBoneName, EPhysBodyOp::PBO_None);
 	}
 }
 
 void AISMPlayerController::ChangeUnHideBone(AISeeMeCharacter* UnHideCharacter)
 {
 	AISeeMeCharacter* SelfCharacter = Cast<AISeeMeCharacter>(GetPawn());
-	if (UnHideCharacter && bFirstAspect)
-	{
-		UnHideCharacter->GetMesh()->UnHideBoneByName(SelfCharacter->HideBoneName);
-	}
+
+	if (UnHideCharacter && UnHideCharacter->GetMesh() && bFirstAspect && SelfCharacter)
+		if (UnHideCharacter->GetMesh()->GetBoneIndex(SelfCharacter->HideBoneName) != INDEX_NONE)
+			UnHideCharacter->GetMesh()->UnHideBoneByName(SelfCharacter->HideBoneName);
 }
 

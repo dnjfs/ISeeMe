@@ -15,7 +15,6 @@
 #include "OnlineSubsystem.h"
 #include "OnlineSubsystemUtils.h"
 #include <GameFramework/GameMode.h>
-//#include <Kismet/GameplayStatics.h>
 #include "ISeeMeGameMode.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
@@ -216,30 +215,26 @@ void AISeeMeCharacter::DisableVoice()
 }
 
 void AISeeMeCharacter::SwapCamera()
-{
-	AISMPlayerController* PC = Cast<AISMPlayerController>(GetController());
-	
+{	
 	if (HasAuthority()) // Swap Camera for Server
 	{
 		if (AISeeMeGameMode* GM = Cast<AISeeMeGameMode>(GetWorld()->GetAuthGameMode()))
-		{
 			GM->SwapCamera();
-		}
 	} 
-	else // Swap Camera for Client
+	else if(AISMPlayerController* PC = Cast<AISMPlayerController>(GetController()))// Swap Camera for Client
 	{
 		PC->ServerCallSwapCamera();
-	} 
+	}
 }
 
 void AISeeMeCharacter::SwapAspect()
 {
 	// Swap Aspect
-	AISMPlayerController* PC = Cast<AISMPlayerController>(GetController());
-	if (PC->OtherCharacter)
-	{
-		PC->ChangeUnHideBone(PC->OtherCharacter);
-		PC->SwapAspect();
-	}
+	if (AISMPlayerController* PC = Cast<AISMPlayerController>(GetController()))
+		if (PC->OtherCharacter)
+		{
+			PC->ChangeUnHideBone(PC->OtherCharacter);
+			PC->SwapAspect();
+		}
 }
 
