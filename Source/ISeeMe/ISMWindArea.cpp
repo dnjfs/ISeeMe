@@ -73,9 +73,15 @@ void AISMWindArea::OnExit(UPrimitiveComponent* OverlappedComponent, AActor* Othe
 
 void AISMWindArea::MulticastApplyWindForce_Implementation()
 {
-	for (ACharacter* Target : Targets)
+	for (int32 i = 0; i < Targets.Num(); i++)
 	{
-		Target->AddMovementInput(WindVector->GetForwardVector(), WindVector->ArrowLength / WindForceInverseCoef);
+		if (i >= Targets.Num()) return; // array changed during iteration 예외 방지
+
+		ACharacter* Target = Targets[i];
+
+		FVector CurrLocation = Target->GetActorLocation();
+		FVector NextLocation = CurrLocation + (WindVector->GetForwardVector() * (WindVector->ArrowLength/WindForceInverseCoef));
+		Target->SetActorLocation(NextLocation);
 	}
 }
 
