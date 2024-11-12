@@ -1,0 +1,72 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+
+#include "ISMWindArea.h"
+#include "Components/BoxComponent.h"
+#include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
+#include "Components/ArrowComponent.h"
+#include "NiagaraSystem.h"
+#include "NiagaraComponent.h"
+#include "NiagaraFunctionLibrary.h"
+
+// Sets default values
+AISMWindArea::AISMWindArea()
+{
+ 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	PrimaryActorTick.bCanEverTick = true;
+
+	Volume = CreateDefaultSubobject<UBoxComponent>(FName("Volume"));
+
+	WindForceInverseCoef = 500.f;
+
+	WindVector = CreateDefaultSubobject<UArrowComponent>(FName("WindVector"));
+	WindVector->SetupAttachment(Volume);
+	WindVector->ArrowLength = WindForceInverseCoef / 5.f;
+}
+
+// Called when the game starts or when spawned
+void AISMWindArea::BeginPlay()
+{
+	Super::BeginPlay();
+	
+	Volume->OnComponentBeginOverlap.AddDynamic(this, &AISMWindArea::MulticastAddTarget);
+	Volume->OnComponentEndOverlap.AddDynamic(this, &AISMWindArea::MulticastRemoveTarget);
+
+	UNiagaraComponent* NiagaraComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(WindEffect, Volume, TEXT("Effect"),
+		WindVector->GetComponentLocation(), WindVector->GetComponentRotation(), EAttachLocation::KeepWorldPosition, true);
+
+	NiagaraComponent->SetNiagaraVariableVec3(TEXT("Box Size"), Volume->GetScaledBoxExtent());
+}
+
+// Called every frame
+void AISMWindArea::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	MulticastApplyWindForce();
+}
+
+void AISMWindArea::MulticastApplyWindForce_Implementation()
+{
+	for (ACharacter* Target : Targets)
+	{
+		Target->AddMovementInput(WindVector->GetForwardVector(), WindVector->ArrowLength / WindForceInverseCoef);
+	}
+}
+
+void AISMWindArea::MulticastAddTarget_Implementation(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (ACharacter* Character = Cast<ACharacter>(OtherActor))
+	{
+		Targets.Add(Character);
+	}
+}
+
+void AISMWindArea::MulticastRemoveTarget_Implementation(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (ACharacter* Character = Cast<ACharacter>(OtherActor))
+	{
+		Targets.Remove(Character);
+	}
+}
