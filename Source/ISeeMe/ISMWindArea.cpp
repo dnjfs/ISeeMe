@@ -33,10 +33,14 @@ void AISMWindArea::BeginPlay()
 	Volume->OnComponentBeginOverlap.AddDynamic(this, &AISMWindArea::MulticastAddTarget);
 	Volume->OnComponentEndOverlap.AddDynamic(this, &AISMWindArea::MulticastRemoveTarget);
 
-	UNiagaraComponent* NiagaraComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(WindEffect, Volume, TEXT("Effect"),
-		WindVector->GetComponentLocation(), WindVector->GetComponentRotation(), EAttachLocation::KeepWorldPosition, true);
+	if (WindEffect)
+	{
+		UNiagaraComponent* NiagaraComponent = UNiagaraFunctionLibrary::SpawnSystemAttached(WindEffect, Volume, TEXT("Effect"),
+			WindVector->GetComponentLocation(), WindVector->GetComponentRotation(), EAttachLocation::KeepWorldPosition, true);
 
-	NiagaraComponent->SetNiagaraVariableVec3(TEXT("Box Size"), Volume->GetScaledBoxExtent());
+		NiagaraComponent->SetNiagaraVariableVec3(TEXT("Box Size"), Volume->GetScaledBoxExtent());
+
+	}
 }
 
 // Called every frame
