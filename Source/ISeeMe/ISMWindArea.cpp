@@ -23,6 +23,8 @@ AISMWindArea::AISMWindArea()
 	WindVector = CreateDefaultSubobject<UArrowComponent>(FName("WindVector"));
 	WindVector->SetupAttachment(Volume);
 	WindVector->ArrowLength = WindForceInverseCoef / 5.f;
+
+	bReplicates = true;
 }
 
 // Called when the game starts or when spawned
@@ -30,8 +32,8 @@ void AISMWindArea::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	Volume->OnComponentBeginOverlap.AddDynamic(this, &AISMWindArea::MulticastAddTarget);
-	Volume->OnComponentEndOverlap.AddDynamic(this, &AISMWindArea::MulticastRemoveTarget);
+	Volume->OnComponentBeginOverlap.AddDynamic(this, &AISMWindArea::OnEnter);
+	Volume->OnComponentEndOverlap.AddDynamic(this, &AISMWindArea::OnExit);
 
 	if (WindEffect)
 	{
@@ -39,7 +41,6 @@ void AISMWindArea::BeginPlay()
 			WindVector->GetComponentLocation(), WindVector->GetComponentRotation(), EAttachLocation::KeepWorldPosition, true);
 
 		NiagaraComponent->SetNiagaraVariableVec3(TEXT("Box Size"), Volume->GetScaledBoxExtent());
-
 	}
 }
 
@@ -48,7 +49,26 @@ void AISMWindArea::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+	if (!HasAuthority())
+		return;
+
 	MulticastApplyWindForce();
+}
+
+void AISMWindArea::OnEnter(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	if (!HasAuthority())
+		return;
+
+	MulticastAddTarget(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex, bFromSweep, SweepResult);
+}
+
+void AISMWindArea::OnExit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+{
+	if (!HasAuthority())
+		return;
+
+	MulticastRemoveTarget(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex);
 }
 
 void AISMWindArea::MulticastApplyWindForce_Implementation()
