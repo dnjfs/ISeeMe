@@ -16,6 +16,7 @@
 #include "OnlineSubsystemUtils.h"
 #include <GameFramework/GameMode.h>
 #include "ISeeMeGameMode.h"
+#include "ISMCharacterState.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -132,8 +133,9 @@ void AISeeMeCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		EnhancedInputComponent->BindAction(ToggleVoiceAction, ETriggerEvent::Triggered, this, &AISeeMeCharacter::DisableVoice);
 	
 		EnhancedInputComponent->BindAction(SwapCameraAction, ETriggerEvent::Started, this, &AISeeMeCharacter::SwapCamera);
-
 		EnhancedInputComponent->BindAction(SwapAspectAction, ETriggerEvent::Started, this, &AISeeMeCharacter::SwapAspect);
+
+		EnhancedInputComponent->BindAction(GoCheckPointAction, ETriggerEvent::Started, this, &AISeeMeCharacter::CallGoCheckPoint);
 	}
 	else
 	{
@@ -238,3 +240,49 @@ void AISeeMeCharacter::SwapAspect()
 		}
 }
 
+void AISeeMeCharacter::CallGoCheckPoint()
+{
+	if (HasAuthority()) // Swap Camera for Server
+	{
+		GoCheckPoint();
+	}
+	else
+	{
+		ServerCallGoCheckPoint();
+	}
+}
+
+void AISeeMeCharacter::GoCheckPoint()
+{
+	if (AISMCharacterState* State = Cast<AISMCharacterState>(this->GetPlayerState()))
+	{
+		if (AISMCheckPoint* CheckPoint = State->CurCheckPoint)
+		{
+			TArray<ACharacter*> Characters;
+
+			for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+			{
+				AISMPlayerController* PC = Cast<AISMPlayerController>(Iterator->Get());
+				if (PC == nullptr)
+					continue;
+
+				ACharacter* BaseCharacter = PC->GetCharacter();
+
+				if (BaseCharacter == nullptr)
+					continue;
+
+				Characters.Add(BaseCharacter);
+			}
+
+			if(Characters[0])
+				Characters[0]->SetActorLocation(CheckPoint->Spawn1PPlayer->GetComponentLocation());
+			if(Characters[1])
+				Characters[1]->SetActorLocation(CheckPoint->Spawn2PPlayer->GetComponentLocation());
+		}
+	}
+}
+
+void AISeeMeCharacter::ServerCallGoCheckPoint_Implementation()
+{
+	GoCheckPoint();
+}

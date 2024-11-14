@@ -33,6 +33,9 @@ public:
 	/** When first perspective, hide bone name */
 	UPROPERTY(EditAnywhere, Category = "Bone")
 	FName HideBoneName;
+
+	UFUNCTION(Server, Reliable)
+	void ServerCallGoCheckPoint();
 protected:
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
@@ -54,6 +57,12 @@ protected:
 
 	/** Called for swap aspect */
 	void SwapAspect();
+
+	/** Called for go check point */
+	void GoCheckPoint();
+
+	/** Called for go check point */
+	void CallGoCheckPoint();
 
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -106,5 +115,9 @@ private:
 	/** Swap Aspect Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* SwapAspectAction;
+
+	/** Go Check Point Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* GoCheckPointAction;
 };
 
