@@ -47,11 +47,13 @@ void AISMCheckPoint::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if(TriggerVolume)
+	if (TriggerVolume)
+	{
 		TriggerVolume->OnComponentBeginOverlap.AddDynamic(this, &AISMCheckPoint::OnOverlapBegin);
+		TriggerVolume->OnComponentEndOverlap.AddDynamic(this, &AISMCheckPoint::OnOverlapEnd);
+	}
 
-	if(CheckPointMesh)
-		CheckPointMesh->SetMaterial(0, BaseMaterial);
+	MulticastChangeMaterial(DetectPlayer);
 
 	DetectPlayer = 0;
 }
@@ -76,35 +78,68 @@ void AISMCheckPoint::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor*
 				return;
 			}
 
+			// When one detect
 			if (!State->bCheckPoint && DetectPlayer <= 1)
 			{
 				State->CurCheckPoint = this;
 				State->bCheckPoint = true;
 				DetectPlayer++;
-				MulticastChangeMaterial(CheckMaterial);
+				MulticastChangeMaterial(DetectPlayer);
 			}
 
+			// When all detect
 			if (DetectPlayer == 2)
 			{
-				MulticastChangeMaterial(AllCheckMaterial);
+				MulticastChangeMaterial(DetectPlayer);
 				
 				if (HasAuthority())
 					InitCheckPoint();
 				else
-					ServerCallSwapCamera();
-
-				UE_LOG(LogTemp, Warning, TEXT("All Detect"));
+					ServerInitCheckPoint();
 			}
 		}
 	}
 }
 
-void AISMCheckPoint::MulticastChangeMaterial_Implementation(UMaterialInterface* ChangeMaterial)
+void AISMCheckPoint::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (CheckPointMesh && ChangeMaterial)
+	if (ACharacter* Character = Cast<ACharacter>(OtherActor))
 	{
-		CheckPointMesh->SetMaterial(0, ChangeMaterial);
-		UE_LOG(LogTemp, Warning, TEXT("Detect"));
+		if (AISMCharacterState* State = Cast<AISMCharacterState>(Character->GetPlayerState()))
+		{
+			if (!HasAuthority())
+			{
+				return;
+			}
+
+			// When one out
+			if (DetectPlayer != 2 && State->bCheckPoint)
+			{
+				State->bCheckPoint = false;
+				DetectPlayer--;
+				MulticastChangeMaterial(DetectPlayer);
+			}
+		}
+	}
+}
+
+void AISMCheckPoint::MulticastChangeMaterial_Implementation(int CurDetect)
+{
+	// According to the perception of a person
+	if (CheckPointMesh)
+	{
+		if (CurDetect == 0 && BaseMaterial)
+		{
+			CheckPointMesh->SetMaterial(0, BaseMaterial);
+		}
+		else if(CurDetect == 1 && CheckMaterial)
+		{
+			CheckPointMesh->SetMaterial(0, CheckMaterial);
+		}
+		else if (CurDetect == 2 && AllCheckMaterial)
+		{
+			CheckPointMesh->SetMaterial(0, AllCheckMaterial);
+		}
 	}
 	else
 	{
@@ -127,7 +162,7 @@ void AISMCheckPoint::InitCheckPoint()
 	}
 }
 
-void AISMCheckPoint::ServerCallSwapCamera_Implementation()
+void AISMCheckPoint::ServerInitCheckPoint_Implementation()
 {
 	InitCheckPoint();
 }

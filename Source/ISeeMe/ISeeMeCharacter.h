@@ -34,6 +34,7 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Bone")
 	FName HideBoneName;
 
+	/** Call Go Check Point Function from client to the server **/
 	UFUNCTION(Server, Reliable)
 	void ServerCallGoCheckPoint();
 protected:

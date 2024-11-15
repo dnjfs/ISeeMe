@@ -242,11 +242,11 @@ void AISeeMeCharacter::SwapAspect()
 
 void AISeeMeCharacter::CallGoCheckPoint()
 {
-	if (HasAuthority()) // Swap Camera for Server
+	if (HasAuthority()) // Call Go Check Point Function on the server
 	{
 		GoCheckPoint();
-	}
-	else
+	} 
+	else // Call Go Check Point Function on the client
 	{
 		ServerCallGoCheckPoint();
 	}
@@ -274,7 +274,8 @@ void AISeeMeCharacter::GoCheckPoint()
 				Characters.Add(BaseCharacter);
 			}
 
-			if(Characters[0])
+			// Go back Check Point
+			if (Characters[0])
 				Characters[0]->SetActorLocation(CheckPoint->Spawn1PPlayer->GetComponentLocation());
 			if(Characters[1])
 				Characters[1]->SetActorLocation(CheckPoint->Spawn2PPlayer->GetComponentLocation());
@@ -284,5 +285,5 @@ void AISeeMeCharacter::GoCheckPoint()
 
 void AISeeMeCharacter::ServerCallGoCheckPoint_Implementation()
 {
-	GoCheckPoint();
+	GoCheckPoint(); //  Call Go Check Point Function from client to the server
 }
