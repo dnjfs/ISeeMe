@@ -21,6 +21,8 @@ protected:
 
 	virtual void Tick(float DeltaSeconds) override;
 
+	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
+
 	void ResetTimer();
 
 	UFUNCTION(NetMulticast, Unreliable)
@@ -48,4 +50,6 @@ private:
 	float DormantTime = 3.f;
 
 	float RemainTime = 0.f;
+
+	FTimerHandle TimerHandle;
 };

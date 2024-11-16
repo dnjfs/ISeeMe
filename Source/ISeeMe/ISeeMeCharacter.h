@@ -59,6 +59,9 @@ protected:
 	/** Called for swap aspect */
 	void SwapAspect();
 
+	/** Called for open menu */
+	void OpenMenu();
+
 	/** Called for go check point */
 	void GoCheckPoint();
 
@@ -116,6 +119,9 @@ private:
 	/** Swap Aspect Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* SwapAspectAction;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* OpenMenuAction;
 
 	/** Go Check Point Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))

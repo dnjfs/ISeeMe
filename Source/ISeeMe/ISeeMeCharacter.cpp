@@ -10,12 +10,14 @@
 #include "EnhancedInputComponent.h"
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
+#include "Kismet/GameplayStatics.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "ISMPlayerController.h"
 #include "OnlineSubsystem.h"
 #include "OnlineSubsystemUtils.h"
-#include <GameFramework/GameMode.h>
+#include "GameFramework/GameMode.h"
 #include "ISeeMeGameMode.h"
+#include "ISeeMe/UI/ISMHUD.h"
 #include "ISMCharacterState.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
@@ -134,6 +136,8 @@ void AISeeMeCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	
 		EnhancedInputComponent->BindAction(SwapCameraAction, ETriggerEvent::Started, this, &AISeeMeCharacter::SwapCamera);
 		EnhancedInputComponent->BindAction(SwapAspectAction, ETriggerEvent::Started, this, &AISeeMeCharacter::SwapAspect);
+
+		EnhancedInputComponent->BindAction(OpenMenuAction, ETriggerEvent::Triggered, this, &AISeeMeCharacter::OpenMenu);
 
 		EnhancedInputComponent->BindAction(GoCheckPointAction, ETriggerEvent::Started, this, &AISeeMeCharacter::CallGoCheckPoint);
 	}
@@ -287,3 +291,18 @@ void AISeeMeCharacter::ServerCallGoCheckPoint_Implementation()
 {
 	GoCheckPoint(); //  Call Go Check Point Function from client to the server
 }
+
+void AISeeMeCharacter::OpenMenu()
+{
+	if (APlayerController* PC = Cast<APlayerController>(GetController()))
+	{
+		if (AHUD* HUD = PC->GetHUD())
+		{
+			if (AISMHUD* ISMHUD = Cast<AISMHUD>(HUD))
+			{
+				ISMHUD->ToggleInGameMenu(PC);
+			}
+		}
+	}
+}
+

@@ -59,11 +59,18 @@ void AISMFlickerGround::Tick(float DeltaTime)
 	{
 		MulticastAwake(false);
 
-		FTimerHandle TimerHandle;
+		//FTimerHandle TimerHandle;
 		GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]() {
 			this->ResetTimer();
 		}, DormantTime, false);
 	}
+}
+
+void AISMFlickerGround::EndPlay(EEndPlayReason::Type EndPlayReason)
+{
+	Super::EndPlay(EndPlayReason);
+
+	GetWorld()->GetTimerManager().ClearTimer(TimerHandle);
 }
 
 void AISMFlickerGround::ResetTimer()

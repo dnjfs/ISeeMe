@@ -79,7 +79,7 @@ void AISMLobbyController::CreateSession()
 	if (FNamedOnlineSession* ExistingSession = OnlineSessionInterface->GetNamedSession(NAME_GameSession))
 	{
 		OnlineSessionInterface->DestroySession(NAME_GameSession);
-		LOG_SCREEN("Destroy session: %s", NAME_GameSession);
+		//LOG_SCREEN("Destroy session: %s", NAME_GameSession);
 	}
 
 	// 델리게이트 연결
