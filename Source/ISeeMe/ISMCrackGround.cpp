@@ -10,9 +10,12 @@ AISMCrackGround::AISMCrackGround()
 	PrimaryActorTick.bCanEverTick = true;
 	
 	GroundMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Ground"));
-	GroundMesh->OnComponentHit.AddDynamic(this, &AISMCrackGround::OnStep);
 
 	RootComponent = GroundMesh;
+
+	BoxCollision = CreateDefaultSubobject<UBoxComponent>(TEXT("Box"));
+	BoxCollision->OnComponentBeginOverlap.AddDynamic(this, &AISMCrackGround::OnStep);
+	BoxCollision->AttachToComponent(GroundMesh, FAttachmentTransformRules::KeepRelativeTransform);
 
 	CrackGeometry = CreateDefaultSubobject<UGeometryCollectionComponent>(TEXT("CrackGeometry"));
 	MulticastCrackAwake(false);
@@ -60,7 +63,7 @@ void AISMCrackGround::Tick(float DeltaTime)
 	}
 }
 
-void AISMCrackGround::OnStep(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit)
+void AISMCrackGround::OnStep(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (!HasAuthority())
 		return;

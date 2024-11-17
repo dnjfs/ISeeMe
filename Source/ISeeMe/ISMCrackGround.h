@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "GeometryCollection/GeometryCollectionComponent.h"
-#include "Components/SphereComponent.h"
+#include "Components/BoxComponent.h"
 #include "Field/FieldSystemComponent.h"
 #include "ISMCrackGround.generated.h"
 
@@ -21,7 +21,7 @@ protected:
 	virtual void BeginPlay() override;
 
 	UFUNCTION()
-	void OnStep(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, FVector NormalImpulse, const FHitResult& Hit);
+	void OnStep(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
 	void OnCracked();
 
@@ -53,6 +53,9 @@ private:
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UGeometryCollectionComponent> CrackGeometry;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UBoxComponent> BoxCollision;
 
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UMaterialInterface> BaseMaterial;
