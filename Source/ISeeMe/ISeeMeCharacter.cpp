@@ -260,6 +260,7 @@ void AISeeMeCharacter::GoCheckPoint()
 {
 	TArray<AISeeMeCharacter*> Characters;
 	TArray<AISMCheckPoint*> CheckPoints;
+	TArray<AISMCharacterState*> States;
 
 	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 	{
@@ -272,8 +273,11 @@ void AISeeMeCharacter::GoCheckPoint()
 			{
 				Characters.Add(Character);
 				if (AISMCharacterState* State = Cast<AISMCharacterState>(Character->GetPlayerState()))
-					if(AISMCheckPoint* CheckPoint = State->CurCheckPoint)
+				{
+					States.Add(State);
+					if (AISMCheckPoint* CheckPoint = State->CurCheckPoint)
 						CheckPoints.Add(CheckPoint);
+				}
 			}
 	}
 
@@ -283,10 +287,6 @@ void AISeeMeCharacter::GoCheckPoint()
 		{
 			Characters[0]->SetActorLocation(CheckPoints[0]->Spawn1PPlayer->GetComponentLocation());
 			Characters[1]->SetActorLocation(CheckPoints[1]->Spawn2PPlayer->GetComponentLocation());
-		}
-		else 
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Don't go back"));
 		}
 }
 
