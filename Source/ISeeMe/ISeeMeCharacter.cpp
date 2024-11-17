@@ -258,33 +258,36 @@ void AISeeMeCharacter::CallGoCheckPoint()
 
 void AISeeMeCharacter::GoCheckPoint()
 {
-	if (AISMCharacterState* State = Cast<AISMCharacterState>(this->GetPlayerState()))
+	TArray<AISeeMeCharacter*> Characters;
+	TArray<AISMCheckPoint*> CheckPoints;
+
+	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 	{
-		if (AISMCheckPoint* CheckPoint = State->CurCheckPoint)
-		{
-			TArray<ACharacter*> Characters;
+		AISMPlayerController* PC = Cast<AISMPlayerController>(Iterator->Get());
+		if (PC == nullptr)
+			continue;
 
-			for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+		if(ACharacter* BaseCharacter = PC->GetCharacter())
+			if (AISeeMeCharacter* Character = Cast<AISeeMeCharacter>(BaseCharacter))
 			{
-				AISMPlayerController* PC = Cast<AISMPlayerController>(Iterator->Get());
-				if (PC == nullptr)
-					continue;
-
-				ACharacter* BaseCharacter = PC->GetCharacter();
-
-				if (BaseCharacter == nullptr)
-					continue;
-
-				Characters.Add(BaseCharacter);
+				Characters.Add(Character);
+				if (AISMCharacterState* State = Cast<AISMCharacterState>(Character->GetPlayerState()))
+					if(AISMCheckPoint* CheckPoint = State->CurCheckPoint)
+						CheckPoints.Add(CheckPoint);
 			}
-
-			// Go back Check Point
-			if (Characters[0])
-				Characters[0]->SetActorLocation(CheckPoint->Spawn1PPlayer->GetComponentLocation());
-			if(Characters[1])
-				Characters[1]->SetActorLocation(CheckPoint->Spawn2PPlayer->GetComponentLocation());
-		}
 	}
+
+	// Go back Check Point
+	if(Characters.Num() == 2)
+		if (CheckPoints.Num() == 2)
+		{
+			Characters[0]->SetActorLocation(CheckPoints[0]->Spawn1PPlayer->GetComponentLocation());
+			Characters[1]->SetActorLocation(CheckPoints[1]->Spawn2PPlayer->GetComponentLocation());
+		}
+		else 
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Don't go back"));
+		}
 }
 
 void AISeeMeCharacter::ServerCallGoCheckPoint_Implementation()
