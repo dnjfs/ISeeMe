@@ -5,6 +5,8 @@
 
 #include "Components/StaticMeshComponent.h"
 
+#include "ISeeMeCharacter.h"
+
 AISMCrackGround::AISMCrackGround()
 {
 	PrimaryActorTick.bCanEverTick = true;
@@ -66,6 +68,9 @@ void AISMCrackGround::Tick(float DeltaTime)
 void AISMCrackGround::OnStep(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (!HasAuthority())
+		return;
+
+	if (!OtherActor->IsA<AISeeMeCharacter>())
 		return;
 
 	UE_LOG(LogTemp, Warning, TEXT("On Step!"));
