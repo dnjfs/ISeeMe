@@ -81,7 +81,6 @@ void AISMCheckPoint::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor*
 			// When one detect
 			if (!State->bCheckPoint && DetectPlayer <= 1)
 			{
-				State->CurCheckPoint = this;
 				State->bCheckPoint = true;
 				DetectPlayer++;
 				MulticastChangeMaterial(DetectPlayer);
@@ -91,6 +90,7 @@ void AISMCheckPoint::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor*
 			if (DetectPlayer == 2)
 			{
 				MulticastChangeMaterial(DetectPlayer);
+				DetectPlayer++;
 				
 				if (HasAuthority())
 					InitCheckPoint();
@@ -155,8 +155,11 @@ void AISMCheckPoint::InitCheckPoint()
 		{
 			if (ACharacter* Character = Cast<ACharacter>(PC->GetCharacter()))
 			{
-				if(AISMCharacterState* State = Cast<AISMCharacterState>(Character->GetPlayerState()))
+				if (AISMCharacterState* State = Cast<AISMCharacterState>(Character->GetPlayerState()))
+				{
 					State->bCheckPoint = false;
+					State->CurCheckPoint = this;
+				}
 			}
 		}
 	}
