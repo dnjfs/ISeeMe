@@ -13,6 +13,7 @@ class UCameraComponent;
 class UInputMappingContext;
 class UInputAction;
 struct FInputActionValue;
+class UTimelineComponent;
 
 DECLARE_LOG_CATEGORY_EXTERN(LogTemplateCharacter, Log, All);
 
@@ -77,9 +78,6 @@ protected:
 	bool InitVoiceChat();
 
 private:
-	/* Voice Chat */
-	IOnlineVoicePtr OnlineVoicePtr;
-
 	/** Camera boom positioning the camera behind the character */
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = Camera, meta = (AllowPrivateAccess = "true"))
 	USpringArmComponent* CameraBoom;
@@ -120,11 +118,28 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* SwapAspectAction;
 
+	/** Open Menu Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* OpenMenuAction;
 
 	/** Go Check Point Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* GoCheckPointAction;
+
+	/* Voice Chat */
+	IOnlineVoicePtr OnlineVoicePtr;
+
+	/* Focus */
+	UPROPERTY(EditDefaultsOnly, Category = Timeline, meta = (AllowPrivateAccess = "true"))
+	UTimelineComponent* FocusTimeline;
+
+	UPROPERTY(EditDefaultsOnly, Category = Timeline, meta = (AllowPrivateAccess = "true"))
+	UCurveFloat* FocusCurve;
+
+	FRotator FocusStartRotator;
+	FRotator FocusEndRotator;
+
+	UFUNCTION()
+	void PlayFocusTimeline(float Value);
 };
 

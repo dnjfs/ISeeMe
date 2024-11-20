@@ -19,6 +19,7 @@
 #include "ISeeMeGameMode.h"
 #include "ISeeMe/UI/ISMHUD.h"
 #include "ISMCharacterState.h"
+#include "Components/TimelineComponent.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -31,6 +32,8 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 AISeeMeCharacter::AISeeMeCharacter()
 {
+	PrimaryActorTick.bCanEverTick = true;
+
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 
@@ -58,6 +61,8 @@ AISeeMeCharacter::AISeeMeCharacter()
 	FollowCamera->SetupAttachment(CameraBoom, USpringArmComponent::SocketName); // Attach the camera to the end of the boom and let the boom adjust to match the controller orientation
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
+	FocusTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("FocusTimeline"));
+
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 }
@@ -80,6 +85,16 @@ void AISeeMeCharacter::BeginPlay()
 	{
 		LOG_SCREEN("Init voice chat fail");
 	}
+
+	if (FocusCurve)
+	{
+		FOnTimelineFloat OnTimelineFloat;
+		OnTimelineFloat.BindUFunction(this, TEXT("PlayFocusTimeline"));
+
+		FocusTimeline->AddInterpFloat(FocusCurve, OnTimelineFloat, TEXT("Alpha"));
+		FocusTimeline->SetLooping(false);
+		FocusTimeline->SetIgnoreTimeDilation(true);
+	}
 }
 
 bool AISeeMeCharacter::InitVoiceChat()
@@ -99,6 +114,7 @@ bool AISeeMeCharacter::InitVoiceChat()
 	}
 	return false;
 }
+
 
 //////////////////////////////////////////////////////////////////////////
 // Input
@@ -185,16 +201,27 @@ void AISeeMeCharacter::Look(const FInputActionValue& Value)
 
 void AISeeMeCharacter::Focus()
 {
-	if (GetController() == nullptr)
-		return;
-
-	if (AISMPlayerController* ISMPlayerController = Cast<AISMPlayerController>(GetController()))
+	if (AController* MyController = GetController())
 	{
-		if (ACharacter* OtherCharacter = ISMPlayerController->GetOtherCharacter())
+		if (AISMPlayerController* ISMPlayerController = Cast<AISMPlayerController>(MyController))
 		{
-			float NewYaw = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), OtherCharacter->GetActorLocation()).Yaw;
-			GetController()->SetControlRotation(FRotator(0.f, NewYaw, 0.f));
+			if (ACharacter* OtherCharacter = ISMPlayerController->GetOtherCharacter())
+			{
+				FocusStartRotator = ISMPlayerController->GetControlRotation();
+				FocusEndRotator = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), OtherCharacter->GetActorLocation());
+				
+				FocusTimeline->PlayFromStart();
+			}
 		}
+	}
+}
+
+void AISeeMeCharacter::PlayFocusTimeline(float Alpha)
+{
+	if (AController* MyController = GetController())
+	{
+		MyController->SetControlRotation(
+			UKismetMathLibrary::RLerp(FocusStartRotator, FocusEndRotator, Alpha, true));
 	}
 }
 
