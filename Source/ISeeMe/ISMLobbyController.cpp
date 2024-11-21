@@ -113,9 +113,9 @@ void AISMLobbyController::OnCreateSessionComplete(FName SessionName, bool bWasSu
 		return;
 	}
 
-	LOG_SCREEN("Successful CreateSession()");
+	LOG_SCREEN("Successful CreateSession() - %s", *SessionName.ToString());
 	
-	UGameplayStatics::OpenLevel(this, TEXT("ThirdPersonMap"), true, "Listen");
+	UGameplayStatics::OpenLevel(this, TEXT("Chapter1"), true, "Listen");
 }
 
 void AISMLobbyController::FindSession()
