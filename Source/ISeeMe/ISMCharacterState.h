@@ -16,7 +16,21 @@ class ISEEME_API AISMCharacterState : public APlayerState
 	GENERATED_BODY()
 	
 public:
+	/*First Check Point Location*/
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Spawn")
+	FVector InitSpawnPointLocation;
+
+	/*First Check Point Rotator*/
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Spawn")
+	FRotator InitialSpawnPointRotator;
+
+	/*Current Check Point*/
 	AISMCheckPoint* CurCheckPoint;
+
+	/*Current Check Point State*/
 	bool bCheckPoint = false;
 
+	/*Player Number*/
+	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Player Info")
+	int32 CustomPlayerID;
 };

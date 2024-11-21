@@ -81,6 +81,23 @@ void AISeeMeCharacter::BeginPlay()
 		if (GetMesh())
 			GetMesh()->SetRenderCustomDepth(true);
 
+	// Save Transform 
+	if (HasAuthority()) 
+	{
+		GetWorld()->GetTimerManager().SetTimerForNextTick([this]()
+			{
+				if (AISMCharacterState* State = Cast<AISMCharacterState>(GetPlayerState()))
+				{
+					State->InitSpawnPointLocation = GetActorLocation();
+					State->InitialSpawnPointRotator = GetActorRotation();
+				}
+				else
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Fail: PlayerState is not initialized yet."));
+				}
+			});
+	}
+
 	if (InitVoiceChat())
 	{
 		LOG_SCREEN("Init voice chat success");
