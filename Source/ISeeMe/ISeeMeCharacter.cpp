@@ -229,7 +229,9 @@ void AISeeMeCharacter::Focus()
 			if (ACharacter* OtherCharacter = ISMPlayerController->GetOtherCharacter())
 			{
 				FocusStartRotator = ISMPlayerController->GetControlRotation();
-				FocusEndRotator = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), OtherCharacter->GetActorLocation());
+
+				float NewYaw = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), OtherCharacter->GetActorLocation()).Yaw;
+				FocusEndRotator = FRotator(FocusStartRotator.Pitch, NewYaw, FocusStartRotator.Roll);
 				
 				FocusTimeline->PlayFromStart();
 			}
