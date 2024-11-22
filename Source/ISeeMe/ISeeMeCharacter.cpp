@@ -184,6 +184,35 @@ void AISeeMeCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	}
 }
 
+void AISeeMeCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (GetCharacterMovement()->IsFalling())
+	{
+		if (!bIsFalling)
+		{
+			FirstHeight = GetActorLocation().Z;
+			bIsFalling = true;
+		}
+	}
+	else
+	{
+		if (!bIsFalling)
+			return;
+
+		if (FirstHeight - GetActorLocation().Z >= DeadHeight)
+		{
+			if (AISMCharacterState* State = Cast<AISMCharacterState>(this->GetPlayerState()))
+			{
+				SetActorLocation(State->InitSpawnPointLocation);
+				SetActorRotation(State->InitialSpawnPointRotator);
+			}
+		}
+		bIsFalling = false;
+	}
+}
+
 void AISeeMeCharacter::Move(const FInputActionValue& Value)
 {
 	// input is a Vector2D
