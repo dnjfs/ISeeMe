@@ -35,9 +35,16 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Bone")
 	FName HideBoneName;
 
+	/**  How high to dead */
+	UPROPERTY(EditAnywhere)
+	float DeadHeight=1000;
+
 	/** Call Go Check Point Function from client to the server **/
 	UFUNCTION(Server, Reliable)
 	void ServerCallGoCheckPoint();
+
+	virtual void Tick(float DeltaTime) override;
+
 protected:
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
@@ -141,5 +148,11 @@ private:
 
 	UFUNCTION()
 	void PlayFocusTimeline(float Value);
+
+	/*Judgement falling */
+	bool bIsFalling = true;
+
+	/* When fall, first location */
+	float FirstHeight = 0;
 };
 
