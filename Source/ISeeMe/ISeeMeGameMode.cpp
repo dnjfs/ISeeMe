@@ -5,6 +5,7 @@
 #include "UObject/ConstructorHelpers.h"
 
 #include "ISMPlayerController.h"
+#include "ISMCharacterState.h"
 
 AISeeMeGameMode::AISeeMeGameMode()
 {
@@ -13,6 +14,17 @@ AISeeMeGameMode::AISeeMeGameMode()
 	if (PlayerPawnBPClass.Class != NULL)
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
+	}
+}
+
+void AISeeMeGameMode::PostLogin(APlayerController* NewPlayer)
+{
+	Super::PostLogin(NewPlayer);
+
+	if (AISMCharacterState* State = NewPlayer->GetPlayerState<AISMCharacterState>())
+	{
+		int32 CurrentPlayerCount = GetNumPlayers();
+		State->CustomPlayerID = CurrentPlayerCount; // First Player = 1, Second Player = 2
 	}
 }
 

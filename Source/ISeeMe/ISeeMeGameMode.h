@@ -13,6 +13,11 @@ class AISeeMeGameMode : public AGameModeBase
 
 public:
 	AISeeMeGameMode();
+
+	/*For give each player a number*/
+	void PostLogin(APlayerController* NewPlayer);
+
+	/*For swap camera*/
 	void SwapCamera();
 
 	bool bSwapCamera = true;
