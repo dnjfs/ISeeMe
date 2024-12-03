@@ -53,7 +53,7 @@ AISeeMeCharacter::AISeeMeCharacter()
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
 	CameraBoom->SetupAttachment(RootComponent);
-	CameraBoom->TargetArmLength = 400.0f; // The camera follows at this distance behind the character	
+	CameraBoom->TargetArmLength = 600.0f; // The camera follows at this distance behind the character	
 	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
 
 	// Create a follow camera
@@ -181,6 +181,35 @@ void AISeeMeCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	else
 	{
 		UE_LOG(LogTemplateCharacter, Error, TEXT("'%s' Failed to find an Enhanced Input component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
+	}
+}
+
+void AISeeMeCharacter::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (GetCharacterMovement()->IsFalling())
+	{
+		if (!bIsFalling)
+		{
+			FirstHeight = GetActorLocation().Z;
+			bIsFalling = true;
+		}
+	}
+	else
+	{
+		if (!bIsFalling)
+			return;
+
+		if (FirstHeight - GetActorLocation().Z >= DeadHeight)
+		{
+			if (AISMCharacterState* State = Cast<AISMCharacterState>(this->GetPlayerState()))
+			{
+				SetActorLocation(State->InitSpawnPointLocation);
+				SetActorRotation(State->InitialSpawnPointRotator);
+			}
+		}
+		bIsFalling = false;
 	}
 }
 

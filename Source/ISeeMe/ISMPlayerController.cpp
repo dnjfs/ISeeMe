@@ -93,7 +93,7 @@ void AISMPlayerController::ChangeThirdAspect()
 	if (class USpringArmComponent* OtherCameraBoom = OtherCharacter->GetCameraBoom())
 	{
 		OtherCameraBoom->SetRelativeLocation(FVector(0,0,100));
-		OtherCameraBoom->TargetArmLength = 400.0f;
+		OtherCameraBoom->TargetArmLength = 600.0f;
 
 		if (class UCameraComponent* OtherFollowCamera = OtherCharacter->GetFollowCamera())
 			OtherFollowCamera->SetRelativeRotation(FRotator(-15, 0, 0));
