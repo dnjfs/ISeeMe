@@ -43,6 +43,9 @@ public:
 	UFUNCTION(Server, Reliable)
 	void ServerCallGoCheckPoint();
 
+	/** Called for swap camera */
+	void SwapCamera();
+
 	virtual void Tick(float DeltaTime) override;
 
 protected:
@@ -60,9 +63,6 @@ protected:
 
 	/** Called for disable voice */
 	void DisableVoice();
-
-	/** Called for swap camera */
-	void SwapCamera();
 
 	/** Called for swap aspect */
 	void SwapAspect();

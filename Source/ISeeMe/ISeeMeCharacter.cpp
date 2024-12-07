@@ -304,7 +304,9 @@ void AISeeMeCharacter::SwapCamera()
 	if (HasAuthority()) // Swap Camera for Server
 	{
 		if (AISeeMeGameMode* GM = Cast<AISeeMeGameMode>(GetWorld()->GetAuthGameMode()))
+		{
 			GM->SwapCamera();
+		}
 	} 
 	else if(AISMPlayerController* PC = Cast<AISMPlayerController>(GetController()))// Swap Camera for Client
 	{

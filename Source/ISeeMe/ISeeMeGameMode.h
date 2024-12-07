@@ -21,6 +21,9 @@ public:
 	void SwapCamera();
 
 	bool bSwapCamera = true;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Swap")
+	float SwapTime = 30;
 };
 
 
