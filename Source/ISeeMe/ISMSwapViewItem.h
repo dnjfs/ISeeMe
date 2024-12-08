@@ -34,6 +34,4 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UBoxComponent* TriggerVolume;
-
-	FTimerHandle SwapTimerHandle;
 };

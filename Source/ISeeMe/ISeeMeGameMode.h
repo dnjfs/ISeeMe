@@ -24,6 +24,8 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Swap")
 	float SwapTime = 30;
+
+	FTimerHandle SwapTimerHandle;
 };
 
 

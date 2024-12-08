@@ -20,6 +20,7 @@
 #include "ISeeMe/UI/ISMHUD.h"
 #include "ISMCharacterState.h"
 #include "Components/TimelineComponent.h"
+#include "ISMGameState.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -300,17 +301,36 @@ void AISeeMeCharacter::DisableVoice()
 }
 
 void AISeeMeCharacter::SwapCamera()
-{	
-	if (HasAuthority()) // Swap Camera for Server
+{
+	// 게임 상태 가져오기
+	if (AISMGameState* GS = Cast<AISMGameState>(UGameplayStatics::GetGameState(this)))
 	{
-		if (AISeeMeGameMode* GM = Cast<AISeeMeGameMode>(GetWorld()->GetAuthGameMode()))
+		// HasSwapItem이 1인지 확인
+		if (GS->HasSwapItem != 1)
 		{
-			GM->SwapCamera();
+			UE_LOG(LogTemp, Warning, TEXT("Cannot swap camera: HasSwapItem = %d"), GS->HasSwapItem);
+			return; // 조건에 맞지 않으면 종료
 		}
-	} 
-	else if(AISMPlayerController* PC = Cast<AISMPlayerController>(GetController()))// Swap Camera for Client
-	{
-		PC->ServerCallSwapCamera();
+
+		if (HasAuthority()) // 서버에서 실행
+		{
+			if (AISeeMeGameMode* GM = Cast<AISeeMeGameMode>(GetWorld()->GetAuthGameMode()))
+			{
+				GS->HasSwapItem--; // 서버에서 값 감소
+				GetWorldTimerManager().SetTimer(GM->SwapTimerHandle, FTimerDelegate::CreateWeakLambda(this, [GM]()
+					{
+						GM->SwapCamera();
+					}), GM->SwapTime, false);
+				GM->SwapCamera();
+			}
+		}
+		else // 클라이언트에서 실행
+		{
+			if (AISMPlayerController* PC = Cast<AISMPlayerController>(GetController()))
+			{
+				PC->ServerCallSwapCamera();
+			}
+		}
 	}
 }
 

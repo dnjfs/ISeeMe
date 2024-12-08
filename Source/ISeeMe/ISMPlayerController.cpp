@@ -8,6 +8,8 @@
 #include "Camera/CameraComponent.h"
 #include "ISeeMeGameMode.h"
 #include "ISeeMeCharacter.h"
+#include "ISMGameState.h"
+#include <Kismet/GameplayStatics.h>
 
 
 AISMPlayerController::AISMPlayerController()
@@ -28,7 +30,7 @@ void AISMPlayerController::OnPossess(APawn* aPawn)
 	Super::OnPossess(aPawn);
 
 	if (HasAuthority())
-		SwapCamera();
+		SwapCamera(false);
 }
 
 void AISMPlayerController::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
@@ -51,13 +53,30 @@ void AISMPlayerController::OnRep_SwapCamera()
 
 void AISMPlayerController::ServerCallSwapCamera_Implementation()
 {
-	SwapCamera();
+	SwapCamera(true);
 }
 
-void AISMPlayerController::SwapCamera()
+void AISMPlayerController::SwapCamera(bool bItem)
 {
 	if (AISeeMeGameMode* GM = Cast<AISeeMeGameMode>(GetWorld()->GetAuthGameMode()))
-		GM->SwapCamera();
+	{
+		if (!bItem)
+		{
+			GM->SwapCamera();
+		}
+		else
+		{
+			if (AISMGameState* GS = Cast<AISMGameState>(UGameplayStatics::GetGameState(this)))
+			{
+				GS->HasSwapItem--;
+				GetWorldTimerManager().SetTimer(GM->SwapTimerHandle, FTimerDelegate::CreateWeakLambda(this, [GM]()
+					{
+						GM->SwapCamera();
+					}), GM->SwapTime, false);
+				GM->SwapCamera();
+			}
+		}
+	}
 }
 
 void AISMPlayerController::RecoverAspect_Implementation()

@@ -32,7 +32,7 @@ public:
 
 	/** Swap camera for Game Mode */
 	UFUNCTION()
-	void SwapCamera();
+	void SwapCamera(bool bItem);
 
 	/** Client call for Server swap camera*/
 	UFUNCTION(Server, Reliable)

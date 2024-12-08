@@ -73,8 +73,6 @@ void AISMCrackGround::OnStep(UPrimitiveComponent* HitComp, AActor* OtherActor, U
 	if (!OtherActor->IsA<AISeeMeCharacter>())
 		return;
 
-	UE_LOG(LogTemp, Warning, TEXT("On Step!"));
-
 	SetActorTickEnabled(true);
 	MulticastSetCracking(true);
 }

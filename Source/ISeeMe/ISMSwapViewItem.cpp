@@ -4,6 +4,8 @@
 #include "ISMSwapViewItem.h"
 #include "ISeeMeCharacter.h"
 #include "ISeeMeGameMode.h"
+#include "ISMGameState.h"
+#include <Kismet/GameplayStatics.h>
 
 // Sets default values
 AISMSwapViewItem::AISMSwapViewItem()
@@ -50,17 +52,16 @@ void AISMSwapViewItem::Tick(float DeltaTime)
 
 void AISMSwapViewItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (!HasAuthority())
-		return;
-
-	MulticastVisibleMesh(false);
-	if (AISeeMeGameMode* GM = Cast<AISeeMeGameMode>(GetWorld()->GetAuthGameMode()))
+	if (HasAuthority())
 	{
-		GetWorldTimerManager().SetTimer(SwapTimerHandle, FTimerDelegate::CreateWeakLambda(this, [GM]()
+		if (AISMGameState* GS = Cast<AISMGameState>(UGameplayStatics::GetGameState(this)))
+		{
+			if (GS->HasSwapItem == 0)
 			{
-				GM->SwapCamera();
-			}), GM->SwapTime, false);
-		GM->SwapCamera();
+				GS->HasSwapItem++;
+				MulticastVisibleMesh(false);
+			}
+		}
 	}
 }
 
