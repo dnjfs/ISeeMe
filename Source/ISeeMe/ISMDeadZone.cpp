@@ -9,7 +9,7 @@
 AISMDeadZone::AISMDeadZone()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 
 	TriggerVolume = CreateDefaultSubobject<UBoxComponent>(TEXT("TriggerVolume"));
 	if (TriggerVolume == nullptr)
@@ -32,13 +32,6 @@ void AISMDeadZone::BeginPlay()
 	{
 		TriggerVolume->OnComponentBeginOverlap.AddDynamic(this, &AISMDeadZone::OnOverlapBegin);
 	}
-}
-
-// Called every frame
-void AISMDeadZone::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
 }
 
 void AISMDeadZone::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
