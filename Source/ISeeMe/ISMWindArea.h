@@ -43,7 +43,7 @@ private:
 	void MulticastRemoveTarget(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	UFUNCTION(NetMulticast, Reliable)
-	void MulticastApplyWindForce();
+	void MulticastApplyWindForce(float DeltaTime);
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UBoxComponent* Volume;
@@ -56,6 +56,4 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UNiagaraSystem* WindEffect;
-
-	float WindForceInverseCoef;
 };

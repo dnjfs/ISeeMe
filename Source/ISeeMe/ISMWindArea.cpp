@@ -18,11 +18,9 @@ AISMWindArea::AISMWindArea()
 
 	Volume = CreateDefaultSubobject<UBoxComponent>(FName("Volume"));
 
-	WindForceInverseCoef = 500.f;
-
 	WindVector = CreateDefaultSubobject<UArrowComponent>(FName("WindVector"));
 	WindVector->SetupAttachment(Volume);
-	WindVector->ArrowLength = WindForceInverseCoef / 5.f;
+	WindVector->ArrowLength = 100.f;
 
 	bReplicates = true;
 }
@@ -52,7 +50,7 @@ void AISMWindArea::Tick(float DeltaTime)
 	if (!HasAuthority())
 		return;
 
-	MulticastApplyWindForce();
+	MulticastApplyWindForce(DeltaTime);
 }
 
 void AISMWindArea::OnEnter(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -71,7 +69,7 @@ void AISMWindArea::OnExit(UPrimitiveComponent* OverlappedComponent, AActor* Othe
 	MulticastRemoveTarget(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex);
 }
 
-void AISMWindArea::MulticastApplyWindForce_Implementation()
+void AISMWindArea::MulticastApplyWindForce_Implementation(float DeltaTime)
 {
 	for (int32 i = 0; i < Targets.Num(); i++)
 	{
@@ -80,7 +78,7 @@ void AISMWindArea::MulticastApplyWindForce_Implementation()
 		ACharacter* Target = Targets[i];
 
 		FVector CurrLocation = Target->GetActorLocation();
-		FVector NextLocation = CurrLocation + (WindVector->GetForwardVector() * (WindVector->ArrowLength/WindForceInverseCoef));
+		FVector NextLocation = CurrLocation + (WindVector->GetForwardVector() * WindVector->ArrowLength * DeltaTime);
 		Target->SetActorLocation(NextLocation);
 	}
 }
