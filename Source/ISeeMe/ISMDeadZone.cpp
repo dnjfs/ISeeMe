@@ -4,6 +4,7 @@
 #include "ISMDeadZone.h"
 #include "ISMCharacterState.h"
 #include "ISeeMeCharacter.h"
+#include "ISMPlayerController.h"
 
 // Sets default values
 AISMDeadZone::AISMDeadZone()
@@ -37,28 +38,6 @@ void AISMDeadZone::BeginPlay()
 void AISMDeadZone::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (AISeeMeCharacter* Character = Cast<AISeeMeCharacter>(OtherActor))
-		if (AISMCharacterState* State = Cast<AISMCharacterState>(Character->GetPlayerState()))
-		{
-			if (!HasAuthority())
-				return;
-
-			if (State->CurCheckPoint)
-			{
-				if (State->CustomPlayerID == 1)
-				{
-					Character->SetActorLocation(State->CurCheckPoint->Spawn1PPlayer->GetComponentLocation());
-					Character->SetActorRotation(State->CurCheckPoint->Spawn1PPlayer->GetComponentRotation());
-				}
-				else if (State->CustomPlayerID == 2)
-				{
-					Character->SetActorLocation(State->CurCheckPoint->Spawn2PPlayer->GetComponentLocation());
-					Character->SetActorRotation(State->CurCheckPoint->Spawn2PPlayer->GetComponentRotation());
-				}
-			} // When get check point
-			else
-			{
-				Character->SetActorLocation(State->InitSpawnPointLocation);
-				Character->SetActorRotation(State->InitialSpawnPointRotator);
-			} // When don't get check point
-		}
+		if (AISMPlayerController* Controller = Cast<AISMPlayerController>(Character->GetController()))
+			Controller->DeadCharacter();
 }

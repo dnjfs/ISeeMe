@@ -57,6 +57,8 @@ public:
 	UPROPERTY(ReplicatedUsing = OnRep_SwapCamera)
 	TObjectPtr<class AISeeMeCharacter> OtherCharacter;
 
+	void DeadCharacter();
+
 private:
 	bool bFirstAspect = false;
 

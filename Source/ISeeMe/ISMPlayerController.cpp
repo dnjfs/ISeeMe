@@ -8,6 +8,7 @@
 #include "Camera/CameraComponent.h"
 #include "ISeeMeGameMode.h"
 #include "ISeeMeCharacter.h"
+#include "ISMCharacterState.h"
 
 
 AISMPlayerController::AISMPlayerController()
@@ -127,3 +128,24 @@ void AISMPlayerController::ChangeUnHideBone(AISeeMeCharacter* UnHideCharacter)
 			UnHideCharacter->GetMesh()->UnHideBoneByName(SelfCharacter->HideBoneName);
 }
 
+void AISMPlayerController::DeadCharacter()
+{
+	AISMCharacterState* State = GetPlayerState<AISMCharacterState>();
+	if (State == nullptr)
+		return;
+
+	AISeeMeCharacter* MyCharacter = Cast<AISeeMeCharacter>(GetCharacter());
+	if (MyCharacter == nullptr)
+		return;
+
+	if (USceneComponent* RespawnPoint = State->GetRespawnPoint(State->CustomPlayerID)) // When get check point
+	{
+		MyCharacter->SetActorLocation(RespawnPoint->GetComponentLocation());
+		MyCharacter->SetActorRotation(RespawnPoint->GetComponentRotation());
+	}
+	else // When don't get check point
+	{
+		MyCharacter->SetActorLocation(State->InitSpawnPointLocation);
+		MyCharacter->SetActorRotation(State->InitialSpawnPointRotator);
+	}
+}
