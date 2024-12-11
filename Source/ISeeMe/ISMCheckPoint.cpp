@@ -146,7 +146,7 @@ void AISMCheckPoint::InitCheckPoint()
 	{
 		if (AISMPlayerController* PC = Cast<AISMPlayerController>(Iterator->Get()))
 		{
-			if (ACharacter* Character = Cast<ACharacter>(PC->GetCharacter()))
+			if (ACharacter* Character = PC->GetCharacter())
 			{
 				if (AISMCharacterState* State = Cast<AISMCharacterState>(Character->GetPlayerState()))
 				{

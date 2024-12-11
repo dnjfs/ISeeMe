@@ -251,19 +251,16 @@ void AISeeMeCharacter::Look(const FInputActionValue& Value)
 
 void AISeeMeCharacter::Focus()
 {
-	if (AController* MyController = GetController())
+	if (AISMPlayerController* ISMPlayerController = GetController<AISMPlayerController>())
 	{
-		if (AISMPlayerController* ISMPlayerController = Cast<AISMPlayerController>(MyController))
+		if (ACharacter* OtherCharacter = ISMPlayerController->GetOtherCharacter())
 		{
-			if (ACharacter* OtherCharacter = ISMPlayerController->GetOtherCharacter())
-			{
-				FocusStartRotator = ISMPlayerController->GetControlRotation();
+			FocusStartRotator = ISMPlayerController->GetControlRotation();
 
-				float NewYaw = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), OtherCharacter->GetActorLocation()).Yaw;
-				FocusEndRotator = FRotator(FocusStartRotator.Pitch, NewYaw, FocusStartRotator.Roll);
-				
-				FocusTimeline->PlayFromStart();
-			}
+			float NewYaw = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), OtherCharacter->GetActorLocation()).Yaw;
+			FocusEndRotator = FRotator(FocusStartRotator.Pitch, NewYaw, FocusStartRotator.Roll);
+
+			FocusTimeline->PlayFromStart();
 		}
 	}
 }
@@ -339,11 +336,8 @@ void AISeeMeCharacter::GoCheckPoint()
 {
 	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 	{
-		AISMPlayerController* PC = Cast<AISMPlayerController>(Iterator->Get());
-		if (PC == nullptr)
-			continue;
-
-		PC->DeadCharacter();
+		if (AISMPlayerController* PC = Cast<AISMPlayerController>(Iterator->Get()))
+			PC->DeadCharacter();
 	}
 }
 
@@ -354,15 +348,10 @@ void AISeeMeCharacter::ServerCallGoCheckPoint_Implementation()
 
 void AISeeMeCharacter::OpenMenu()
 {
-	if (APlayerController* PC = Cast<APlayerController>(GetController()))
+	if (APlayerController* PC = GetController<APlayerController>())
 	{
-		if (AHUD* HUD = PC->GetHUD())
-		{
-			if (AISMHUD* ISMHUD = Cast<AISMHUD>(HUD))
-			{
-				ISMHUD->ToggleInGameMenu(PC);
-			}
-		}
+		if (AISMHUD* ISMHUD = Cast<AISMHUD>(PC->GetHUD()))
+			ISMHUD->ToggleInGameMenu(PC);
 	}
 }
 

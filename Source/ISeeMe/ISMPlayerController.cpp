@@ -134,7 +134,7 @@ void AISMPlayerController::DeadCharacter()
 	if (State == nullptr)
 		return;
 
-	AISeeMeCharacter* MyCharacter = Cast<AISeeMeCharacter>(GetCharacter());
+	ACharacter* MyCharacter = GetCharacter();
 	if (MyCharacter == nullptr)
 		return;
 
