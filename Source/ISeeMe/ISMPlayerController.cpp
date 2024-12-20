@@ -8,8 +8,7 @@
 #include "Camera/CameraComponent.h"
 #include "ISeeMeGameMode.h"
 #include "ISeeMeCharacter.h"
-#include "ISMGameState.h"
-#include <Kismet/GameplayStatics.h>
+#include "ISMCharacterState.h"
 
 
 AISMPlayerController::AISMPlayerController()
@@ -30,7 +29,7 @@ void AISMPlayerController::OnPossess(APawn* aPawn)
 	Super::OnPossess(aPawn);
 
 	if (HasAuthority())
-		SwapCamera(false);
+		SwapCamera();
 }
 
 void AISMPlayerController::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
@@ -53,30 +52,13 @@ void AISMPlayerController::OnRep_SwapCamera()
 
 void AISMPlayerController::ServerCallSwapCamera_Implementation()
 {
-	SwapCamera(true);
+	SwapCamera();
 }
 
-void AISMPlayerController::SwapCamera(bool bItem)
+void AISMPlayerController::SwapCamera()
 {
 	if (AISeeMeGameMode* GM = Cast<AISeeMeGameMode>(GetWorld()->GetAuthGameMode()))
-	{
-		if (!bItem)
-		{
-			GM->SwapCamera();
-		}
-		else
-		{
-			if (AISMGameState* GS = Cast<AISMGameState>(UGameplayStatics::GetGameState(this)))
-			{
-				GS->HasSwapItem--;
-				GetWorldTimerManager().SetTimer(GM->SwapTimerHandle, FTimerDelegate::CreateWeakLambda(this, [GM]()
-					{
-						GM->SwapCamera();
-					}), GM->SwapTime, false);
-				GM->SwapCamera();
-			}
-		}
-	}
+		GM->SwapCamera();
 }
 
 void AISMPlayerController::RecoverAspect_Implementation()
@@ -146,3 +128,24 @@ void AISMPlayerController::ChangeUnHideBone(AISeeMeCharacter* UnHideCharacter)
 			UnHideCharacter->GetMesh()->UnHideBoneByName(SelfCharacter->HideBoneName);
 }
 
+void AISMPlayerController::DeadCharacter()
+{
+	AISMCharacterState* State = GetPlayerState<AISMCharacterState>();
+	if (State == nullptr)
+		return;
+
+	ACharacter* MyCharacter = GetCharacter();
+	if (MyCharacter == nullptr)
+		return;
+
+	if (USceneComponent* RespawnPoint = State->GetRespawnPoint(State->CustomPlayerID)) // When get check point
+	{
+		MyCharacter->SetActorLocation(RespawnPoint->GetComponentLocation());
+		MyCharacter->SetActorRotation(RespawnPoint->GetComponentRotation());
+	}
+	else // When don't get check point
+	{
+		MyCharacter->SetActorLocation(State->InitSpawnPointLocation);
+		MyCharacter->SetActorRotation(State->InitialSpawnPointRotator);
+	}
+}

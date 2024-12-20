@@ -188,7 +188,7 @@ void AISeeMeCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 void AISeeMeCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	/*
 	if (GetCharacterMovement()->IsFalling())
 	{
 		if (!bIsFalling)
@@ -212,6 +212,7 @@ void AISeeMeCharacter::Tick(float DeltaTime)
 		}
 		bIsFalling = false;
 	}
+	*/
 }
 
 void AISeeMeCharacter::Move(const FInputActionValue& Value)
@@ -252,19 +253,16 @@ void AISeeMeCharacter::Look(const FInputActionValue& Value)
 
 void AISeeMeCharacter::Focus()
 {
-	if (AController* MyController = GetController())
+	if (AISMPlayerController* ISMPlayerController = GetController<AISMPlayerController>())
 	{
-		if (AISMPlayerController* ISMPlayerController = Cast<AISMPlayerController>(MyController))
+		if (ACharacter* OtherCharacter = ISMPlayerController->GetOtherCharacter())
 		{
-			if (ACharacter* OtherCharacter = ISMPlayerController->GetOtherCharacter())
-			{
-				FocusStartRotator = ISMPlayerController->GetControlRotation();
+			FocusStartRotator = ISMPlayerController->GetControlRotation();
 
-				float NewYaw = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), OtherCharacter->GetActorLocation()).Yaw;
-				FocusEndRotator = FRotator(FocusStartRotator.Pitch, NewYaw, FocusStartRotator.Roll);
-				
-				FocusTimeline->PlayFromStart();
-			}
+			float NewYaw = UKismetMathLibrary::FindLookAtRotation(GetActorLocation(), OtherCharacter->GetActorLocation()).Yaw;
+			FocusEndRotator = FRotator(FocusStartRotator.Pitch, NewYaw, FocusStartRotator.Roll);
+
+			FocusTimeline->PlayFromStart();
 		}
 	}
 }
@@ -359,36 +357,11 @@ void AISeeMeCharacter::CallGoCheckPoint()
 
 void AISeeMeCharacter::GoCheckPoint()
 {
-	TArray<AISeeMeCharacter*> Characters;
-	TArray<AISMCheckPoint*> CheckPoints;
-	TArray<AISMCharacterState*> States;
-
 	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 	{
-		AISMPlayerController* PC = Cast<AISMPlayerController>(Iterator->Get());
-		if (PC == nullptr)
-			continue;
-
-		if(ACharacter* BaseCharacter = PC->GetCharacter())
-			if (AISeeMeCharacter* Character = Cast<AISeeMeCharacter>(BaseCharacter))
-			{
-				Characters.Add(Character);
-				if (AISMCharacterState* State = Cast<AISMCharacterState>(Character->GetPlayerState()))
-				{
-					States.Add(State);
-					if (AISMCheckPoint* CheckPoint = State->CurCheckPoint)
-						CheckPoints.Add(CheckPoint);
-				}
-			}
+		if (AISMPlayerController* PC = Cast<AISMPlayerController>(Iterator->Get()))
+			PC->DeadCharacter();
 	}
-
-	// Go back Check Point
-	if(Characters.Num() == 2)
-		if (CheckPoints.Num() == 2)
-		{
-			Characters[0]->SetActorLocation(CheckPoints[0]->Spawn1PPlayer->GetComponentLocation());
-			Characters[1]->SetActorLocation(CheckPoints[1]->Spawn2PPlayer->GetComponentLocation());
-		}
 }
 
 void AISeeMeCharacter::ServerCallGoCheckPoint_Implementation()
@@ -398,15 +371,10 @@ void AISeeMeCharacter::ServerCallGoCheckPoint_Implementation()
 
 void AISeeMeCharacter::OpenMenu()
 {
-	if (APlayerController* PC = Cast<APlayerController>(GetController()))
+	if (APlayerController* PC = GetController<APlayerController>())
 	{
-		if (AHUD* HUD = PC->GetHUD())
-		{
-			if (AISMHUD* ISMHUD = Cast<AISMHUD>(HUD))
-			{
-				ISMHUD->ToggleInGameMenu(PC);
-			}
-		}
+		if (AISMHUD* ISMHUD = Cast<AISMHUD>(PC->GetHUD()))
+			ISMHUD->ToggleInGameMenu(PC);
 	}
 }
 

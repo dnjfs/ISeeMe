@@ -27,8 +27,6 @@ protected:
 	void MulticastChangeMaterial(int CurDetect);
 
 public:
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
 
 	/*Init Check Point from the client to the server*/
 	UFUNCTION(Server, Reliable)

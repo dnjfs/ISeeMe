@@ -16,6 +16,9 @@ class ISEEME_API AISMCharacterState : public APlayerState
 	GENERATED_BODY()
 	
 public:
+	UStaticMeshComponent* GetRespawnPoint(int InCustomPlayerId);
+
+public:
 	/*First Check Point Location*/
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Spawn")
 	FVector InitSpawnPointLocation;
