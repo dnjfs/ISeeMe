@@ -66,7 +66,7 @@ bool AISMLobbyController::GetSessionInterface()
 	return true;
 }
 
-void AISMLobbyController::CreateSession()
+void AISMLobbyController::CreateSession(FName ChapterName)
 {
 	// 세션 인터페이스 유효성 검사
 	if (OnlineSessionInterface.IsValid() == false)
@@ -76,9 +76,9 @@ void AISMLobbyController::CreateSession()
 	}
 
 	// NAME_GameSession 이름의 세션이 존재하는지 검사하여 파괴
-	if (FNamedOnlineSession* ExistingSession = OnlineSessionInterface->GetNamedSession(NAME_GameSession))
+	if (FNamedOnlineSession* ExistingSession = OnlineSessionInterface->GetNamedSession(ChapterName))
 	{
-		OnlineSessionInterface->DestroySession(NAME_GameSession);
+		OnlineSessionInterface->DestroySession(ChapterName);
 		//LOG_SCREEN("Destroy session: %s", NAME_GameSession);
 	}
 
@@ -102,7 +102,7 @@ void AISMLobbyController::CreateSession()
 
 	// 세션 생성
 	if (const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController())
-		OnlineSessionInterface->CreateSession(*LocalPlayer->GetPreferredUniqueNetId(), NAME_GameSession, *SessionSettings);
+		OnlineSessionInterface->CreateSession(*LocalPlayer->GetPreferredUniqueNetId(), ChapterName, *SessionSettings);
 }
 
 void AISMLobbyController::OnCreateSessionComplete(FName SessionName, bool bWasSuccessful)
@@ -115,7 +115,7 @@ void AISMLobbyController::OnCreateSessionComplete(FName SessionName, bool bWasSu
 
 	LOG_SCREEN("Successful CreateSession() - %s", *SessionName.ToString());
 	
-	UGameplayStatics::OpenLevel(this, TEXT("Chapter1"), true, "Listen");
+	UGameplayStatics::OpenLevel(this, SessionName, true, "Listen");
 }
 
 void AISMLobbyController::FindSession()
