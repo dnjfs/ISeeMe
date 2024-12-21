@@ -38,33 +38,48 @@ void AISMRollingObstacle::BeginPlay()
 
 		RotatingMovement->RotationRate = RotationSpeed;
 
-		FVector ObjectOffset = FVector::Zero();
-
-		if (RotationSpeed.Pitch != 0) // Y축 기준 회전
-		{
-			ObjectOffset.Z += RotatorArmLength;
-		}
-		if (RotationSpeed.Yaw != 0) // Z축 기준 회전
-		{
-			ObjectOffset.X += RotatorArmLength;
-		}
-		if (RotationSpeed.Roll != 0) // X축 기준 회전
-		{
-			ObjectOffset.Y += RotatorArmLength;
-		}
-
-		RotatingObject->SetRelativeLocation(ObjectOffset);
+		SetRelativeObjectLocation();
 	}
 	if (!HasAuthority())
 		SetActorTickEnabled(false);
 }
 
+void AISMRollingObstacle::SetRelativeObjectLocation()
+{
+	FVector ObjectOffset = FVector::Zero();
+
+	if (RotationSpeed.Pitch != 0) // Y축 기준 회전
+		ObjectOffset.Z += 1.f;
+
+	if (RotationSpeed.Yaw != 0) // Z축 기준 회전
+		ObjectOffset.X += 1.f;
+
+	if (RotationSpeed.Roll != 0) // X축 기준 회전
+		ObjectOffset.Y += 1.f;
+
+	//정규화
+	ObjectOffset.Normalize();
+	ObjectOffset *= RotatorArmLength;
+
+	RotatingObject->SetRelativeLocation(ObjectOffset);
+}
 
 // Called every frame
 void AISMRollingObstacle::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	if(HasAuthority())
+	if (HasAuthority())
+	{
+#if WITH_EDITOR
+		EditorTick(DeltaTime);
+#endif
+
 		RotatingObject->SetWorldRotation(InitialRotation);
+	}
+}
+
+void AISMRollingObstacle::EditorTick(float DeltaTime)
+{
+	SetRelativeObjectLocation();
 }
