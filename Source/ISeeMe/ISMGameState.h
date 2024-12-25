@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameStateBase.h"
+#include "ISMSwapViewItem.h"
 #include "ISMGameState.generated.h"
 
 /**
@@ -18,8 +19,16 @@ protected:
 	AISMGameState();
 
 public:
+	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere)
+	AISMSwapViewItem* SwapViewItem; // Current Own
+
 	UPROPERTY(Replicated)
-	int32 HasSwapItem;
+	TArray<AISMSwapViewItem*> UsedSwapViewItems; // Before return items, used item
+
+	UPROPERTY(Replicated)
+	AISMSwapViewItem* SaveSwapViewItem; // When check point, save item
 
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
+	bool bAcqCheckPoint;
 };

@@ -6,6 +6,8 @@
 #include "GameFramework/Character.h"
 #include "ISMCharacterState.h"
 #include "ISMPlayerController.h"
+#include "ISMGameState.h"
+#include <Kismet/GameplayStatics.h>
 
 // Sets default values
 AISMCheckPoint::AISMCheckPoint()
@@ -82,6 +84,16 @@ void AISMCheckPoint::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor*
 			// When all detect
 			if (DetectPlayer == 2)
 			{
+				if (AISMGameState* GS = Cast<AISMGameState>(UGameplayStatics::GetGameState(this)))
+				{
+					if (GS->SwapViewItem != nullptr)
+					{
+						GS->bAcqCheckPoint = true;
+						GS->SaveSwapViewItem = GS->SwapViewItem;
+					}
+					GS->UsedSwapViewItems.Empty();
+				}
+
 				MulticastChangeMaterial(DetectPlayer);
 				DetectPlayer++;
 				

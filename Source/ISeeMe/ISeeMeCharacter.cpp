@@ -303,18 +303,20 @@ void AISeeMeCharacter::SwapCamera()
 	// 게임 상태 가져오기
 	if (AISMGameState* GS = Cast<AISMGameState>(UGameplayStatics::GetGameState(this)))
 	{
-		// HasSwapItem이 1인지 확인
-		if (GS->HasSwapItem != 1)
+		if (GS->SwapViewItem == nullptr)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Cannot swap camera: HasSwapItem = %d"), GS->HasSwapItem);
+			UE_LOG(LogTemp, Warning, TEXT("Cannot swap camera"));
 			return; // 조건에 맞지 않으면 종료
 		}
 
 		if (HasAuthority()) // 서버에서 실행
 		{
+			UE_LOG(LogTemp, Warning, TEXT("Use"));
+			GS->UsedSwapViewItems.Add(GS->SwapViewItem);
+			GS->SwapViewItem = nullptr;
+
 			if (AISeeMeGameMode* GM = Cast<AISeeMeGameMode>(GetWorld()->GetAuthGameMode()))
 			{
-				GS->HasSwapItem--; // 서버에서 값 감소
 				GetWorldTimerManager().SetTimer(GM->SwapTimerHandle, FTimerDelegate::CreateWeakLambda(this, [GM]()
 					{
 						GM->SwapCamera();
@@ -357,6 +359,41 @@ void AISeeMeCharacter::CallGoCheckPoint()
 
 void AISeeMeCharacter::GoCheckPoint()
 {
+	if (AISMGameState* GS = Cast<AISMGameState>(UGameplayStatics::GetGameState(this)))
+	{
+		// Used Item Empty
+		for (auto& Item : GS->UsedSwapViewItems)
+		{
+			Item->MulticastVisibleMesh(true);
+			Item = nullptr;
+		}
+		GS->UsedSwapViewItems.Empty();
+
+		// Return current swap item 
+		if (GS->SwapViewItem != nullptr)
+		{
+			GS->SwapViewItem->MulticastVisibleMesh(true);
+			GS->SwapViewItem = nullptr;
+		}
+
+		// Return Check point state
+		if (GS->bAcqCheckPoint && GS->SaveSwapViewItem!=nullptr)
+		{
+			GS->SaveSwapViewItem->MulticastVisibleMesh(false);
+			GS->SwapViewItem = GS->SaveSwapViewItem;
+		}
+
+		// Return Swap Camera State
+		if (AISeeMeGameMode* GM = Cast<AISeeMeGameMode>(GetWorld()->GetAuthGameMode()))
+		{
+			if (!GM->bSwapCamera)
+			{
+				GetWorldTimerManager().ClearTimer(GM->SwapTimerHandle);
+				GM->SwapCamera();
+			}
+		}
+	}
+
 	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 	{
 		if (AISMPlayerController* PC = Cast<AISMPlayerController>(Iterator->Get()))

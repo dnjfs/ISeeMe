@@ -36,7 +36,7 @@ AISMSwapViewItem::AISMSwapViewItem()
 void AISMSwapViewItem::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	if (TriggerVolume)
 	{
 		TriggerVolume->OnComponentBeginOverlap.AddDynamic(this, &AISMSwapViewItem::OnOverlapBegin);
@@ -52,13 +52,14 @@ void AISMSwapViewItem::Tick(float DeltaTime)
 
 void AISMSwapViewItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (HasAuthority())
+	AISeeMeCharacter* OverlappingCharacter = Cast<AISeeMeCharacter>(OtherActor);
+	if (HasAuthority() && OverlappingCharacter)
 	{
 		if (AISMGameState* GS = Cast<AISMGameState>(UGameplayStatics::GetGameState(this)))
 		{
-			if (GS->HasSwapItem == 0)
+			if (GS->SwapViewItem == nullptr)
 			{
-				GS->HasSwapItem++;
+				GS->SwapViewItem = this;
 				MulticastVisibleMesh(false);
 			}
 		}

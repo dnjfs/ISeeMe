@@ -7,12 +7,17 @@
 AISMGameState::AISMGameState()
 {
 	bReplicates = true;
-	HasSwapItem = 0;
+	SwapViewItem = nullptr;
+	SaveSwapViewItem = nullptr;
+	UsedSwapViewItems.Empty();
+	bAcqCheckPoint = false;
 }
 
 void AISMGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(AISMGameState, HasSwapItem);
+	DOREPLIFETIME(AISMGameState, SwapViewItem);
+	DOREPLIFETIME(AISMGameState, SaveSwapViewItem);
+	DOREPLIFETIME(AISMGameState, UsedSwapViewItems);
 }

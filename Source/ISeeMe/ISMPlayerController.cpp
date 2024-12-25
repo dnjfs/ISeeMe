@@ -9,6 +9,8 @@
 #include "ISeeMeGameMode.h"
 #include "ISeeMeCharacter.h"
 #include "ISMCharacterState.h"
+#include "ISMGameState.h"
+#include <Kismet/GameplayStatics.h>
 
 
 AISMPlayerController::AISMPlayerController()
@@ -29,7 +31,7 @@ void AISMPlayerController::OnPossess(APawn* aPawn)
 	Super::OnPossess(aPawn);
 
 	if (HasAuthority())
-		SwapCamera();
+		SwapCamera(false);
 }
 
 void AISMPlayerController::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
@@ -52,10 +54,33 @@ void AISMPlayerController::OnRep_SwapCamera()
 
 void AISMPlayerController::ServerCallSwapCamera_Implementation()
 {
-	SwapCamera();
+	if (AISMGameState* GS = Cast<AISMGameState>(UGameplayStatics::GetGameState(this)))
+	{
+		if (GS->SwapViewItem == nullptr)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Cannot swap camera"));
+			return; // 조건에 맞지 않으면 종료
+		}
+
+		if (HasAuthority()) // 서버에서 실행
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Use"));
+			GS->UsedSwapViewItems.Add(GS->SwapViewItem);
+			GS->SwapViewItem = nullptr;
+
+			if (AISeeMeGameMode* GM = Cast<AISeeMeGameMode>(GetWorld()->GetAuthGameMode()))
+			{
+				GetWorldTimerManager().SetTimer(GM->SwapTimerHandle, FTimerDelegate::CreateWeakLambda(this, [GM]()
+					{
+						GM->SwapCamera();
+					}), GM->SwapTime, false);
+				GM->SwapCamera();
+			}
+		}
+	}
 }
 
-void AISMPlayerController::SwapCamera()
+void AISMPlayerController::SwapCamera(bool bItem)
 {
 	if (AISeeMeGameMode* GM = Cast<AISeeMeGameMode>(GetWorld()->GetAuthGameMode()))
 		GM->SwapCamera();
