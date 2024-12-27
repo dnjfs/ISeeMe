@@ -40,7 +40,7 @@ protected:
 	bool GetSessionInterface();
 
 	UFUNCTION(BlueprintCallable)
-	void CreateSession();
+	void CreateSession(FName ChapterName);
 	UFUNCTION(BlueprintCallable)
 	void FindSession();
 

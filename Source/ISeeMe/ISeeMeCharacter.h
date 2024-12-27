@@ -39,6 +39,9 @@ public:
 	UPROPERTY(EditAnywhere)
 	float DeadHeight=1000;
 
+	UPROPERTY(ReplicatedUsing = OnRep_IsCameraRestored)
+	bool IsCameraRestored = true;
+
 	/** Call Go Check Point Function from client to the server **/
 	UFUNCTION(Server, Reliable)
 	void ServerCallGoCheckPoint();
@@ -49,6 +52,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 protected:
+	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
+
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
 
@@ -75,6 +80,9 @@ protected:
 
 	/** Called for go check point */
 	void CallGoCheckPoint();
+
+	/** Called for control pitch */
+	void ControlPitch(const FInputActionValue& Value);
 
 	// APawn interface
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
@@ -133,6 +141,10 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* GoCheckPointAction;
 
+	/** Go Check Point Input Action */
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
+	UInputAction* ControlPitchAction;
+
 	/* Voice Chat */
 	IOnlineVoicePtr OnlineVoicePtr;
 
@@ -146,13 +158,16 @@ private:
 	FRotator FocusStartRotator;
 	FRotator FocusEndRotator;
 
-	UFUNCTION()
-	void PlayFocusTimeline(float Value);
-
 	/*Judgement falling */
 	bool bIsFalling = true;
 
 	/* When fall, first location */
 	float FirstHeight = 0;
+
+	UFUNCTION()
+	void PlayFocusTimeline(float Value);
+
+	UFUNCTION()
+	void OnRep_IsCameraRestored();
 };
 

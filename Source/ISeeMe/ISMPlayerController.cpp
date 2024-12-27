@@ -118,11 +118,8 @@ void AISMPlayerController::ChangeThirdAspect()
 {
 	if (class USpringArmComponent* OtherCameraBoom = OtherCharacter->GetCameraBoom())
 	{
-		OtherCameraBoom->SetRelativeLocation(FVector(0,0,100));
+		OtherCameraBoom->SetRelativeLocation(FVector(0,0,0));
 		OtherCameraBoom->TargetArmLength = 600.0f;
-
-		if (class UCameraComponent* OtherFollowCamera = OtherCharacter->GetFollowCamera())
-			OtherFollowCamera->SetRelativeRotation(FRotator(-15, 0, 0));
 	}
 }
 
@@ -134,9 +131,6 @@ void AISMPlayerController::ChangeFirstAspect()
 
 		OtherCameraBoom->SetRelativeLocation(FVector(0, 0, 75));
 		OtherCameraBoom->TargetArmLength = 0;
-
-		if (class UCameraComponent* OtherFollowCamera = OtherCharacter->GetFollowCamera())
-			OtherFollowCamera->SetRelativeRotation(FRotator(0, 0, 0));
 
 		if (OtherCharacter && OtherCharacter->GetMesh() && SelfCharacter)
 			if (OtherCharacter->GetMesh()->GetBoneIndex(SelfCharacter->HideBoneName) != INDEX_NONE)

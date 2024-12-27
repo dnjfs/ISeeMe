@@ -18,6 +18,8 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	virtual bool ShouldTickIfViewportsOnly() const override { return true; }
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -39,4 +41,8 @@ private:
 	class URotatingMovementComponent* RotatingMovement;
 
 	FRotator InitialRotation;
+
+	void EditorTick(float DeltaTime);
+
+	void SetRelativeObjectLocation();
 };
