@@ -64,6 +64,11 @@ void AISeeMeGameMode::SwapCamera()
 			PCs[i]->SetViewTarget(Characters[i]);
 			PCs[i]->SetOtherCharacter(Characters[i]);
 			PCs[i]->CurrentAspect();
+
+			if (AISeeMeCharacter* ISeeMeCharacter = PCs[i]->GetPawn<AISeeMeCharacter>())
+			{
+				ISeeMeCharacter->IsCameraRestored = true;
+			}
 		}
 	}
 	else
@@ -74,6 +79,11 @@ void AISeeMeGameMode::SwapCamera()
 			PCs[i]->SetViewTarget(Characters[(i + 1 < PlayerNum) ? i + 1 : 0]);
 			PCs[i]->SetOtherCharacter(Characters[(i + 1 < PlayerNum) ? i + 1 : 0]);
 			PCs[i]->CurrentAspect();
+			
+			if (AISeeMeCharacter* ISeeMeCharacter = PCs[i]->GetPawn<AISeeMeCharacter>())
+			{
+				ISeeMeCharacter->IsCameraRestored = false;
+			}
 		}
 	}
 	bSwapCamera = !bSwapCamera;
