@@ -80,10 +80,6 @@ void AISeeMeCharacter::BeginPlay()
 	// Call the base class  
 	Super::BeginPlay();
 
-	// 카메라 각도 고정
-	if (auto PC = GetController())
-		PC->SetControlRotation(FRotator(-15, 0, 0));
-
 	// 내 캐릭터 강조를 위해 '커스텀 뎁스 패스 렌더(bRenderCustomDepth)' 켜기
 	if (GetController() && GetController()->IsLocalController())
 		if (GetMesh())
