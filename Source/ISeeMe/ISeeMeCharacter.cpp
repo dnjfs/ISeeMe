@@ -21,6 +21,7 @@
 #include "ISMCharacterState.h"
 #include "Components/TimelineComponent.h"
 #include "ISMGameState.h"
+#include <Net/UnrealNetwork.h>
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -68,6 +69,12 @@ AISeeMeCharacter::AISeeMeCharacter()
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 }
 
+void AISeeMeCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+	DOREPLIFETIME(AISeeMeCharacter, IsCameraRestored);
+}
+
 void AISeeMeCharacter::BeginPlay()
 {
 	// Call the base class  
@@ -102,10 +109,6 @@ void AISeeMeCharacter::BeginPlay()
 	if (InitVoiceChat())
 	{
 		LOG_SCREEN("Init voice chat success");
-	}
-	else
-	{
-		LOG_SCREEN("Init voice chat fail");
 	}
 
 	if (FocusCurve)
@@ -178,6 +181,8 @@ void AISeeMeCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 		EnhancedInputComponent->BindAction(OpenMenuAction, ETriggerEvent::Triggered, this, &AISeeMeCharacter::OpenMenu);
 
 		EnhancedInputComponent->BindAction(GoCheckPointAction, ETriggerEvent::Started, this, &AISeeMeCharacter::CallGoCheckPoint);
+
+		EnhancedInputComponent->BindAction(ControlPitchAction, ETriggerEvent::Triggered, this, &AISeeMeCharacter::ControlPitch);
 	}
 	else
 	{
@@ -247,7 +252,9 @@ void AISeeMeCharacter::Look(const FInputActionValue& Value)
 	{
 		// add yaw and pitch input to controller
 		AddControllerYawInput(LookAxisVector.X);
-		//AddControllerPitchInput(LookAxisVector.Y); // 너무 어려움
+
+		if (IsCameraRestored)
+			AddControllerPitchInput(LookAxisVector.Y);
 	}
 }
 
@@ -273,6 +280,18 @@ void AISeeMeCharacter::PlayFocusTimeline(float Alpha)
 	{
 		MyController->SetControlRotation(
 			UKismetMathLibrary::RLerp(FocusStartRotator, FocusEndRotator, Alpha, true));
+	}
+}
+
+void AISeeMeCharacter::OnRep_IsCameraRestored()
+{
+	if (IsCameraRestored)
+	{
+		CameraBoom->bInheritPitch = true;
+	}
+	else
+	{
+		CameraBoom->bInheritPitch = false;
 	}
 }
 
@@ -354,6 +373,28 @@ void AISeeMeCharacter::CallGoCheckPoint()
 	else // Call Go Check Point Function on the client
 	{
 		ServerCallGoCheckPoint();
+	}
+}
+
+void AISeeMeCharacter::ControlPitch(const FInputActionValue& Value)
+{
+	if (IsCameraRestored)
+		return;
+
+	const float FloatValue = Value.Get<float>();
+
+	if (AISMPlayerController* ISMPlayerController = GetController<AISMPlayerController>())
+	{
+		if (AISeeMeCharacter* OtherCharacter = ISMPlayerController->GetOtherCharacter())
+		{
+			if (OtherCharacter->GetCameraBoom()->bInheritPitch == true)
+				OtherCharacter->GetCameraBoom()->bInheritPitch = false;
+
+			if (FloatValue > 0)
+				OtherCharacter->GetCameraBoom()->AddRelativeRotation(FRotator(1.f, 0.f, 0.f));
+			else
+				OtherCharacter->GetCameraBoom()->AddRelativeRotation(FRotator(-1.f, 0.f, 0.f));
+		}
 	}
 }
 
