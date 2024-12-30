@@ -59,6 +59,10 @@
 		{
 			"Name": "LiveLinkCurveDebugUI",
 			"Enabled": true
+		},
+		{
+			"Name": "Cargo",
+			"Enabled": false
 		}
 	]
 }
