@@ -64,17 +64,24 @@ void AISMPlayerController::ServerCallSwapCamera_Implementation()
 
 		if (HasAuthority()) // 서버에서 실행
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Use"));
-			GS->UsedSwapViewItems.Add(GS->SwapViewItem);
-			GS->SwapViewItem = nullptr;
-
 			if (AISeeMeGameMode* GM = Cast<AISeeMeGameMode>(GetWorld()->GetAuthGameMode()))
 			{
+				if (GM->SwapTimerHandle.IsValid())
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Already Swapped!"));
+					return;
+				}
+
 				GetWorldTimerManager().SetTimer(GM->SwapTimerHandle, FTimerDelegate::CreateWeakLambda(this, [GM]()
 					{
 						GM->SwapCamera();
+						GM->SwapTimerHandle.Invalidate();
 					}), GM->SwapTime, false);
 				GM->SwapCamera();
+
+				UE_LOG(LogTemp, Warning, TEXT("Use"));
+				GS->UsedSwapViewItems.Add(GS->SwapViewItem);
+				GS->SwapViewItem = nullptr;
 			}
 		}
 	}
