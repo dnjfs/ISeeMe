@@ -10,8 +10,7 @@
 // Sets default values
 AISMSwapViewItem::AISMSwapViewItem()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
 	bReplicates = true;
 
 	ItemMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("CheckPointMesh"));
@@ -41,13 +40,6 @@ void AISMSwapViewItem::BeginPlay()
 	{
 		TriggerVolume->OnComponentBeginOverlap.AddDynamic(this, &AISMSwapViewItem::OnOverlapBegin);
 	}
-}
-
-// Called every frame
-void AISMSwapViewItem::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
 }
 
 void AISMSwapViewItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
