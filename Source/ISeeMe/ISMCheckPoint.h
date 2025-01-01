@@ -69,6 +69,7 @@ public:
 	/*When all detect, change material*/
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UMaterialInterface> AllCheckMaterial;
+
 private:
 	int DetectPlayer = 0;
 };
