@@ -26,6 +26,17 @@ private:
 	UPROPERTY(EditAnywhere)
 	FVector LaunchVelocity;
 
+	FVector OriginalLocation;
+
+	UPROPERTY(EditDefaultsOnly, Category = Timeline, meta = (AllowPrivateAccess = "true"))
+	class UTimelineComponent* ShakeTimeline;
+
+	UPROPERTY(EditDefaultsOnly, Category = Timeline, meta = (AllowPrivateAccess = "true"))
+	class UCurveFloat* ShakeCurve;
+
 	UFUNCTION(NetMulticast, Reliable)
-	void LaunchCharacter(AActor* OverlappedActor, AActor* OtherActor);
+	void MulticastLaunchCharacter(AActor* OverlappedActor, AActor* OtherActor);
+
+	UFUNCTION()
+	void PlayShakeTimeline(float Value);
 };
