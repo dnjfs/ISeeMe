@@ -8,6 +8,8 @@
 #include "OnlineSessionSettings.h"
 #include "Online/OnlineSessionNames.h"
 #include "Kismet/GameplayStatics.h"
+#include "ISMCharacterState.h"
+#include "ISMGameInstance.h"
 
 AISMLobbyController::AISMLobbyController()
 	: CreateSessionCompleteDelegate(FOnCreateSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnCreateSessionComplete))
@@ -267,3 +269,4 @@ void AISMLobbyController::JoinSession(const FOnlineSessionSearchResult& Result)
 	if (const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController())
 		OnlineSessionInterface->JoinSession(*LocalPlayer->GetPreferredUniqueNetId(), NAME_GameSession, Result);
 }
+

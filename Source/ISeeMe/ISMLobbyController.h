@@ -43,7 +43,7 @@ protected:
 	void CreateSession(FName ChapterName);
 	UFUNCTION(BlueprintCallable)
 	void FindSession();
-
+	
 	void OnCreateSessionComplete(FName SessionName, bool bWasSuccessful);
 	void OnFindSessionComplete(bool bWasSuccessful);
 	void OnJoinSessionComplate(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
@@ -51,6 +51,7 @@ protected:
 	void OnFindFriendSessionComplete(int32 LocalUserNum, bool bWasSuccessful, const TArray<FOnlineSessionSearchResult>&);
 	void OnSessionUserInviteAccepted(const bool bWasSuccessful, const int32 ControllerId, FUniqueNetIdPtr UserId, const FOnlineSessionSearchResult& InviteResult);
 	void JoinSession(const FOnlineSessionSearchResult& Result);
+	
 
 private:
 	IOnlineSessionPtr OnlineSessionInterface;

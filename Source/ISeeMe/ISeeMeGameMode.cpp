@@ -6,6 +6,7 @@
 
 #include "ISMPlayerController.h"
 #include "ISMCharacterState.h"
+#include "ISMGameInstance.h"
 
 AISeeMeGameMode::AISeeMeGameMode()
 {
@@ -25,6 +26,31 @@ void AISeeMeGameMode::PostLogin(APlayerController* NewPlayer)
 	{
 		int32 CurrentPlayerCount = GetNumPlayers();
 		State->CustomPlayerID = CurrentPlayerCount; // First Player = 1, Second Player = 2
+	}
+
+	if (UISMGameInstance* GameInstance = Cast<UISMGameInstance>(GetGameInstance()))
+	{
+		if (GameInstance->SelectedPawnClass != nullptr)
+		{
+			// SelectedPawnClass가 유효한지 추가적인 검사
+			if (GameInstance->SelectedPawnClass->IsChildOf(APawn::StaticClass()))
+			{
+				UE_LOG(LogTemp, Warning, TEXT("%s"), *GameInstance->SelectedPawnClass->GetName());
+				DefaultPawnClass = GameInstance->SelectedPawnClass;
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Invalid Pawn Class"));
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("SelectedPawnClass is null"));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("No GameInstance"));
 	}
 }
 
