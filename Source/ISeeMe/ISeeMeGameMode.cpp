@@ -35,8 +35,15 @@ void AISeeMeGameMode::PostLogin(APlayerController* NewPlayer)
 			// SelectedPawnClass가 유효한지 추가적인 검사
 			if (GameInstance->SelectedPawnClass->IsChildOf(APawn::StaticClass()))
 			{
-				UE_LOG(LogTemp, Warning, TEXT("%s"), *GameInstance->SelectedPawnClass->GetName());
 				DefaultPawnClass = GameInstance->SelectedPawnClass;
+				UE_LOG(LogTemp, Warning, TEXT("DefaultPawnClass set to: %s"), *DefaultPawnClass->GetName());
+
+				// 기존 Pawn 파괴 및 새 Pawn 생성
+				if (NewPlayer->GetPawn())
+				{
+					NewPlayer->GetPawn()->Destroy();
+				}
+				RestartPlayer(NewPlayer);
 			}
 			else
 			{

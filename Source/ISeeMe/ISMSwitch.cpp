@@ -103,7 +103,6 @@ void AISMSwitch::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* Other
 		CurDetectPlayer--;
 		if (CurDetectPlayer < 1)
 		{
-			TargetLocation = StartLocation;
 			MulticastChangeMaterial(false);
 		}
 	}
@@ -114,10 +113,12 @@ void AISMSwitch::MulticastChangeMaterial_Implementation(bool bCheck)
 	SetActorTickEnabled(true);
 	if (bCheck)
 	{
+		TargetLocation = EndLocation;
 		SwitchMesh->SetMaterial(0, CheckMaterial);
 	}
 	else
 	{
+		TargetLocation = StartLocation;
 		SwitchMesh->SetMaterial(0, BaseMaterial);
 	}
 }
