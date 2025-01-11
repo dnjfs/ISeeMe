@@ -13,8 +13,8 @@ UCLASS()
 class ISEEME_API AISMSwitch : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	AISMSwitch();
 
@@ -28,7 +28,7 @@ protected:
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastChangeMaterial(bool bCheck);
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
