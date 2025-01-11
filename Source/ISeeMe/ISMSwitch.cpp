@@ -3,6 +3,8 @@
 
 #include "ISMSwitch.h"
 #include "GameFramework/Character.h"
+#include "Components/BoxComponent.h"
+#include "Components/ArrowComponent.h"
 
 // Sets default values
 AISMSwitch::AISMSwitch()
@@ -11,13 +13,9 @@ AISMSwitch::AISMSwitch()
 	PrimaryActorTick.bCanEverTick = true;
 
 	SwitchMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SwitchMesh"));
-	if (SwitchMesh == nullptr)
-		return;
 	SwitchMesh->SetupAttachment(RootComponent);
 
 	TriggerVolume = CreateDefaultSubobject<UBoxComponent>(TEXT("TriggerVolume"));
-	if (TriggerVolume == nullptr)
-		return;
 	TriggerVolume->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	TriggerVolume->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
 	TriggerVolume->SetCollisionResponseToChannel(ECC_Pawn, HasAuthority() ? ECR_Overlap : ECR_Ignore);
@@ -25,8 +23,6 @@ AISMSwitch::AISMSwitch()
 	TriggerVolume->SetupAttachment(SwitchMesh);
 
 	MoveMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MoveMesh"));
-	if (MoveMesh == nullptr)
-		return;
 	MoveMesh->SetupAttachment(RootComponent);
 
 	bReplicates = true;

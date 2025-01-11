@@ -4,9 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include <NiagaraActor.h>
-#include <Components/BoxComponent.h>
-#include <Components/ArrowComponent.h>
 #include "ISMSwitch.generated.h"
 
 UCLASS()
