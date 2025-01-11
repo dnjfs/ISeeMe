@@ -4,17 +4,14 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include <NiagaraActor.h>
-#include <Components/BoxComponent.h>
-#include <Components/ArrowComponent.h>
 #include "ISMSwitch.generated.h"
 
 UCLASS()
 class ISEEME_API AISMSwitch : public AActor
 {
 	GENERATED_BODY()
-	
-public:	
+
+public:
 	// Sets default values for this actor's properties
 	AISMSwitch();
 
@@ -28,7 +25,7 @@ protected:
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastChangeMaterial(bool bCheck);
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 

@@ -3,21 +3,19 @@
 
 #include "ISMSwitch.h"
 #include "GameFramework/Character.h"
+#include "Components/BoxComponent.h"
+#include "Components/ArrowComponent.h"
 
 // Sets default values
 AISMSwitch::AISMSwitch()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	SwitchMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("SwitchMesh"));
-	if (SwitchMesh == nullptr)
-		return;
 	SwitchMesh->SetupAttachment(RootComponent);
 
 	TriggerVolume = CreateDefaultSubobject<UBoxComponent>(TEXT("TriggerVolume"));
-	if (TriggerVolume == nullptr)
-		return;
 	TriggerVolume->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	TriggerVolume->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
 	TriggerVolume->SetCollisionResponseToChannel(ECC_Pawn, HasAuthority() ? ECR_Overlap : ECR_Ignore);
@@ -25,8 +23,6 @@ AISMSwitch::AISMSwitch()
 	TriggerVolume->SetupAttachment(SwitchMesh);
 
 	MoveMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MoveMesh"));
-	if (MoveMesh == nullptr)
-		return;
 	MoveMesh->SetupAttachment(RootComponent);
 
 	bReplicates = true;
@@ -36,7 +32,7 @@ AISMSwitch::AISMSwitch()
 void AISMSwitch::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 	// Init Location and Speed
 	StartLocation = MoveMesh->GetComponentLocation();
 	EndLocation = StartLocation + DirectionVector;
@@ -70,7 +66,7 @@ void AISMSwitch::MulticastMove_Implementation(float DeltaTime)
 	FVector WorldNextLocation = CurLocation + ((TargetLocation - CurLocation).GetSafeNormal()) * DeltaTime * MoveSpeed;
 	MoveMesh->SetWorldLocation(WorldNextLocation);
 
-	if (DistanceToTarget <=1)
+	if (DistanceToTarget <= 1)
 	{
 		SetActorTickEnabled(false);
 		return;
@@ -118,7 +114,7 @@ void AISMSwitch::MulticastChangeMaterial_Implementation(bool bCheck)
 	SetActorTickEnabled(true);
 	if (bCheck)
 	{
-		SwitchMesh->SetMaterial(0,CheckMaterial);
+		SwitchMesh->SetMaterial(0, CheckMaterial);
 	}
 	else
 	{
