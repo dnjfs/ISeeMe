@@ -140,6 +140,14 @@ void AISMLobbyController::FindSession()
 		OnlineSessionInterface->FindSessions(*LocalPlayer->GetPreferredUniqueNetId(), SessionSearch.ToSharedRef());
 }
 
+void AISMLobbyController::ExitGame()
+{
+	if (UWorld* World = GetWorld())
+	{
+		UKismetSystemLibrary::QuitGame(World, this, EQuitPreference::Quit, true);
+	}	
+}
+
 void AISMLobbyController::OnFindSessionComplete(bool bWasSuccessful)
 {
 	if (OnlineSessionInterface.IsValid() == false)
