@@ -43,6 +43,8 @@ protected:
 	void CreateSession(FName ChapterName);
 	UFUNCTION(BlueprintCallable)
 	void FindSession();
+	UFUNCTION(BlueprintCallable)
+	void ExitGame();
 
 	void OnCreateSessionComplete(FName SessionName, bool bWasSuccessful);
 	void OnFindSessionComplete(bool bWasSuccessful);
