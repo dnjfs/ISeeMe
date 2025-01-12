@@ -77,11 +77,3 @@ DerivedDataCache/*
 
 # From IntellyJ
 .idea/
-
-# Don't ignore Wwise .dll and .lib files as these are needed for compiling
-!Plugins/Wwise/**/*.dll
-!Plugins/Wwise/**/*.lib
-!Plugins/WwiseNiagara/**/*.dll
-!Plugins/WwiseNiagara/**/*.lib
-!Plugins/WwiseSoundEngine/**/*.dll
-!Plugins/WwiseSoundEngine/**/*.lib
