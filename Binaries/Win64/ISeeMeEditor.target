@@ -34,226 +34,6 @@
 			"Type": "RequiredResource"
 		},
 		{
-			"Path": "$(ProjectDir)/Plugins/WwiseNiagara/Binaries/Win64/UnrealEditor-WwiseNiagara.dll",
-			"Type": "DynamicLibrary"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/WwiseNiagara/Binaries/Win64/UnrealEditor-WwiseNiagara.pdb",
-			"Type": "SymbolFile"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/WwiseNiagara/Binaries/Win64/UnrealEditor.modules",
-			"Type": "RequiredResource"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/WwiseSoundEngine/Binaries/Win64/UnrealEditor-WwiseAuthoring.dll",
-			"Type": "DynamicLibrary"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/WwiseSoundEngine/Binaries/Win64/UnrealEditor-WwiseAuthoring.pdb",
-			"Type": "SymbolFile"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/WwiseSoundEngine/Binaries/Win64/UnrealEditor-WwiseLowLevelUtils.dll",
-			"Type": "DynamicLibrary"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/WwiseSoundEngine/Binaries/Win64/UnrealEditor-WwiseLowLevelUtils.pdb",
-			"Type": "SymbolFile"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/WwiseSoundEngine/Binaries/Win64/UnrealEditor-WwiseSoundEngine.dll",
-			"Type": "DynamicLibrary"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/WwiseSoundEngine/Binaries/Win64/UnrealEditor-WwiseSoundEngine.pdb",
-			"Type": "SymbolFile"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/WwiseSoundEngine/Binaries/Win64/UnrealEditor.modules",
-			"Type": "RequiredResource"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/Wwise/Binaries/Win64/UnrealEditor-AkAudio.dll",
-			"Type": "DynamicLibrary"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/Wwise/Binaries/Win64/UnrealEditor-AkAudio.pdb",
-			"Type": "SymbolFile"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/Wwise/Binaries/Win64/UnrealEditor-AkAudioMixer.dll",
-			"Type": "DynamicLibrary"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/Wwise/Binaries/Win64/UnrealEditor-AkAudioMixer.pdb",
-			"Type": "SymbolFile"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/Wwise/Binaries/Win64/UnrealEditor-AudiokineticTools.dll",
-			"Type": "DynamicLibrary"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/Wwise/Binaries/Win64/UnrealEditor-AudiokineticTools.pdb",
-			"Type": "SymbolFile"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/Wwise/Binaries/Win64/UnrealEditor-Wwise.dll",
-			"Type": "DynamicLibrary"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/Wwise/Binaries/Win64/UnrealEditor-Wwise.pdb",
-			"Type": "SymbolFile"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/Wwise/Binaries/Win64/UnrealEditor-WwiseAudioLinkEditor.dll",
-			"Type": "DynamicLibrary"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/Wwise/Binaries/Win64/UnrealEditor-WwiseAudioLinkEditor.pdb",
-			"Type": "SymbolFile"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/Wwise/Binaries/Win64/UnrealEditor-WwiseAudioLinkRuntime.dll",
-			"Type": "DynamicLibrary"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/Wwise/Binaries/Win64/UnrealEditor-WwiseAudioLinkRuntime.pdb",
-			"Type": "SymbolFile"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/Wwise/Binaries/Win64/UnrealEditor-WwiseConcurrency.dll",
-			"Type": "DynamicLibrary"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/Wwise/Binaries/Win64/UnrealEditor-WwiseConcurrency.pdb",
-			"Type": "SymbolFile"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/Wwise/Binaries/Win64/UnrealEditor-WwiseEditorUtils.dll",
-			"Type": "DynamicLibrary"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/Wwise/Binaries/Win64/UnrealEditor-WwiseEditorUtils.pdb",
-			"Type": "SymbolFile"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/Wwise/Binaries/Win64/UnrealEditor-WwiseEngineUtils.dll",
-			"Type": "DynamicLibrary"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/Wwise/Binaries/Win64/UnrealEditor-WwiseEngineUtils.pdb",
-			"Type": "SymbolFile"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/Wwise/Binaries/Win64/UnrealEditor-WwiseFileHandler.dll",
-			"Type": "DynamicLibrary"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/Wwise/Binaries/Win64/UnrealEditor-WwiseFileHandler.pdb",
-			"Type": "SymbolFile"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/Wwise/Binaries/Win64/UnrealEditor-WwiseObjectUtils.dll",
-			"Type": "DynamicLibrary"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/Wwise/Binaries/Win64/UnrealEditor-WwiseObjectUtils.pdb",
-			"Type": "SymbolFile"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/Wwise/Binaries/Win64/UnrealEditor-WwiseObstructionOcclusion.dll",
-			"Type": "DynamicLibrary"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/Wwise/Binaries/Win64/UnrealEditor-WwiseObstructionOcclusion.pdb",
-			"Type": "SymbolFile"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/Wwise/Binaries/Win64/UnrealEditor-WwisePackaging.dll",
-			"Type": "DynamicLibrary"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/Wwise/Binaries/Win64/UnrealEditor-WwisePackaging.pdb",
-			"Type": "SymbolFile"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/Wwise/Binaries/Win64/UnrealEditor-WwisePackagingEditor.dll",
-			"Type": "DynamicLibrary"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/Wwise/Binaries/Win64/UnrealEditor-WwisePackagingEditor.pdb",
-			"Type": "SymbolFile"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/Wwise/Binaries/Win64/UnrealEditor-WwisePackagingRuntime.dll",
-			"Type": "DynamicLibrary"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/Wwise/Binaries/Win64/UnrealEditor-WwisePackagingRuntime.pdb",
-			"Type": "SymbolFile"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/Wwise/Binaries/Win64/UnrealEditor-WwiseProcessing.dll",
-			"Type": "DynamicLibrary"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/Wwise/Binaries/Win64/UnrealEditor-WwiseProcessing.pdb",
-			"Type": "SymbolFile"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/Wwise/Binaries/Win64/UnrealEditor-WwiseProjectDatabase.dll",
-			"Type": "DynamicLibrary"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/Wwise/Binaries/Win64/UnrealEditor-WwiseProjectDatabase.pdb",
-			"Type": "SymbolFile"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/Wwise/Binaries/Win64/UnrealEditor-WwiseReconcile.dll",
-			"Type": "DynamicLibrary"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/Wwise/Binaries/Win64/UnrealEditor-WwiseReconcile.pdb",
-			"Type": "SymbolFile"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/Wwise/Binaries/Win64/UnrealEditor-WwiseResourceCooker.dll",
-			"Type": "DynamicLibrary"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/Wwise/Binaries/Win64/UnrealEditor-WwiseResourceCooker.pdb",
-			"Type": "SymbolFile"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/Wwise/Binaries/Win64/UnrealEditor-WwiseResourceLoader.dll",
-			"Type": "DynamicLibrary"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/Wwise/Binaries/Win64/UnrealEditor-WwiseResourceLoader.pdb",
-			"Type": "SymbolFile"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/Wwise/Binaries/Win64/UnrealEditor-WwiseSimpleExternalSource.dll",
-			"Type": "DynamicLibrary"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/Wwise/Binaries/Win64/UnrealEditor-WwiseSimpleExternalSource.pdb",
-			"Type": "SymbolFile"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/Wwise/Binaries/Win64/UnrealEditor-WwiseUtils.dll",
-			"Type": "DynamicLibrary"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/Wwise/Binaries/Win64/UnrealEditor-WwiseUtils.pdb",
-			"Type": "SymbolFile"
-		},
-		{
-			"Path": "$(ProjectDir)/Plugins/Wwise/Binaries/Win64/UnrealEditor.modules",
-			"Type": "RequiredResource"
-		},
-		{
 			"Path": "$(EngineDir)/Binaries/Win64/AgentInterface.dll",
 			"Type": "DynamicLibrary"
 		},
@@ -4004,6 +3784,7 @@
 			"Type": "UFS"
 		},
 		{
+<<<<<<< Updated upstream
 			"Path": "$(ProjectDir)/Plugins/WwiseNiagara/WwiseNiagara.uplugin",
 			"Type": "UFS"
 		},
@@ -4136,6 +3917,8 @@
 			"Type": "UFS"
 		},
 		{
+=======
+>>>>>>> Stashed changes
 			"Path": "$(EngineDir)/Binaries/ThirdParty/DbgHelp/dbghelp.dll",
 			"Type": "NonUFS"
 		},
@@ -27410,9 +27193,6 @@
 		"WmfMedia",
 		"WorldMetrics",
 		"WorldPartitionHLODUtilities",
-		"Wwise",
-		"WwiseNiagara",
-		"WwiseSoundEngine",
 		"XCodeSourceCodeAccess",
 		"XGEController",
 		"XInputDevice",
