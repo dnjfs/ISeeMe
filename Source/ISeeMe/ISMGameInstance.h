@@ -15,11 +15,16 @@ class ISEEME_API UISMGameInstance : public UGameInstance
 	GENERATED_BODY()
 	
 public:
-	/*Player Pawn*/
-	UPROPERTY(BlueprintReadWrite)
-	TSubclassOf<APawn> SelectedPawnClass;
+	UPROPERTY()
+	TArray<TSubclassOf<APawn>> SelectedPawnClasses;
 
+    UPROPERTY()
+    TSubclassOf<APawn> SelectedPawnClass;
 
-	UFUNCTION(BlueprintCallable)
-	void SetSelectedPawnClass(TSubclassOf<APawn> NewPawnClass);
+    /*void AddToPersistentArray(const TSubclassOf<APawn>& NewValue);
+
+    const TArray<TSubclassOf<APawn>>& GetPersistentArray() const
+    {
+        return SelectedPawnClasses;
+    }*/
 };

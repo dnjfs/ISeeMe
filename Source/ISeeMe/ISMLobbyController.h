@@ -53,7 +53,18 @@ protected:
 	void OnFindFriendSessionComplete(int32 LocalUserNum, bool bWasSuccessful, const TArray<FOnlineSessionSearchResult>&);
 	void OnSessionUserInviteAccepted(const bool bWasSuccessful, const int32 ControllerId, FUniqueNetIdPtr UserId, const FOnlineSessionSearchResult& InviteResult);
 	void JoinSession(const FOnlineSessionSearchResult& Result);
+
+	UFUNCTION(BlueprintCallable)
+	void CallSelectCharacter(TSubclassOf<APawn> NewPawnClass);
+
+	UFUNCTION(Server, Reliable)
+	void ServerSelectCharacter(TSubclassOf<APawn> NewPawnClass);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastSelectCharacter(TSubclassOf<APawn> NewPawnClass);
 	
+	UPROPERTY(BlueprintReadWrite, Replicated)
+	TArray<TSubclassOf<APawn>> SelectedPawnClasses;
 
 private:
 	IOnlineSessionPtr OnlineSessionInterface;

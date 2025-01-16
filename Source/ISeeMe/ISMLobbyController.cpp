@@ -10,6 +10,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "ISMCharacterState.h"
 #include "ISMGameInstance.h"
+#include <Net/UnrealNetwork.h>
 
 AISMLobbyController::AISMLobbyController()
 	: CreateSessionCompleteDelegate(FOnCreateSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnCreateSessionComplete))
@@ -27,11 +28,21 @@ void AISMLobbyController::BeginPlay()
 	if (UIWidgetClass == nullptr)
 		return;
 
-	UIWidgetInstance = CreateWidget<UUserWidget>(this, UIWidgetClass);
-	if (UIWidgetInstance == nullptr)
-		return;
-
-	UIWidgetInstance->AddToViewport();
+	if (APlayerController* PC = GetWorld()->GetFirstPlayerController())
+	{
+		if (PC->IsLocalController())
+		{
+			UIWidgetInstance = CreateWidget<UUserWidget>(PC, UIWidgetClass);
+			if (UIWidgetInstance)
+			{
+				UIWidgetInstance->AddToViewport();
+			}
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Attempted to create widget on non-local controller!"));
+		}
+	}
 
 	FInputModeUIOnly Mode;
 	Mode.SetWidgetToFocus(UIWidgetInstance->GetCachedWidget());
@@ -43,6 +54,36 @@ void AISMLobbyController::BeginPlay()
 		LOG_SCREEN("Failed GetSessionInterface()");
 		return;
 	}
+}
+
+void AISMLobbyController::CallSelectCharacter(TSubclassOf<APawn> NewPawnClass)
+{
+	if (HasAuthority())
+		MulticastSelectCharacter(NewPawnClass);
+	else
+		ServerSelectCharacter(NewPawnClass);
+}
+
+void AISMLobbyController::ServerSelectCharacter_Implementation(TSubclassOf<APawn> NewPawnClass)
+{
+	MulticastSelectCharacter(NewPawnClass);
+}
+
+void AISMLobbyController::MulticastSelectCharacter_Implementation(TSubclassOf<APawn> NewPawnClass)
+{
+	if (UISMGameInstance* GameInstance = GetGameInstance<UISMGameInstance>())
+	{
+		//GameInstance->SelectedPawnClasses.Add(NewPawnClass);
+		GameInstance->SelectedPawnClass = NewPawnClass;
+		UE_LOG(LogTemp, Warning, TEXT("GameInstance Change : %d"), GameInstance->SelectedPawnClasses.Num());
+	}
+}
+
+void AISMLobbyController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AISMLobbyController, SelectedPawnClasses);
 }
 
 bool AISMLobbyController::GetSessionInterface()
@@ -91,7 +132,14 @@ void AISMLobbyController::CreateSession(FName ChapterName)
 	SessionSettings->NumPublicConnections = 2;		// 허용되는 플레이어 수
 	SessionSettings->bShouldAdvertise = true;		// 광고되는 세션인지 개인 세션인지
 	SessionSettings->bAllowJoinInProgress = true;	// 세션 진행중에 참여 허용
-	SessionSettings->bIsLANMatch = false;			// LAN에서만 실행되고 외부 공개되지 않음
+	if (IOnlineSubsystem::Get()->GetSubsystemName() == "NULL")
+	{
+		SessionSettings->bIsLANMatch = true;
+	}
+	else
+	{
+		SessionSettings->bIsLANMatch = false;
+	}
 	SessionSettings->bIsDedicated = false;			// 데디케이티드 서버인지 (리슨 서버가 아닌지)
 	SessionSettings->bUsesPresence = true;			// Presence 사용 (유저 정보에 세션 정보를 표시하는듯)
 	SessionSettings->bAllowJoinViaPresence = true;	// Presence를 통해 참여 허용

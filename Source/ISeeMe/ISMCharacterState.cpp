@@ -2,6 +2,10 @@
 
 
 #include "ISMCharacterState.h"
+#include <Net/UnrealNetwork.h>
+#include "ISMGameInstance.h"
+#include "ISMPlayerController.h"
+#include "ISeeMeCharacter.h"
 
 UStaticMeshComponent* AISMCharacterState::GetRespawnPoint(int InCustomPlayerId)
 {

@@ -14,7 +14,7 @@ UCLASS()
 class ISEEME_API AISMCharacterState : public APlayerState
 {
 	GENERATED_BODY()
-	
+
 public:
 	UStaticMeshComponent* GetRespawnPoint(int InCustomPlayerId);
 
@@ -36,4 +36,5 @@ public:
 	/*Player Number*/
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Player Info")
 	int32 CustomPlayerID;
+
 };
