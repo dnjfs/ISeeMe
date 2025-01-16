@@ -3,6 +3,7 @@
 
 #include "ISeeMe/UI/ISMHUD.h"
 #include "ISeeMe/UI/InGameMenu.h"
+#include "ISeeMe/UI/ISMOverlay.h"
 
 void AISMHUD::BeginPlay()
 {
@@ -15,6 +16,11 @@ void AISMHUD::BeginPlay()
 		{
 			InGameMenu = CreateWidget<UInGameMenu>(PlayerController, InGameMenuClass);
 			InGameMenu->AddToViewport();
+		}
+		if (PlayerController && ISMOverlayClass)
+		{
+			ISMOverlay = CreateWidget<UISMOverlay>(PlayerController, ISMOverlayClass);
+			ISMOverlay->AddToViewport();
 		}
 	}
 }
