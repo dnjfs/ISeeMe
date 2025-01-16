@@ -7,6 +7,9 @@
 #include "ISMPlayerController.h"
 #include "ISMCharacterState.h"
 #include "ISMGameInstance.h"
+#include "ISMLobbyController.h"
+#include <Kismet/GameplayStatics.h>
+#include "ISMGameState.h"
 
 AISeeMeGameMode::AISeeMeGameMode()
 {
@@ -16,7 +19,10 @@ AISeeMeGameMode::AISeeMeGameMode()
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
+
+	bUseSeamlessTravel = true;
 }
+
 
 void AISeeMeGameMode::PostLogin(APlayerController* NewPlayer)
 {
@@ -25,44 +31,13 @@ void AISeeMeGameMode::PostLogin(APlayerController* NewPlayer)
 	if (AISMCharacterState* State = NewPlayer->GetPlayerState<AISMCharacterState>())
 	{
 		int32 CurrentPlayerCount = GetNumPlayers();
-		State->CustomPlayerID = CurrentPlayerCount; // First Player = 1, Second Player = 2
-	}
-
-	if (UISMGameInstance* GameInstance = Cast<UISMGameInstance>(GetGameInstance()))
-	{
-		if (GameInstance->SelectedPawnClass != nullptr)
-		{
-			// SelectedPawnClass가 유효한지 추가적인 검사
-			if (GameInstance->SelectedPawnClass->IsChildOf(APawn::StaticClass()))
-			{
-				DefaultPawnClass = GameInstance->SelectedPawnClass;
-				UE_LOG(LogTemp, Warning, TEXT("DefaultPawnClass set to: %s"), *DefaultPawnClass->GetName());
-
-				// 기존 Pawn 파괴 및 새 Pawn 생성
-				if (NewPlayer->GetPawn())
-				{
-					NewPlayer->GetPawn()->Destroy();
-				}
-				RestartPlayer(NewPlayer);
-			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("Invalid Pawn Class"));
-			}
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("SelectedPawnClass is null"));
-		}
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("No GameInstance"));
+		State->CustomPlayerID = CurrentPlayerCount;
 	}
 }
 
 void AISeeMeGameMode::SwapCamera()
 {
+	LOG_SCREEN("Swap");
 	int32 CurrentPlayers = GetNumPlayers();
 
 	TArray<AISMPlayerController*> PCs;
@@ -120,4 +95,70 @@ void AISeeMeGameMode::SwapCamera()
 		}
 	}
 	bSwapCamera = !bSwapCamera;
+}
+
+void AISeeMeGameMode::SelectCharacter()
+{
+	UISMGameInstance* GameInstance = GetGameInstance<UISMGameInstance>();
+	if (GameInstance == nullptr)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("GameMode : No GameInstance"));
+		return;
+	}
+
+
+	TArray<AISeeMeCharacter*> LocalCharacters;
+	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	{
+		AISMPlayerController* PC = Cast<AISMPlayerController>(Iterator->Get());
+		if (PC == nullptr)
+			continue;
+
+		ACharacter* BaseCharacter = PC->GetCharacter();
+		if (BaseCharacter && BaseCharacter->IsA(AISeeMeCharacter::StaticClass()))
+		{
+			AISeeMeCharacter* LocalCharacter = Cast<AISeeMeCharacter>(BaseCharacter);
+			LocalCharacters.Add(LocalCharacter);
+		}
+	}
+
+	if (LocalCharacters.Num() != SelectedPawnClasses.Num())
+	{
+		UE_LOG(LogTemp, Error, TEXT("Mismatch between Characters (%d) and SelectedPawnClasses (%d) count!"),
+			LocalCharacters.Num(), SelectedPawnClasses.Num());
+		return;
+	}
+
+	for (int i = 0; i < LocalCharacters.Num(); i++)
+	{
+		AISeeMeCharacter* MyCharacter = LocalCharacters[i];
+		if (TSubclassOf<APawn> SelectedClass = SelectedPawnClasses[i])
+		{
+			APawn* ExistingPawn = MyCharacter->GetController()->GetPawn();
+			AController* Controller = MyCharacter->GetController();
+			if (ExistingPawn)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Destroying existing pawn for player %d: %s"), i, *ExistingPawn->GetName());
+				ExistingPawn->Destroy();
+			}
+
+			FVector MySpawnLocation = MyCharacter->GetActorLocation();
+			FRotator MySpawnRotation = MyCharacter->GetActorRotation();
+			if (!MySpawnLocation.ContainsNaN() && !MySpawnRotation.ContainsNaN())
+			{
+				APawn* NewPawn = GetWorld()->SpawnActor<APawn>(SelectedClass, MySpawnLocation, MySpawnRotation);
+
+				if (NewPawn)
+				{
+					if (Controller && NewPawn)
+					{
+						Controller->Possess(NewPawn);
+						UE_LOG(LogTemp, Warning, TEXT("Spawned and possessed new pawn for player %d"), i);
+						UE_LOG(LogTemp, Warning, TEXT("Pawn Name (%s) and Num (%d) Controller"),
+							*NewPawn->GetName(), i, *GetName());
+					}
+				}
+			}
+		}
+	}
 }

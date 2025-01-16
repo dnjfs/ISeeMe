@@ -59,6 +59,23 @@ public:
 
 	void DeadCharacter();
 
+	//////////////////////////////
+
+	UPROPERTY(Replicated, EditAnywhere, Category = "Game Data")
+	TSubclassOf<APawn> SelectedPawnClass;
+
+	UPROPERTY(ReplicatedUsing = SpawnClass)
+	TArray<TSubclassOf<APawn>> SelectedPawnClasses;
+
+	UFUNCTION(Server, Unreliable)
+	void ServerSpawnClass();
+
+	UFUNCTION()
+	void SpawnClass();
+
+	UFUNCTION()
+	void OneSpawnClass();
+
 private:
 	bool bFirstAspect = false;
 
@@ -70,4 +87,7 @@ private:
 
 	/** Change Third Aspect */
 	void ChangeThirdAspect();
+
+	UPROPERTY(ReplicatedUsing = SpawnClass)
+	bool bSpawn = true;
 };
