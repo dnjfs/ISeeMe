@@ -7,6 +7,7 @@
 #include "ISMHUD.generated.h"
 
 class UInGameMenu;
+class UISMOverlay;
 
 UCLASS()
 class ISEEME_API AISMHUD : public AHUD
@@ -15,6 +16,8 @@ class ISEEME_API AISMHUD : public AHUD
 	
 public:
 	void ToggleInGameMenu(APlayerController* PlayerController);
+
+	FORCEINLINE UISMOverlay* GetISMOverlay() { return ISMOverlay; };
 
 protected:
 	virtual void BeginPlay() override;
@@ -25,4 +28,10 @@ private:
 
 	UPROPERTY()
 	UInGameMenu* InGameMenu;
+
+	UPROPERTY(EditDefaultsOnly)
+	TSubclassOf<UISMOverlay> ISMOverlayClass;
+
+	UPROPERTY()
+	UISMOverlay* ISMOverlay;
 };
