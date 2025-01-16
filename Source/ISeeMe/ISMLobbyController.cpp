@@ -73,17 +73,9 @@ void AISMLobbyController::MulticastSelectCharacter_Implementation(TSubclassOf<AP
 {
 	if (UISMGameInstance* GameInstance = GetGameInstance<UISMGameInstance>())
 	{
-		//GameInstance->SelectedPawnClasses.Add(NewPawnClass);
 		GameInstance->SelectedPawnClass = NewPawnClass;
 		UE_LOG(LogTemp, Warning, TEXT("GameInstance Change : %d"), GameInstance->SelectedPawnClasses.Num());
 	}
-}
-
-void AISMLobbyController::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-
-	DOREPLIFETIME(AISMLobbyController, SelectedPawnClasses);
 }
 
 bool AISMLobbyController::GetSessionInterface()

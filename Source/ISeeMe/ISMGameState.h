@@ -18,6 +18,8 @@ class ISEEME_API AISMGameState : public AGameStateBase
 protected:
 	AISMGameState();
 
+	virtual void BeginPlay() override;
+
 public:
 	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere)
 	AISMSwapViewItem* SwapViewItem; // Current Own
@@ -31,4 +33,11 @@ public:
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 	bool bAcqCheckPoint;
+
+	UPROPERTY(Replicated)
+	TArray<TSubclassOf<APawn>> SelectedPawnClasses;
+
+	UFUNCTION()
+	void AddSelectedPawnClass(const TSubclassOf<APawn> &NewPawn);
+
 };

@@ -13,6 +13,7 @@
 #include <Kismet/GameplayStatics.h>
 #include "ISMLobbyController.h"
 #include "ISMGameInstance.h"
+#include "TimerManager.h"
 
 
 AISMPlayerController::AISMPlayerController()
@@ -25,6 +26,18 @@ void AISMPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
+	if (bSpawn)
+	{
+		if (HasAuthority())
+		{
+			bSpawn = false;
+		}
+		else
+		{
+			ServerSpawnClass();
+		}
+	}
+
 	SetInputMode(FInputModeGameOnly());
 	SetShowMouseCursor(false);
 }
@@ -33,25 +46,23 @@ void AISMPlayerController::OnPossess(APawn* aPawn)
 {
 	Super::OnPossess(aPawn);
 
-	if (HasAuthority())
+	if (aPawn && bPossess)
 	{
-		SwapCamera(false);
+		UE_LOG(LogTemp, Warning, TEXT("Possessing Pawn: %s"), *aPawn->GetName());
+
+		FTimerHandle TimerHandle;
+		GetWorldTimerManager().SetTimer(
+			TimerHandle,
+			this,
+			&AISMPlayerController::OneSpawnClass,
+			1.0f, // 딜레이 시간
+			false // 반복 여부
+		);
 	}
-	/*if (bSpawn)
+	else
 	{
-		if (HasAuthority())
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Server"));
-			SpawnClass();
-			SwapCamera(false);
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Client"));
-			ServerSpawnClass();
-			SpawnClass();
-		}
-	}*/
+		UE_LOG(LogTemp, Warning, TEXT("OnPossess called with null Pawn or bPossess is false."));
+	}
 }
 
 void AISMPlayerController::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
@@ -59,8 +70,6 @@ void AISMPlayerController::GetLifetimeReplicatedProps(TArray< FLifetimeProperty 
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
 	DOREPLIFETIME(AISMPlayerController, OtherCharacter);
-	DOREPLIFETIME(AISMPlayerController, bSpawn);
-	DOREPLIFETIME(AISMPlayerController, SelectedPawnClasses);
 }
 
 void AISMPlayerController::OnRep_SwapCamera()
@@ -76,41 +85,33 @@ void AISMPlayerController::OnRep_SwapCamera()
 
 void AISMPlayerController::ServerSpawnClass_Implementation()
 {
-	/*if (!HasAuthority()) // 서버에서 권한 확인
+	/*if (AISMGameState* GS = Cast<AISMGameState>(UGameplayStatics::GetGameState(this)))
+		if(UISMGameInstance* GameInstance = GetGameInstance<UISMGameInstance>())
+			if(GameInstance->SelectedPawnClass)
+				GS->AddSelectedPawnClass(GameInstance->SelectedPawnClass);*/
+
+	if (AISMGameState* GS = Cast<AISMGameState>(UGameplayStatics::GetGameState(this)))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("ServerSpawnClass was called, but this is not the server!"));
-		return;
-	}
-	SpawnClass();*/
-	UISMGameInstance* GameInstance = GetGameInstance<UISMGameInstance>();
-	if (GameInstance == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("GameMode : No GameInstance"));
-		return;
+		if (UISMGameInstance* GameInstance = GetGameInstance<UISMGameInstance>())
+		{
+			if (GameInstance->SelectedPawnClass)
+				GS->AddSelectedPawnClass(GameInstance->SelectedPawnClass);
+			else
+				UE_LOG(LogTemp, Warning, TEXT("No GameInstance->SelectedPawnClass in PlayerController"));
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("No GameInstance in PlayerController"));
+		}
 	}
 	else
 	{
-		SelectedPawnClasses.Add(GameInstance->SelectedPawnClass);
+		UE_LOG(LogTemp, Warning, TEXT("No GameState in PlayerController"));
 	}
 }
 
 void AISMPlayerController::SpawnClass()
 {
-	bSpawn = false;
-
-	UISMGameInstance* GameInstance = GetGameInstance<UISMGameInstance>();
-	if (GameInstance == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("GameMode : No GameInstance"));
-		return;
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("%s"), *GameInstance->SelectedPawnClass->GetName());
-		SelectedPawnClasses.Add(GameInstance->SelectedPawnClass);
-	}
-
-
 	TArray<AISeeMeCharacter*> LocalCharacters;
 	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 	{
@@ -126,20 +127,27 @@ void AISMPlayerController::SpawnClass()
 		}
 	}
 
-	if (LocalCharacters.Num() != SelectedPawnClasses.Num())
+	AISMGameState* GS = Cast<AISMGameState>(UGameplayStatics::GetGameState(this));
+	if (GS==nullptr)
+	{
+		return;
+	}
+
+	if (LocalCharacters.Num() != GS->SelectedPawnClasses.Num())
 	{
 		UE_LOG(LogTemp, Error, TEXT("Mismatch between Characters (%d) and SelectedPawnClasses (%d) count!"),
-			LocalCharacters.Num(), SelectedPawnClasses.Num());
+			LocalCharacters.Num(), GS->SelectedPawnClasses.Num());
 		return;
 	}
 
 	for (int i = 0; i < LocalCharacters.Num(); i++)
 	{
 		AISeeMeCharacter* MyCharacter = LocalCharacters[i];
-		if (TSubclassOf<APawn> SelectedClass = SelectedPawnClasses[i])
+		if (GS->SelectedPawnClasses[i])
 		{
 			APawn* ExistingPawn = MyCharacter->GetController()->GetPawn();
-			AController* Controller = MyCharacter->GetController();
+			AISMPlayerController* Controller = Cast<AISMPlayerController>(MyCharacter->GetController());
+			Controller->bPossess = false;
 			if (ExistingPawn)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("Destroying existing pawn for player %d: %s"), i, *ExistingPawn->GetName());
@@ -150,7 +158,7 @@ void AISMPlayerController::SpawnClass()
 			FRotator MySpawnRotation = MyCharacter->GetActorRotation();
 			if (!MySpawnLocation.ContainsNaN() && !MySpawnRotation.ContainsNaN())
 			{
-				APawn* NewPawn = GetWorld()->SpawnActor<APawn>(SelectedClass, MySpawnLocation, MySpawnRotation);
+				APawn* NewPawn = GetWorld()->SpawnActor<APawn>(GS->SelectedPawnClasses[i], MySpawnLocation, MySpawnRotation);
 
 				if (NewPawn)
 				{
@@ -169,39 +177,11 @@ void AISMPlayerController::SpawnClass()
 
 void AISMPlayerController::OneSpawnClass()
 {
-	UISMGameInstance* GameInstance = GetGameInstance<UISMGameInstance>();
-	if (GameInstance == nullptr)
+	if (HasAuthority())
 	{
-		UE_LOG(LogTemp, Warning, TEXT("GameMode : No GameInstance"));
-		return;
-	}
-	bSpawn = false;
-	UE_LOG(LogTemp, Warning, TEXT("One Character"));
-	AISeeMeCharacter* MyCharacter = Cast<AISeeMeCharacter>(GetCharacter());
-	APawn* ExistingPawn = MyCharacter->GetController()->GetPawn();
-	AController* Controller = MyCharacter->GetController();
-	if (ExistingPawn)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Destroying existing pawn for player 0: %s"), *ExistingPawn->GetName());
-		ExistingPawn->Destroy();
-	}
-
-	FVector MySpawnLocation = MyCharacter->GetActorLocation();
-	FRotator MySpawnRotation = MyCharacter->GetActorRotation();
-	if (!MySpawnLocation.ContainsNaN() && !MySpawnRotation.ContainsNaN())
-	{
-		APawn* NewPawn = GetWorld()->SpawnActor<APawn>(GameInstance->SelectedPawnClass, MySpawnLocation, MySpawnRotation);
-
-		if (NewPawn)
-		{
-			if (Controller && NewPawn)
-			{
-				Controller->Possess(NewPawn);
-				UE_LOG(LogTemp, Warning, TEXT("Spawned and possessed new pawn for player 0"));
-				UE_LOG(LogTemp, Warning, TEXT("Pawn Name (%s) and Num 0 Controller"),
-					*NewPawn->GetName(), *GetName());
-			}
-		}
+		UE_LOG(LogTemp, Warning, TEXT("OnPosses"));
+		SpawnClass();
+		SwapCamera(false);
 	}
 }
 

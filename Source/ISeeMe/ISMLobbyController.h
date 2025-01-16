@@ -62,9 +62,6 @@ protected:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastSelectCharacter(TSubclassOf<APawn> NewPawnClass);
-	
-	UPROPERTY(BlueprintReadWrite, Replicated)
-	TArray<TSubclassOf<APawn>> SelectedPawnClasses;
 
 private:
 	IOnlineSessionPtr OnlineSessionInterface;

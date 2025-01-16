@@ -61,19 +61,13 @@ public:
 
 	//////////////////////////////
 
-	UPROPERTY(Replicated, EditAnywhere, Category = "Game Data")
-	TSubclassOf<APawn> SelectedPawnClass;
-
-	UPROPERTY(ReplicatedUsing = SpawnClass)
-	TArray<TSubclassOf<APawn>> SelectedPawnClasses;
-
 	UFUNCTION(Server, Unreliable)
 	void ServerSpawnClass();
 
 	UFUNCTION()
 	void SpawnClass();
 
-	UFUNCTION()
+	UFUNCTION(BlueprintCallable)
 	void OneSpawnClass();
 
 private:
@@ -88,6 +82,7 @@ private:
 	/** Change Third Aspect */
 	void ChangeThirdAspect();
 
-	UPROPERTY(ReplicatedUsing = SpawnClass)
 	bool bSpawn = true;
+
+	bool bPossess = true;
 };
