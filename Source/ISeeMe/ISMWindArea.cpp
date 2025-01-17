@@ -9,6 +9,7 @@
 #include "NiagaraSystem.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
+#include <Kismet/GameplayStatics.h>
 
 // Sets default values
 AISMWindArea::AISMWindArea()
@@ -97,4 +98,10 @@ void AISMWindArea::MulticastRemoveTarget_Implementation(UPrimitiveComponent* Ove
 	{
 		Targets.Remove(Character);
 	}
+}
+
+void AISMWindArea::MulticastPlaySound_Implementation()
+{
+	//
+	//UGameplayStatics::PlaySoundAtLocation(this, Sound, );
 }

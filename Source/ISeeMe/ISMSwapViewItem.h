@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include <Components/BoxComponent.h>
+#include <Sound/SoundCue.h>
 #include "ISMSwapViewItem.generated.h"
 
 UCLASS()
@@ -35,4 +36,11 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UBoxComponent* TriggerVolume;
+
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundBase* Sound;
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastPlaySound();
+
 };
