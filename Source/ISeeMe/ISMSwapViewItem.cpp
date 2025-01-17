@@ -6,6 +6,8 @@
 #include "ISeeMeGameMode.h"
 #include "ISMGameState.h"
 #include <Kismet/GameplayStatics.h>
+#include "ISeeMe/UI/ISMHUD.h"
+#include "ISeeMe/UI/ISMOverlay.h"
 
 // Sets default values
 AISMSwapViewItem::AISMSwapViewItem()
@@ -53,7 +55,21 @@ void AISMSwapViewItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActo
 			{
 				GS->SwapViewItem = this;
 				MulticastVisibleMesh(false);
+
+				// 아이템 소지 UI 활성화
+				MulticastSetOverlayIcon(true);
 			}
+		}
+	}
+}
+
+void AISMSwapViewItem::MulticastSetOverlayIcon_Implementation(bool Flag)
+{
+	if (AISMHUD* ISMHUD = Cast<AISMHUD>(UGameplayStatics::GetPlayerController(this, 0)->GetHUD()))
+	{
+		if (UISMOverlay* ISMOverlay = ISMHUD->GetISMOverlay())
+		{
+			ISMOverlay->SetSwapItemIcon(Flag);
 		}
 	}
 }

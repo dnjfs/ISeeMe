@@ -27,6 +27,9 @@ public:
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastVisibleMesh(bool bVisible);
 
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastSetOverlayIcon(bool Flag);
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UStaticMeshComponent* ItemMesh;
 
