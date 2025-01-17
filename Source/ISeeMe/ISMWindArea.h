@@ -23,11 +23,8 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	UPROPERTY(EditAnywhere, Category = "Sound")
-	USoundBase* Sound;
-
-	UFUNCTION(NetMulticast, Reliable)
-	void MulticastPlaySound();
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Sound")
+	UAudioComponent* AudioComponent;
 
 protected:
 	// Called when the game starts or when spawned

@@ -9,6 +9,7 @@
 #include "NiagaraSystem.h"
 #include "NiagaraComponent.h"
 #include "NiagaraFunctionLibrary.h"
+#include "Components/AudioComponent.h"
 #include <Kismet/GameplayStatics.h>
 
 // Sets default values
@@ -23,6 +24,10 @@ AISMWindArea::AISMWindArea()
 	WindVector->SetupAttachment(Volume);
 	WindVector->ArrowLength = 100.f;
 
+	/*AudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComponent"));
+	AudioComponent->SetupAttachment(Volume);
+	AudioComponent->bAutoActivate = false;*/
+
 	bReplicates = true;
 }
 
@@ -30,7 +35,9 @@ AISMWindArea::AISMWindArea()
 void AISMWindArea::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
+	//AudioComponent->Stop();
+
 	Volume->OnComponentBeginOverlap.AddDynamic(this, &AISMWindArea::OnEnter);
 	Volume->OnComponentEndOverlap.AddDynamic(this, &AISMWindArea::OnExit);
 
@@ -98,10 +105,4 @@ void AISMWindArea::MulticastRemoveTarget_Implementation(UPrimitiveComponent* Ove
 	{
 		Targets.Remove(Character);
 	}
-}
-
-void AISMWindArea::MulticastPlaySound_Implementation()
-{
-	//
-	//UGameplayStatics::PlaySoundAtLocation(this, Sound, );
 }
