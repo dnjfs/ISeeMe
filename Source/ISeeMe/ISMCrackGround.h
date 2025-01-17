@@ -9,6 +9,7 @@
 
 class UGeometryCache;
 class UGeometryCacheComponent;
+class UAudioComponent;
 
 UCLASS()
 class ISEEME_API AISMCrackGround : public AActor
@@ -72,4 +73,13 @@ private:
 	float DormantTime = 10.f;
 
 	float RemainTime = 0.f;
+
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	TObjectPtr<UAudioComponent> AudioComponent;
+
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	TObjectPtr<USoundWave> CrackingSound;
+
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	TObjectPtr<USoundWave> BrokenSound;
 };

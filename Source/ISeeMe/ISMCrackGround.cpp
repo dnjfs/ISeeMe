@@ -4,6 +4,7 @@
 #include "ISMCrackGround.h"
 
 #include "Components/StaticMeshComponent.h"
+#include "Components/AudioComponent.h"
 #include "GeometryCache.h"
 #include "GeometryCacheComponent.h"
 
@@ -22,6 +23,10 @@ AISMCrackGround::AISMCrackGround()
 
 	GeometryCacheComp = CreateDefaultSubobject<UGeometryCacheComponent>(TEXT("GeometryCacheComponent"));
 	GeometryCacheComp->SetupAttachment(GroundMesh);
+
+	AudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComponent"));
+	AudioComponent->SetupAttachment(GroundMesh);
+	AudioComponent->bAutoActivate = false;
 }
 
 void AISMCrackGround::BeginPlay()
@@ -83,6 +88,9 @@ void AISMCrackGround::ResetTimer()
 
 	MulticastAwake(true);
 	MulticastSetCracking(false);
+	
+	if (AudioComponent)
+		AudioComponent->SetSound(CrackingSound);
 }
 
 void AISMCrackGround::MulticastAwake_Implementation(bool bInAwake)
@@ -106,6 +114,9 @@ void AISMCrackGround::MulticastSetCracking_Implementation(bool bInCracking)
 		GeometryCacheComp->SetVisibility(bInCracking);
 		GeometryCacheComp->SetGeometryCache(bInCracking ? FirstCrack : nullptr);
 	}
+
+	if (AudioComponent)
+		AudioComponent->Play();
 }
 
 void AISMCrackGround::MulticastChangeCrack_Implementation(UGeometryCache* ChangeGeometry)
@@ -120,5 +131,11 @@ void AISMCrackGround::MulticastSpawnCrackPart_Implementation()
 	{
 		GeometryCacheComp->SetGeometryCache(FallingGeometry);
 		GeometryCacheComp->PlayFromStart();
+	}
+
+	if (AudioComponent)
+	{
+		AudioComponent->SetSound(BrokenSound);
+		AudioComponent->Play();
 	}
 }
