@@ -51,6 +51,15 @@ public:
 
 	virtual void Tick(float DeltaTime) override;
 
+	UFUNCTION(BlueprintCallable)
+	void CallSelectPawn(TSubclassOf<APawn> NewPawn);
+
+	UFUNCTION()
+	void SelectPawn(TSubclassOf<APawn> NewPawn, int num);
+
+	UFUNCTION(Server, Reliable)
+	void ServerSelectPawn(TSubclassOf<APawn> NewPawn);
+
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 

@@ -17,7 +17,11 @@ class ISEEME_API UISMOverlay : public UUserWidget
 public:
 	void SetSwapItemIcon(bool Flag);
 
+	void OffSelectPanel();
 private:
 	UPROPERTY(meta = (BindWidget))
 	class UCanvasPanel* SwapItemPanel;
+
+	UPROPERTY(meta = (BindWidget))
+	class UCanvasPanel* CharacterSelectPanel;
 };

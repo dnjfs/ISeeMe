@@ -1,3 +1,4 @@
+#include "ISMOverlay.h"
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
@@ -15,4 +16,9 @@ void UISMOverlay::SetSwapItemIcon(bool Flag)
 	{
 		SwapItemPanel->SetVisibility(ESlateVisibility::Hidden);
 	}
+}
+
+void UISMOverlay::OffSelectPanel()
+{
+	CharacterSelectPanel->SetVisibility(ESlateVisibility::Hidden);
 }

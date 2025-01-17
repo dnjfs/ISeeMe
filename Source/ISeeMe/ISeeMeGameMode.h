@@ -20,17 +20,19 @@ public:
 	/*For swap camera*/
 	void SwapCamera();
 
-	void SelectCharacter();
-
-	UPROPERTY()
-	TArray<TSubclassOf<APawn>> SelectedPawnClasses;
-
 	bool bSwapCamera = true;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Swap")
 	float SwapTime = 30;
 
 	FTimerHandle SwapTimerHandle;
+
+	UPROPERTY()
+	TArray<TSubclassOf<APawn>> SelectedPawnClasses;
+
+	void ChangePawn();
+
+	int SelectNum = 0;
 };
 
 

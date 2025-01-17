@@ -9,7 +9,8 @@
 #include "ISMGameInstance.h"
 #include "ISMLobbyController.h"
 #include <Kismet/GameplayStatics.h>
-#include "ISMGameState.h"
+#include "UI/ISMHUD.h"
+#include "ISeeMe/UI/ISMOverlay.h"
 
 AISeeMeGameMode::AISeeMeGameMode()
 {
@@ -20,6 +21,8 @@ AISeeMeGameMode::AISeeMeGameMode()
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
 
+	SelectedPawnClasses.Add(nullptr);
+	SelectedPawnClasses.Add(nullptr);
 	bUseSeamlessTravel = true;
 }
 
@@ -97,16 +100,8 @@ void AISeeMeGameMode::SwapCamera()
 	bSwapCamera = !bSwapCamera;
 }
 
-void AISeeMeGameMode::SelectCharacter()
+void AISeeMeGameMode::ChangePawn()
 {
-	UISMGameInstance* GameInstance = GetGameInstance<UISMGameInstance>();
-	if (GameInstance == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("GameMode : No GameInstance"));
-		return;
-	}
-
-
 	TArray<AISeeMeCharacter*> LocalCharacters;
 	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 	{
@@ -132,10 +127,10 @@ void AISeeMeGameMode::SelectCharacter()
 	for (int i = 0; i < LocalCharacters.Num(); i++)
 	{
 		AISeeMeCharacter* MyCharacter = LocalCharacters[i];
-		if (TSubclassOf<APawn> SelectedClass = SelectedPawnClasses[i])
+		if (SelectedPawnClasses[i])
 		{
 			APawn* ExistingPawn = MyCharacter->GetController()->GetPawn();
-			AController* Controller = MyCharacter->GetController();
+			AISMPlayerController* Controller = Cast<AISMPlayerController>(MyCharacter->GetController());
 			if (ExistingPawn)
 			{
 				UE_LOG(LogTemp, Warning, TEXT("Destroying existing pawn for player %d: %s"), i, *ExistingPawn->GetName());
@@ -146,17 +141,12 @@ void AISeeMeGameMode::SelectCharacter()
 			FRotator MySpawnRotation = MyCharacter->GetActorRotation();
 			if (!MySpawnLocation.ContainsNaN() && !MySpawnRotation.ContainsNaN())
 			{
-				APawn* NewPawn = GetWorld()->SpawnActor<APawn>(SelectedClass, MySpawnLocation, MySpawnRotation);
+				APawn* NewPawn = GetWorld()->SpawnActor<APawn>(SelectedPawnClasses[i], MySpawnLocation, MySpawnRotation);
 
 				if (NewPawn)
 				{
-					if (Controller && NewPawn)
-					{
-						Controller->Possess(NewPawn);
-						UE_LOG(LogTemp, Warning, TEXT("Spawned and possessed new pawn for player %d"), i);
-						UE_LOG(LogTemp, Warning, TEXT("Pawn Name (%s) and Num (%d) Controller"),
-							*NewPawn->GetName(), i, *GetName());
-					}
+					Controller->Possess(NewPawn);
+					Controller->MulticastUpdateController();
 				}
 			}
 		}
