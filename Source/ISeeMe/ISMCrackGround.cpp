@@ -90,7 +90,10 @@ void AISMCrackGround::ResetTimer()
 	MulticastSetCracking(false);
 	
 	if (AudioComponent)
+	{
+		AudioComponent->Stop();
 		AudioComponent->SetSound(CrackingSound);
+	}
 }
 
 void AISMCrackGround::MulticastAwake_Implementation(bool bInAwake)
