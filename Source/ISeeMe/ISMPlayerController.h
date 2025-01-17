@@ -59,16 +59,8 @@ public:
 
 	void DeadCharacter();
 
-	//////////////////////////////
-
-	UFUNCTION(Server, Unreliable)
-	void ServerSpawnClass();
-
-	UFUNCTION()
-	void SpawnClass();
-
-	UFUNCTION(BlueprintCallable)
-	void OneSpawnClass();
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastUpdateController();
 
 private:
 	bool bFirstAspect = false;
@@ -81,8 +73,4 @@ private:
 
 	/** Change Third Aspect */
 	void ChangeThirdAspect();
-
-	bool bSpawn = true;
-
-	bool bPossess = true;
 };

@@ -216,6 +216,37 @@ void AISeeMeCharacter::Tick(float DeltaTime)
 	*/
 }
 
+void AISeeMeCharacter::CallSelectPawn(TSubclassOf<APawn> NewPawn)
+{
+	if (HasAuthority())
+	{
+		SelectPawn(NewPawn,0);
+	}
+	else
+	{
+		ServerSelectPawn(NewPawn);
+	}
+}
+
+void AISeeMeCharacter::SelectPawn(TSubclassOf<APawn> NewPawn, int num)
+{
+	if (AISeeMeGameMode* GM = Cast<AISeeMeGameMode>(GetWorld()->GetAuthGameMode()))
+	{
+		GM->SelectedPawnClasses[num] = NewPawn;
+		GM->SelectNum++;
+		UE_LOG(LogTemp, Warning, TEXT("%s add in %d"), *NewPawn->GetName(), GM->SelectedPawnClasses.Num());
+		if (GM->SelectNum == 2)
+		{
+			GM->ChangePawn();
+		}
+	}
+}
+
+void AISeeMeCharacter::ServerSelectPawn_Implementation(TSubclassOf<APawn> NewPawn)
+{
+	SelectPawn(NewPawn, 1);
+}
+
 void AISeeMeCharacter::Move(const FInputActionValue& Value)
 {
 	// input is a Vector2D

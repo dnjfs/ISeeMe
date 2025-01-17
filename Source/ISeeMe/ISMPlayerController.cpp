@@ -27,43 +27,16 @@ void AISMPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	if (bSpawn)
-	{
-		if (HasAuthority())
-		{
-			bSpawn = false;
-		}
-		else
-		{
-			ServerSpawnClass();
-		}
-	}
-
-	SetInputMode(FInputModeGameOnly());
-	SetShowMouseCursor(false);
+	SetInputMode(FInputModeUIOnly());
+	SetShowMouseCursor(true);
 }
 
 void AISMPlayerController::OnPossess(APawn* aPawn)
 {
 	Super::OnPossess(aPawn);
 
-	if (aPawn && bPossess)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Possessing Pawn: %s"), *aPawn->GetName());
-
-		FTimerHandle TimerHandle;
-		GetWorldTimerManager().SetTimer(
-			TimerHandle,
-			this,
-			&AISMPlayerController::OneSpawnClass,
-			1.0f, // 딜레이 시간
-			false // 반복 여부
-		);
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("OnPossess called with null Pawn or bPossess is false."));
-	}
+	if (HasAuthority())
+		SwapCamera(false);
 }
 
 void AISMPlayerController::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
@@ -82,108 +55,6 @@ void AISMPlayerController::OnRep_SwapCamera()
 	CurrentAspect();
 
 	UE_LOG(LogTemp, Warning, TEXT("Camera Swap Success!"));
-}
-
-void AISMPlayerController::ServerSpawnClass_Implementation()
-{
-	/*if (AISMGameState* GS = Cast<AISMGameState>(UGameplayStatics::GetGameState(this)))
-		if(UISMGameInstance* GameInstance = GetGameInstance<UISMGameInstance>())
-			if(GameInstance->SelectedPawnClass)
-				GS->AddSelectedPawnClass(GameInstance->SelectedPawnClass);*/
-
-	if (AISMGameState* GS = Cast<AISMGameState>(UGameplayStatics::GetGameState(this)))
-	{
-		if (UISMGameInstance* GameInstance = GetGameInstance<UISMGameInstance>())
-		{
-			if (GameInstance->SelectedPawnClass)
-				GS->AddSelectedPawnClass(GameInstance->SelectedPawnClass);
-			else
-				UE_LOG(LogTemp, Warning, TEXT("No GameInstance->SelectedPawnClass in PlayerController"));
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("No GameInstance in PlayerController"));
-		}
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("No GameState in PlayerController"));
-	}
-}
-
-void AISMPlayerController::SpawnClass()
-{
-	TArray<AISeeMeCharacter*> LocalCharacters;
-	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
-	{
-		AISMPlayerController* PC = Cast<AISMPlayerController>(Iterator->Get());
-		if (PC == nullptr)
-			continue;
-
-		ACharacter* BaseCharacter = PC->GetCharacter();
-		if (BaseCharacter && BaseCharacter->IsA(AISeeMeCharacter::StaticClass()))
-		{
-			AISeeMeCharacter* LocalCharacter = Cast<AISeeMeCharacter>(BaseCharacter);
-			LocalCharacters.Add(LocalCharacter);
-		}
-	}
-
-	AISMGameState* GS = Cast<AISMGameState>(UGameplayStatics::GetGameState(this));
-	if (GS==nullptr)
-	{
-		return;
-	}
-
-	if (LocalCharacters.Num() != GS->SelectedPawnClasses.Num())
-	{
-		UE_LOG(LogTemp, Error, TEXT("Mismatch between Characters (%d) and SelectedPawnClasses (%d) count!"),
-			LocalCharacters.Num(), GS->SelectedPawnClasses.Num());
-		return;
-	}
-
-	for (int i = 0; i < LocalCharacters.Num(); i++)
-	{
-		AISeeMeCharacter* MyCharacter = LocalCharacters[i];
-		if (GS->SelectedPawnClasses[i])
-		{
-			APawn* ExistingPawn = MyCharacter->GetController()->GetPawn();
-			AISMPlayerController* Controller = Cast<AISMPlayerController>(MyCharacter->GetController());
-			Controller->bPossess = false;
-			if (ExistingPawn)
-			{
-				UE_LOG(LogTemp, Warning, TEXT("Destroying existing pawn for player %d: %s"), i, *ExistingPawn->GetName());
-				ExistingPawn->Destroy();
-			}
-
-			FVector MySpawnLocation = MyCharacter->GetActorLocation();
-			FRotator MySpawnRotation = MyCharacter->GetActorRotation();
-			if (!MySpawnLocation.ContainsNaN() && !MySpawnRotation.ContainsNaN())
-			{
-				APawn* NewPawn = GetWorld()->SpawnActor<APawn>(GS->SelectedPawnClasses[i], MySpawnLocation, MySpawnRotation);
-
-				if (NewPawn)
-				{
-					if (Controller && NewPawn)
-					{
-						Controller->Possess(NewPawn);
-						UE_LOG(LogTemp, Warning, TEXT("Spawned and possessed new pawn for player %d"), i);
-						UE_LOG(LogTemp, Warning, TEXT("Pawn Name (%s) and Num (%d) Controller"),
-							*NewPawn->GetName(), i, *GetName());
-					}
-				}
-			}
-		}
-	}
-}
-
-void AISMPlayerController::OneSpawnClass()
-{
-	if (HasAuthority())
-	{
-		UE_LOG(LogTemp, Warning, TEXT("OnPosses"));
-		SpawnClass();
-		SwapCamera(false);
-	}
 }
 
 void AISMPlayerController::ServerCallSwapCamera_Implementation()
@@ -311,5 +182,35 @@ void AISMPlayerController::DeadCharacter()
 	{
 		MyCharacter->SetActorLocation(State->InitSpawnPointLocation);
 		MyCharacter->SetActorRotation(State->InitialSpawnPointRotator);
+	}
+}
+
+void AISMPlayerController::MulticastUpdateController_Implementation()
+{
+	SetInputMode(FInputModeGameOnly());
+	SetShowMouseCursor(false);
+	if (AISMHUD* ISMHUD = Cast<AISMHUD>(GetHUD()))
+	{
+		if (UISMOverlay* ISMSelectOverlay = ISMHUD->GetISMOverlay())
+		{
+			ISMSelectOverlay->OffSelectPanel();
+		}
+	}
+
+	if (AController* LocalController = GetWorld()->GetFirstPlayerController())
+	{
+		APawn* LocalPawn = LocalController->GetPawn();
+		if (ACharacter* LocalCharacter = Cast<ACharacter>(LocalPawn))
+		{
+			USkeletalMeshComponent* Mesh = LocalCharacter->GetMesh();
+			if (Mesh)
+			{
+				Mesh->SetRenderCustomDepth(true);
+			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Mesh is null!"));
+			}
+		}
 	}
 }

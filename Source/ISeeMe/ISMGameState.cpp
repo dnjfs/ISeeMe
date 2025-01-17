@@ -17,40 +17,6 @@ AISMGameState::AISMGameState()
 	bAcqCheckPoint = false;
 }
 
-void AISMGameState::BeginPlay()
-{
-	if (UISMGameInstance* GameInstance = GetGameInstance<UISMGameInstance>())
-	{
-		if (GameInstance->SelectedPawnClass)
-		{
-			AddSelectedPawnClass(GameInstance->SelectedPawnClass);
-			UE_LOG(LogTemp, Warning, TEXT("Go %s"), *GameInstance->SelectedPawnClass->GetName());
-			if (HasAuthority())
-			{
-				for (int i = 0; i < SelectedPawnClasses.Num(); i++)
-				{
-					UE_LOG(LogTemp, Warning, TEXT("Server : Goes %s"), *SelectedPawnClasses[i]->GetName());
-				}
-			}
-			else
-			{
-				for (int i = 0; i < SelectedPawnClasses.Num(); i++)
-				{
-					UE_LOG(LogTemp, Warning, TEXT("Client : Goes %s"), *SelectedPawnClasses[i]->GetName());
-				}
-			}
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("No GameInstance->SelectedPawnClass in GameState"));
-		}
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("No GameInstance in GameState"));
-	}
-}
-
 void AISMGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
@@ -58,12 +24,5 @@ void AISMGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	DOREPLIFETIME(AISMGameState, SwapViewItem);
 	DOREPLIFETIME(AISMGameState, SaveSwapViewItem);
 	DOREPLIFETIME(AISMGameState, UsedSwapViewItems);
-	DOREPLIFETIME(AISMGameState, SelectedPawnClasses);
-}
-
-void AISMGameState::AddSelectedPawnClass(const TSubclassOf<APawn>& NewPawn)
-{
-	if (HasAuthority())
-		SelectedPawnClasses.Add(NewPawn);
 }
 

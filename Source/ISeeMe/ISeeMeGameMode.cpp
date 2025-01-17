@@ -9,7 +9,8 @@
 #include "ISMGameInstance.h"
 #include "ISMLobbyController.h"
 #include <Kismet/GameplayStatics.h>
-#include "ISMGameState.h"
+#include "UI/ISMHUD.h"
+#include "ISeeMe/UI/ISMOverlay.h"
 
 AISeeMeGameMode::AISeeMeGameMode()
 {
@@ -20,6 +21,8 @@ AISeeMeGameMode::AISeeMeGameMode()
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
 
+	SelectedPawnClasses.Add(nullptr);
+	SelectedPawnClasses.Add(nullptr);
 	bUseSeamlessTravel = true;
 }
 
@@ -95,4 +98,57 @@ void AISeeMeGameMode::SwapCamera()
 		}
 	}
 	bSwapCamera = !bSwapCamera;
+}
+
+void AISeeMeGameMode::ChangePawn()
+{
+	TArray<AISeeMeCharacter*> LocalCharacters;
+	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	{
+		AISMPlayerController* PC = Cast<AISMPlayerController>(Iterator->Get());
+		if (PC == nullptr)
+			continue;
+
+		ACharacter* BaseCharacter = PC->GetCharacter();
+		if (BaseCharacter && BaseCharacter->IsA(AISeeMeCharacter::StaticClass()))
+		{
+			AISeeMeCharacter* LocalCharacter = Cast<AISeeMeCharacter>(BaseCharacter);
+			LocalCharacters.Add(LocalCharacter);
+		}
+	}
+
+	if (LocalCharacters.Num() != SelectedPawnClasses.Num())
+	{
+		UE_LOG(LogTemp, Error, TEXT("Mismatch between Characters (%d) and SelectedPawnClasses (%d) count!"),
+			LocalCharacters.Num(), SelectedPawnClasses.Num());
+		return;
+	}
+
+	for (int i = 0; i < LocalCharacters.Num(); i++)
+	{
+		AISeeMeCharacter* MyCharacter = LocalCharacters[i];
+		if (SelectedPawnClasses[i])
+		{
+			APawn* ExistingPawn = MyCharacter->GetController()->GetPawn();
+			AISMPlayerController* Controller = Cast<AISMPlayerController>(MyCharacter->GetController());
+			if (ExistingPawn)
+			{
+				UE_LOG(LogTemp, Warning, TEXT("Destroying existing pawn for player %d: %s"), i, *ExistingPawn->GetName());
+				ExistingPawn->Destroy();
+			}
+
+			FVector MySpawnLocation = MyCharacter->GetActorLocation();
+			FRotator MySpawnRotation = MyCharacter->GetActorRotation();
+			if (!MySpawnLocation.ContainsNaN() && !MySpawnRotation.ContainsNaN())
+			{
+				APawn* NewPawn = GetWorld()->SpawnActor<APawn>(SelectedPawnClasses[i], MySpawnLocation, MySpawnRotation);
+
+				if (NewPawn)
+				{
+					Controller->Possess(NewPawn);
+					Controller->MulticastUpdateController();
+				}
+			}
+		}
+	}
 }
