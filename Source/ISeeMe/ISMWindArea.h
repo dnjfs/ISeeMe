@@ -59,4 +59,10 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UNiagaraSystem* WindEffect;
+
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundBase* CheckPointSound;
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastWindSound(bool bEnter);
 };
