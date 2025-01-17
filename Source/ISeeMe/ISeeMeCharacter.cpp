@@ -434,6 +434,8 @@ void AISeeMeCharacter::GoCheckPoint()
 		}
 	}
 
+	MulticastPlaySound();
+
 	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 	{
 		if (AISMPlayerController* PC = Cast<AISMPlayerController>(Iterator->Get()))
@@ -444,6 +446,11 @@ void AISeeMeCharacter::GoCheckPoint()
 void AISeeMeCharacter::ServerCallGoCheckPoint_Implementation()
 {
 	GoCheckPoint(); //  Call Go Check Point Function from client to the server
+}
+
+void AISeeMeCharacter::MulticastPlaySound_Implementation()
+{
+	UGameplayStatics::PlaySound2D(this, CheckPointSound);
 }
 
 void AISeeMeCharacter::OpenMenu()

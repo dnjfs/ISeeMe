@@ -70,6 +70,12 @@ public:
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UMaterialInterface> AllCheckMaterial;
 
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundBase* Sound;
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastPlaySound();
+
 private:
 	int DetectPlayer = 0;
 };

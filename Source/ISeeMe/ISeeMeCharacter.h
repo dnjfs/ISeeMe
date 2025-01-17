@@ -60,6 +60,12 @@ public:
 	UFUNCTION(Server, Reliable)
 	void ServerSelectPawn(TSubclassOf<APawn> NewPawn);
 
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundBase* CheckPointSound;
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastPlaySound();
+
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 

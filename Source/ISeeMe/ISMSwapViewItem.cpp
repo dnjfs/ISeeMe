@@ -58,6 +58,7 @@ void AISMSwapViewItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActo
 
 				// 아이템 소지 UI 활성화
 				MulticastSetOverlayIcon(true);
+				MulticastPlaySound();
 			}
 		}
 	}
@@ -87,4 +88,9 @@ void AISMSwapViewItem::MulticastVisibleMesh_Implementation(bool bVisible)
 		TriggerVolume->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 		ItemMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	}
+}
+
+void AISMSwapViewItem::MulticastPlaySound_Implementation()
+{
+	UGameplayStatics::PlaySound2D(this, Sound);
 }

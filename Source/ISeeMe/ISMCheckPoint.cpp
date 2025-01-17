@@ -95,6 +95,7 @@ void AISMCheckPoint::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor*
 				}
 
 				MulticastChangeMaterial(DetectPlayer);
+				MulticastPlaySound();
 				DetectPlayer++;
 				
 				if (HasAuthority())
@@ -173,4 +174,9 @@ void AISMCheckPoint::InitCheckPoint()
 void AISMCheckPoint::ServerInitCheckPoint_Implementation()
 {
 	InitCheckPoint();
+}
+
+void AISMCheckPoint::MulticastPlaySound_Implementation()
+{
+	UGameplayStatics::PlaySound2D(this, Sound);
 }
