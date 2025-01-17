@@ -66,6 +66,12 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastPlaySound();
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
+	UAudioComponent* AudioComponent;
+
+	void EnableAudio();
+	void DisableAudio();
+
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
 

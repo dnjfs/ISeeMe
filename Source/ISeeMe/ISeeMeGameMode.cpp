@@ -79,6 +79,11 @@ void AISeeMeGameMode::SwapCamera()
 			if (AISeeMeCharacter* ISeeMeCharacter = PCs[i]->GetPawn<AISeeMeCharacter>())
 			{
 				ISeeMeCharacter->IsCameraRestored = true;
+				/*if (PlayerNum == 2)
+				{
+					ISeeMeCharacter->EnableAudio();
+					Characters[(i + 1 < PlayerNum) ? i + 1 : 0]->DisableAudio();
+				}*/
 			}
 		}
 	}
@@ -94,6 +99,11 @@ void AISeeMeGameMode::SwapCamera()
 			if (AISeeMeCharacter* ISeeMeCharacter = PCs[i]->GetPawn<AISeeMeCharacter>())
 			{
 				ISeeMeCharacter->IsCameraRestored = false;
+				/*if (PlayerNum == 2)
+				{
+					ISeeMeCharacter->DisableAudio();
+					Characters[(i + 1 < PlayerNum) ? i + 1 : 0]->EnableAudio();
+				}*/
 			}
 		}
 	}

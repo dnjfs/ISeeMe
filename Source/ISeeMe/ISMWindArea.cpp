@@ -11,6 +11,7 @@
 #include "NiagaraFunctionLibrary.h"
 #include "Components/AudioComponent.h"
 #include <Kismet/GameplayStatics.h>
+#include "ISeeMeCharacter.h"
 
 // Sets default values
 AISMWindArea::AISMWindArea()
@@ -24,9 +25,9 @@ AISMWindArea::AISMWindArea()
 	WindVector->SetupAttachment(Volume);
 	WindVector->ArrowLength = 100.f;
 
-	/*AudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComponent"));
+	AudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComponent"));
 	AudioComponent->SetupAttachment(Volume);
-	AudioComponent->bAutoActivate = false;*/
+	AudioComponent->bAutoActivate = false;
 
 	bReplicates = true;
 }
@@ -36,7 +37,7 @@ void AISMWindArea::BeginPlay()
 {
 	Super::BeginPlay();
 
-	//AudioComponent->Stop();
+	AudioComponent->Stop();
 
 	Volume->OnComponentBeginOverlap.AddDynamic(this, &AISMWindArea::OnEnter);
 	Volume->OnComponentEndOverlap.AddDynamic(this, &AISMWindArea::OnExit);
@@ -63,6 +64,12 @@ void AISMWindArea::Tick(float DeltaTime)
 
 void AISMWindArea::OnEnter(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	AISeeMeCharacter* OverlappingCharacter = Cast<AISeeMeCharacter>(OtherActor);
+	if (AudioComponent && OverlappingCharacter)
+	{
+		MulticastWindSound(true);
+	}
+
 	if (!HasAuthority())
 		return;
 
@@ -71,10 +78,28 @@ void AISMWindArea::OnEnter(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 
 void AISMWindArea::OnExit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
+	AISeeMeCharacter* OverlappingCharacter = Cast<AISeeMeCharacter>(OtherActor);
+	if (AudioComponent && OverlappingCharacter)
+	{
+		MulticastWindSound(false);
+	}
+
 	if (!HasAuthority())
 		return;
 
 	MulticastRemoveTarget(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex);
+}
+
+void AISMWindArea::MulticastWindSound_Implementation(bool bEnter)
+{
+	if (bEnter)
+	{
+		AudioComponent->Play();
+	}
+	else
+	{
+		AudioComponent->FadeOut(1.0f, 0.0f);
+	}
 }
 
 void AISMWindArea::MulticastApplyWindForce_Implementation(float DeltaTime)

@@ -22,6 +22,7 @@
 #include "Components/TimelineComponent.h"
 #include "ISMGameState.h"
 #include <Net/UnrealNetwork.h>
+#include "Components/AudioComponent.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -64,6 +65,9 @@ AISeeMeCharacter::AISeeMeCharacter()
 	FollowCamera->bUsePawnControlRotation = false; // Camera does not rotate relative to arm
 
 	FocusTimeline = CreateDefaultSubobject<UTimelineComponent>(TEXT("FocusTimeline"));
+
+	AudioComponent = CreateDefaultSubobject<UAudioComponent>(TEXT("AudioComponent"));
+	AudioComponent->SetupAttachment(RootComponent);
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
@@ -462,3 +466,18 @@ void AISeeMeCharacter::OpenMenu()
 	}
 }
 
+void AISeeMeCharacter::EnableAudio()
+{
+	if (AudioComponent)
+	{
+		AudioComponent->FadeIn(0.5f); 
+	}
+}
+
+void AISeeMeCharacter::DisableAudio()
+{
+	if (AudioComponent)
+	{
+		AudioComponent->FadeOut(0.5f, 0.0f); 
+	}
+}
