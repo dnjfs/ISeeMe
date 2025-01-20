@@ -15,12 +15,12 @@ void AISMHUD::BeginPlay()
 		if (PlayerController && InGameMenuClass)
 		{
 			InGameMenu = CreateWidget<UInGameMenu>(PlayerController, InGameMenuClass);
-			InGameMenu->AddToViewport();
+			InGameMenu->AddToViewport(1);
 		}
 		if (PlayerController && ISMOverlayClass)
 		{
 			ISMOverlay = CreateWidget<UISMOverlay>(PlayerController, ISMOverlayClass);
-			ISMOverlay->AddToViewport();
+			ISMOverlay->AddToViewport(0);
 		}
 	}
 }
