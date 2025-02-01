@@ -3,22 +3,30 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "GameFramework/Actor.h"
+#include "OnlineStats.h"
+#include "AchievementManager.generated.h"
 
-/**
- * 
- */
-class ISEEME_API AchievementManager
+UCLASS()
+class ISEEME_API AAchievementManager : public AActor
 {
-public:
-	AchievementManager();
+	GENERATED_BODY()
+	
+public:	
+	// Sets default values for this actor's properties
+	AAchievementManager();
+
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+public:	
+	// Called every frame
+	virtual void Tick(float DeltaTime) override;
 
 	void QueryAchievements();
 	void OnQueryAchievementsComplete(const FUniqueNetId& PlayerId, const bool bWasSuccessful);
-
 	void UpdateAchievementProgress(const FString& Id, float Percent);
 
-	/** The object we're going to use in order to progress any achievement */
 	FOnlineAchievementsWritePtr AchievementsWriteObjectPtr;
-
-	~AchievementManager();
 };

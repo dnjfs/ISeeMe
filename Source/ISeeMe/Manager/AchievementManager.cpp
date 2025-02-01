@@ -7,11 +7,29 @@
 #include "OnlineSubsystem.h"
 #include "Engine/LocalPlayer.h"
 
-AchievementManager::AchievementManager()
+// Sets default values
+AAchievementManager::AAchievementManager()
 {
+ 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	PrimaryActorTick.bCanEverTick = true;
+
 }
 
-void AchievementManager::QueryAchievements()
+// Called when the game starts or when spawned
+void AAchievementManager::BeginPlay()
+{
+	Super::BeginPlay();
+	
+}
+
+// Called every frame
+void AAchievementManager::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+}
+
+void AAchievementManager::QueryAchievements()
 {
 	//Get the online sub system
 	IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
@@ -33,13 +51,13 @@ void AchievementManager::QueryAchievements()
 			if (Achievements.IsValid())
 			{
 				//Cache all the game's achievements for future use and bind the OnQueryAchievementsComplete function to fire when we're finished caching
-				Achievements->QueryAchievements(*UserId.Get(), FOnQueryAchievementsCompleteDelegate::CreateUObject(this, &AchievementManager::OnQueryAchievementsComplete));
+				Achievements->QueryAchievements(*UserId.Get(), FOnQueryAchievementsCompleteDelegate::CreateUObject(this, &AAchievementManager::OnQueryAchievementsComplete));
 			}
 		}
 	}
 }
 
-void AchievementManager::OnQueryAchievementsComplete(const FUniqueNetId& PlayerId, const bool bWasSuccessful)
+void AAchievementManager::OnQueryAchievementsComplete(const FUniqueNetId& PlayerId, const bool bWasSuccessful)
 {
 	if (bWasSuccessful)
 	{
@@ -51,7 +69,7 @@ void AchievementManager::OnQueryAchievementsComplete(const FUniqueNetId& PlayerI
 	}
 }
 
-void AchievementManager::UpdateAchievementProgress(const FString& Id, float Percent)
+void AAchievementManager::UpdateAchievementProgress(const FString& Id, float Percent)
 {
 	//Get the online sub system
 	IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
@@ -85,8 +103,4 @@ void AchievementManager::UpdateAchievementProgress(const FString& Id, float Perc
 			}
 		}
 	}
-}
-
-AchievementManager::~AchievementManager()
-{
 }
