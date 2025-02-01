@@ -53,24 +53,10 @@ void AISMSwapViewItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActo
 		{
 			if (GS->SwapViewItem == nullptr)
 			{
-				GS->SwapViewItem = this;
+				GS->MulticastSetSwapViewItem(this);
 				MulticastVisibleMesh(false);
-
-				// 아이템 소지 UI 활성화
-				MulticastSetOverlayIcon(true);
 				MulticastPlaySound();
 			}
-		}
-	}
-}
-
-void AISMSwapViewItem::MulticastSetOverlayIcon_Implementation(bool Flag)
-{
-	if (AISMHUD* ISMHUD = Cast<AISMHUD>(UGameplayStatics::GetPlayerController(this, 0)->GetHUD()))
-	{
-		if (UISMOverlay* ISMOverlay = ISMHUD->GetISMOverlay())
-		{
-			ISMOverlay->SetSwapItemIcon(Flag);
 		}
 	}
 }

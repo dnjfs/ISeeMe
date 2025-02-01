@@ -84,13 +84,8 @@ void AISMPlayerController::ServerCallSwapCamera_Implementation()
 					}), GM->SwapTime, false);
 				GM->SwapCamera();
 
-				UE_LOG(LogTemp, Warning, TEXT("Use"));
-
-				// 아이템 소지 UI 비활성화
-				GS->SwapViewItem->MulticastSetOverlayIcon(false);
-
 				GS->UsedSwapViewItems.Add(GS->SwapViewItem);
-				GS->SwapViewItem = nullptr;
+				GS->MulticastSetSwapViewItem(nullptr);
 			}
 		}
 	}

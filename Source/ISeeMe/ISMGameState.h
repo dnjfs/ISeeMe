@@ -10,6 +10,8 @@
 /**
  * 
  */
+DECLARE_DELEGATE_OneParam(FOnSwapItemUpdated, bool);
+
 UCLASS()
 class ISEEME_API AISMGameState : public AGameStateBase
 {
@@ -19,6 +21,8 @@ protected:
 	AISMGameState();
 
 public:
+	FOnSwapItemUpdated OnSwapItemUpdated; 
+
 	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere)
 	AISMSwapViewItem* SwapViewItem; // Current Own
 
@@ -30,5 +34,11 @@ public:
 
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	bool bAcqCheckPoint;
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastSetSwapViewItem(AISMSwapViewItem* AcqSwapViewItem);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastReturnSwapViewItem();
+
+	bool bAcqCheckPoint; // Check Check Point
 };

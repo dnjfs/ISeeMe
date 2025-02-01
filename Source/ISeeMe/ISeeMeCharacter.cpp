@@ -405,36 +405,16 @@ void AISeeMeCharacter::GoCheckPoint()
 {
 	if (AISMGameState* GS = Cast<AISMGameState>(UGameplayStatics::GetGameState(this)))
 	{
-		// Used Item Empty
-		for (auto& Item : GS->UsedSwapViewItems)
-		{
-			Item->MulticastVisibleMesh(true);
-			Item = nullptr;
-		}
-		GS->UsedSwapViewItems.Empty();
+		GS->MulticastReturnSwapViewItem();
+	}
 
-		// Return current swap item 
-		if (GS->SwapViewItem != nullptr)
+	// Return Swap Camera State
+	if (AISeeMeGameMode* GM = Cast<AISeeMeGameMode>(GetWorld()->GetAuthGameMode()))
+	{
+		if (!GM->bSwapCamera)
 		{
-			GS->SwapViewItem->MulticastVisibleMesh(true);
-			GS->SwapViewItem = nullptr;
-		}
-
-		// Return Check point state
-		if (GS->bAcqCheckPoint && GS->SaveSwapViewItem!=nullptr)
-		{
-			GS->SaveSwapViewItem->MulticastVisibleMesh(false);
-			GS->SwapViewItem = GS->SaveSwapViewItem;
-		}
-
-		// Return Swap Camera State
-		if (AISeeMeGameMode* GM = Cast<AISeeMeGameMode>(GetWorld()->GetAuthGameMode()))
-		{
-			if (!GM->bSwapCamera)
-			{
-				GetWorldTimerManager().ClearTimer(GM->SwapTimerHandle);
-				GM->SwapCamera();
-			}
+			GetWorldTimerManager().ClearTimer(GM->SwapTimerHandle);
+			GM->SwapCamera();
 		}
 	}
 

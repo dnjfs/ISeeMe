@@ -26,3 +26,37 @@ void AISMGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	DOREPLIFETIME(AISMGameState, UsedSwapViewItems);
 }
 
+void AISMGameState::MulticastSetSwapViewItem_Implementation(AISMSwapViewItem* AcqSwapViewItem)
+{
+	SwapViewItem = AcqSwapViewItem;
+
+	bool bShowIcon = (SwapViewItem != nullptr);
+	if (OnSwapItemUpdated.IsBound())
+		OnSwapItemUpdated.Execute(bShowIcon); // Call Delegate
+}
+
+void AISMGameState::MulticastReturnSwapViewItem_Implementation()
+{
+	// Used Item Empty
+	for (auto& Item : UsedSwapViewItems)
+	{
+		Item->MulticastVisibleMesh(true);
+		Item = nullptr;
+	}
+	UsedSwapViewItems.Empty();
+
+	// Return current swap item 
+	if (SwapViewItem != nullptr)
+	{
+		SwapViewItem->MulticastVisibleMesh(true);
+		MulticastSetSwapViewItem(nullptr);
+	}
+
+	// Return Check point state
+	if (bAcqCheckPoint && SaveSwapViewItem != nullptr)
+	{
+		SaveSwapViewItem->MulticastVisibleMesh(false);
+		MulticastSetSwapViewItem(SaveSwapViewItem);
+	}
+}
+

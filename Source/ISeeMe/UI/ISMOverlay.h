@@ -15,13 +15,16 @@ class ISEEME_API UISMOverlay : public UUserWidget
 	GENERATED_BODY()
 	
 public:
-	void SetSwapItemIcon(bool Flag);
-
 	void OffSelectPanel();
+
+protected:
+	virtual void NativeConstruct() override;
+
 private:
 	UPROPERTY(meta = (BindWidget))
 	class UCanvasPanel* SwapItemPanel;
 
 	UPROPERTY(meta = (BindWidget))
 	class UCanvasPanel* CharacterSelectPanel;
+
 };

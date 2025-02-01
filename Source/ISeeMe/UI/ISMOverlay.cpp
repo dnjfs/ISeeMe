@@ -1,20 +1,23 @@
-#include "ISMOverlay.h"
 // Fill out your copyright notice in the Description page of Project Settings.
-
 
 #include "ISeeMe/UI/ISMOverlay.h"
 #include "ISMOverlay.h"
 #include "Components/CanvasPanel.h"
+#include "ISeeMe/ISMGameState.h"
 
-void UISMOverlay::SetSwapItemIcon(bool Flag)
+void UISMOverlay::NativeConstruct()
 {
-	if (Flag == true)
+	Super::NativeConstruct();
+
+	if (AISMGameState* GS = GetWorld()->GetGameState<AISMGameState>())
 	{
-		SwapItemPanel->SetVisibility(ESlateVisibility::Visible);
-	}
-	else
-	{
-		SwapItemPanel->SetVisibility(ESlateVisibility::Hidden);
+		GS->OnSwapItemUpdated.BindLambda([this](bool bShowIcon)
+			{
+				if (SwapItemPanel)
+				{
+					SwapItemPanel->SetVisibility(bShowIcon ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
+				}
+			});
 	}
 }
 
