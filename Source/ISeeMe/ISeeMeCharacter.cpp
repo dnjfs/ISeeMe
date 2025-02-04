@@ -362,7 +362,6 @@ void AISeeMeCharacter::SwapAspect()
 	if (AISMPlayerController* PC = Cast<AISMPlayerController>(GetController()))
 		if (PC->OtherCharacter)
 		{
-			PC->ChangeUnHideBone(PC->OtherCharacter);
 			PC->SwapAspect();
 		}
 }

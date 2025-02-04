@@ -38,10 +38,6 @@ public:
 	UFUNCTION(Server, Reliable)
 	void ServerCallSwapCamera();
 
-	/** Called ChangeUnHideBone() for server, client */
-	UFUNCTION(NetMulticast, Reliable)
-	void RecoverAspect();
-
 	/** Swap aspect */
 	UFUNCTION()
 	void SwapAspect();
@@ -49,10 +45,6 @@ public:
 	/** Stay current aspect */
 	UFUNCTION()
 	void CurrentAspect();
-
-	/** To unhide all bones */
-	UFUNCTION()
-	void ChangeUnHideBone(AISeeMeCharacter* OtherCharacter);
 
 	UPROPERTY(ReplicatedUsing = OnRep_SwapCamera)
 	TObjectPtr<class AISeeMeCharacter> OtherCharacter;

@@ -31,9 +31,9 @@ public:
 	/** Returns FollowCamera subobject **/
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
-	/** When first perspective, hide bone name */
+	/** When first perspective, Camera Location */
 	UPROPERTY(EditAnywhere, Category = "Bone")
-	FName HideBoneName;
+	FVector FirstAspectLocation;
 
 	/**  How high to dead */
 	UPROPERTY(EditAnywhere)
