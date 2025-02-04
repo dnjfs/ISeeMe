@@ -71,7 +71,6 @@ void AISeeMeGameMode::SwapCamera()
 	{
 		for (int i = 0; i < PlayerNum; i++)
 		{
-			PCs[i]->RecoverAspect();
 			PCs[i]->SetViewTarget(Characters[i]);
 			PCs[i]->SetOtherCharacter(Characters[i]);
 			PCs[i]->CurrentAspect();
@@ -91,7 +90,6 @@ void AISeeMeGameMode::SwapCamera()
 	{
 		for (int i = 0; i < PlayerNum; i++)
 		{
-			PCs[i]->RecoverAspect();
 			PCs[i]->SetViewTarget(Characters[(i + 1 < PlayerNum) ? i + 1 : 0]);
 			PCs[i]->SetOtherCharacter(Characters[(i + 1 < PlayerNum) ? i + 1 : 0]);
 			PCs[i]->CurrentAspect();
