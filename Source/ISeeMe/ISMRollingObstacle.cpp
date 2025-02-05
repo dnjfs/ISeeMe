@@ -6,6 +6,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/RotatingMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "ISeeMeCharacter.h"
 
 // Sets default values
 AISMRollingObstacle::AISMRollingObstacle()
@@ -35,13 +36,29 @@ void AISMRollingObstacle::BeginPlay()
 	if (HasAuthority())
 	{
 		InitialRotation = RotatingObject->GetComponentRotation();
-
 		RotatingMovement->RotationRate = RotationSpeed;
-
 		SetRelativeObjectLocation();
+
+		RotatingObject->OnComponentBeginOverlap.AddDynamic(this, &AISMRollingObstacle::PushCharacter);
 	}
 	if (!HasAuthority())
 		SetActorTickEnabled(false);
+}
+
+// Called every frame
+void AISMRollingObstacle::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
+	if (HasAuthority())
+	{
+#if WITH_EDITOR
+		EditorTick(DeltaTime);
+#endif
+		RotatingObject->SetWorldRotation(InitialRotation);
+		ObjectOldLoc = ObjectNewLoc;
+		ObjectNewLoc = RotatingObject->GetComponentLocation();
+	}
 }
 
 void AISMRollingObstacle::SetRelativeObjectLocation()
@@ -64,18 +81,17 @@ void AISMRollingObstacle::SetRelativeObjectLocation()
 	RotatingObject->SetRelativeLocation(ObjectOffset);
 }
 
-// Called every frame
-void AISMRollingObstacle::Tick(float DeltaTime)
+void AISMRollingObstacle::PushCharacter(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	Super::Tick(DeltaTime);
+	if (!HasAuthority())
+		return;
 
-	if (HasAuthority())
+	if (ACharacter* Character = Cast<ACharacter>(OtherActor))
 	{
-#if WITH_EDITOR
-		EditorTick(DeltaTime);
-#endif
+		FVector PushingDirection = ObjectNewLoc - ObjectOldLoc;
+		PushingDirection.Normalize();
 
-		RotatingObject->SetWorldRotation(InitialRotation);
+		Character->LaunchCharacter(PushingDirection * PushingPower, true, true);
 	}
 }
 
