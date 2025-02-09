@@ -17,12 +17,15 @@ class ISEEME_API UISMSaveGame : public USaveGame
 public:
 	UISMSaveGame();
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Basic)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	FString SaveSlotName;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Basic)
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	int UserIndex;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite, Category = Basic)
-	FVector PlayerPos; // For Test
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	int CurrChapterNo;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	FName CheckPointID; 
 };

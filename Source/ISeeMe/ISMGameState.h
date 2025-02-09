@@ -41,4 +41,6 @@ public:
 	void MulticastReturnSwapViewItem();
 
 	bool bAcqCheckPoint; // Check Check Point
+
+	int CurrChapterNo = 1; // TODO : 이거 세팅하는거
 };
