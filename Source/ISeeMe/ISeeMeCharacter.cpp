@@ -23,6 +23,7 @@
 #include "ISMGameState.h"
 #include <Net/UnrealNetwork.h>
 #include "Components/AudioComponent.h"
+#include "ISMGameInstance.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -102,6 +103,46 @@ void AISeeMeCharacter::BeginPlay()
 				else
 				{
 					UE_LOG(LogTemp, Warning, TEXT("Fail: PlayerState is not initialized yet."));
+				}
+
+				// 호스트에 체크포인트가 저장되어있을 경우 작동
+				if (UISMGameInstance* GI = GetGameInstance<UISMGameInstance>())
+				{
+					if (GI->SavedCheckPointID != FName("None"))
+					{
+						TArray<AActor*> CheckPoints;
+						UGameplayStatics::GetAllActorsOfClass(GetWorld(), AISMCheckPoint::StaticClass(), CheckPoints);
+						for (AActor* ACheckPoint : CheckPoints)
+						{
+							if (GI->SavedCheckPointID == ACheckPoint->GetFName()) // 체크포인트 찾음
+							{
+								AISMCheckPoint* ISMCheckPoint = Cast<AISMCheckPoint>(ACheckPoint);
+
+								if (AISMGameState* GS = Cast<AISMGameState>(UGameplayStatics::GetGameState(this)))
+								{
+									if (GS->SwapViewItem != nullptr)
+									{
+										GS->bAcqCheckPoint = true;
+										GS->SaveSwapViewItem = GS->SwapViewItem;
+									}
+									GS->UsedSwapViewItems.Empty();
+
+									ISMCheckPoint->MulticastChangeMaterial(2);
+									ISMCheckPoint->InitCheckPoint();
+
+									if (AISMPlayerController* PC = GetController<AISMPlayerController>())
+									{
+										PC->DeadCharacter();
+									}
+								}
+								break;
+							}
+							else
+							{
+								continue;
+							}
+						}
+					}
 				}
 			});
 	}

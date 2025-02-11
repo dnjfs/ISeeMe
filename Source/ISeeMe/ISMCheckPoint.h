@@ -22,11 +22,10 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+public:
 	/* Change Material to the Server, Client*/
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastChangeMaterial(int CurDetect);
-
-public:
 
 	/*Init Check Point from the client to the server*/
 	UFUNCTION(Server, Reliable)

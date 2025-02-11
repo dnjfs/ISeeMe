@@ -9,6 +9,8 @@
 #include "ISMGameState.h"
 #include <Kismet/GameplayStatics.h>
 #include "ISMSaveGame.h"
+#include "ISMGameState.h"
+#include "ISMGameInstance.h"
 
 // Sets default values
 AISMCheckPoint::AISMCheckPoint()
@@ -182,10 +184,12 @@ void AISMCheckPoint::SaveCheckPointInfo()
 
 	if (UISMSaveGame* SaveGameInstance = Cast<UISMSaveGame>(UGameplayStatics::CreateSaveGameObject(UISMSaveGame::StaticClass())))
 	{
-		if (AISMGameState* GS = Cast<AISMGameState>(UGameplayStatics::GetGameState(this)))
+		if (UISMGameInstance* GI = GetGameInstance<UISMGameInstance>())
 		{
-			SaveGameInstance->CheckPointID = this->GetFName();
-			SaveGameInstance->CurrChapterNo = GS->CurrChapterNo;
+			GI->SavedCheckPointID = this->GetFName();
+
+			SaveGameInstance->CheckPointID = GI->SavedCheckPointID;
+			SaveGameInstance->CurrChapterNo = GI->CurrChapterNo;
 
 			UGameplayStatics::AsyncSaveGameToSlot(SaveGameInstance, TEXT("SaveSlot"), 0);
 		}

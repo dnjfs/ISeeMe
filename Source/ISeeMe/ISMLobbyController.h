@@ -25,6 +25,10 @@ class ISEEME_API AISMLobbyController : public APlayerController
 
 	AISMLobbyController();
 
+public:
+	UFUNCTION(BlueprintCallable)
+	void CreateSession(FName ChapterName);
+
 protected:
 	virtual void BeginPlay() override;
 
@@ -39,8 +43,6 @@ private:
 protected:
 	bool GetSessionInterface();
 
-	UFUNCTION(BlueprintCallable)
-	void CreateSession(FName ChapterName);
 	UFUNCTION(BlueprintCallable)
 	void FindSession();
 	UFUNCTION(BlueprintCallable)
