@@ -7,7 +7,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "ISMGameState.h"
 #include "GameFramework/Character.h"
-
+#include "ISMPlayerController.h"
 // Sets default values
 AISMChapterClearTrigger::AISMChapterClearTrigger()
 {
@@ -62,6 +62,7 @@ void AISMChapterClearTrigger::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, 
 
 void AISMChapterClearTrigger::CompleteChapter()
 {
+	MoveToNextChapter();
 	MulticastSaveChapterNo();
 }
 
@@ -83,6 +84,11 @@ void AISMChapterClearTrigger::MulticastSaveChapterNo_Implementation()
 
 void AISMChapterClearTrigger::MoveToNextChapter()
 {
-	//TODO
+	UWorld* World = GetWorld(); 
+
+	if (HasAuthority())
+	{
+		World->ServerTravel("/Game/ISeeMe/Maps/" + NextChapter + "?listen", true);
+	}
 }
 

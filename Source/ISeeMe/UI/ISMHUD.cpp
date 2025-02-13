@@ -4,11 +4,12 @@
 #include "ISeeMe/UI/ISMHUD.h"
 #include "ISeeMe/UI/InGameMenu.h"
 #include "ISeeMe/UI/ISMOverlay.h"
+#include <ISeeMe/ISMLobbyController.h>
 
 void AISMHUD::BeginPlay()
 {
 	Super::BeginPlay();
-
+    
 	if (UWorld* World = GetWorld())
 	{
 		APlayerController* PlayerController = World->GetFirstPlayerController();

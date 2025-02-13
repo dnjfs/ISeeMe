@@ -23,7 +23,6 @@ AISeeMeGameMode::AISeeMeGameMode()
 
 	SelectedPawnClasses.Add(nullptr);
 	SelectedPawnClasses.Add(nullptr);
-	bUseSeamlessTravel = true;
 }
 
 

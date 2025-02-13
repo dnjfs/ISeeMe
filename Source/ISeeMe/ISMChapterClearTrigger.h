@@ -36,6 +36,9 @@ protected:
 	UFUNCTION()
 	void MoveToNextChapter();
 
+	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Move")
+	FString NextChapter;
+
 private:
 	UPROPERTY(EditDefaultsOnly)
 	class UBoxComponent* TriggerBox;
