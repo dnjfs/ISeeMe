@@ -5,7 +5,7 @@
 #include "Components/BoxComponent.h"
 #include "ISMSaveGame.h"
 #include "Kismet/GameplayStatics.h"
-#include "ISMGameState.h"
+#include "ISMGameInstance.h"
 #include "GameFramework/Character.h"
 #include "ISMPlayerController.h"
 // Sets default values
@@ -63,6 +63,8 @@ void AISMChapterClearTrigger::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, 
 void AISMChapterClearTrigger::CompleteChapter()
 {
 	MoveToNextChapter();
+	if (GEngine)
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, TEXT("Chapter Clear"));
 	MulticastSaveChapterNo();
 }
 
@@ -70,12 +72,11 @@ void AISMChapterClearTrigger::MulticastSaveChapterNo_Implementation()
 {
 	if (UISMSaveGame* SaveGameInstance = Cast<UISMSaveGame>(UGameplayStatics::CreateSaveGameObject(UISMSaveGame::StaticClass())))
 	{
-		if (AISMGameState* GS = Cast<AISMGameState>(UGameplayStatics::GetGameState(this)))
+		if (UISMGameInstance* GI = GetGameInstance<UISMGameInstance>())
 		{
+			GI->CurrChapterNo++;
+			SaveGameInstance->CurrChapterNo = GI->CurrChapterNo;
 			SaveGameInstance->CheckPointID = FName("None");
-
-			GS->CurrChapterNo++;
-			SaveGameInstance->CurrChapterNo = GS->CurrChapterNo;
 
 			UGameplayStatics::AsyncSaveGameToSlot(SaveGameInstance, TEXT("SaveSlot"), 0);
 		}

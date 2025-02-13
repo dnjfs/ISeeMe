@@ -27,4 +27,8 @@ public:
     {
         return SelectedPawnClasses;
     }*/
+
+    int CurrChapterNo;
+
+    FName SavedCheckPointID;
 };
