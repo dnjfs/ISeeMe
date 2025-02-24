@@ -15,19 +15,10 @@ class ISEEME_API UISMGameInstance : public UGameInstance
 	GENERATED_BODY()
 	
 public:
-	UPROPERTY()
-	TArray<TSubclassOf<APawn>> SelectedPawnClasses;
-
-    UPROPERTY()
+    UPROPERTY(BlueprintReadWrite)
     TSubclassOf<APawn> SelectedPawnClass;
 
-    /*void AddToPersistentArray(const TSubclassOf<APawn>& NewValue);
-
-    const TArray<TSubclassOf<APawn>>& GetPersistentArray() const
-    {
-        return SelectedPawnClasses;
-    }*/
-
+    UPROPERTY(BlueprintReadWrite)
     int CurrChapterNo;
 
     FName SavedCheckPointID;

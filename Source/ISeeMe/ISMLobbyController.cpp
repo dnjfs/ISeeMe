@@ -56,28 +56,6 @@ void AISMLobbyController::BeginPlay()
 	}
 }
 
-void AISMLobbyController::CallSelectCharacter(TSubclassOf<APawn> NewPawnClass)
-{
-	if (HasAuthority())
-		MulticastSelectCharacter(NewPawnClass);
-	else
-		ServerSelectCharacter(NewPawnClass);
-}
-
-void AISMLobbyController::ServerSelectCharacter_Implementation(TSubclassOf<APawn> NewPawnClass)
-{
-	MulticastSelectCharacter(NewPawnClass);
-}
-
-void AISMLobbyController::MulticastSelectCharacter_Implementation(TSubclassOf<APawn> NewPawnClass)
-{
-	if (UISMGameInstance* GameInstance = GetGameInstance<UISMGameInstance>())
-	{
-		GameInstance->SelectedPawnClass = NewPawnClass;
-		UE_LOG(LogTemp, Warning, TEXT("GameInstance Change : %d"), GameInstance->SelectedPawnClasses.Num());
-	}
-}
-
 bool AISMLobbyController::GetSessionInterface()
 {
 	IOnlineSubsystem* OSS = IOnlineSubsystem::Get();

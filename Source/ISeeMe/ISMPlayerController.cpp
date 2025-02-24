@@ -27,13 +27,25 @@ void AISMPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
 
-	SetInputMode(FInputModeUIOnly());
-	SetShowMouseCursor(true);
+	SetInputMode(FInputModeGameOnly());
+	SetShowMouseCursor(false);
 }
 
 void AISMPlayerController::OnPossess(APawn* aPawn)
 {
 	Super::OnPossess(aPawn);
+
+	if (IsLocalController())
+	{
+		if (ACharacter* LocalCharacter = Cast<ACharacter>(GetPawn()))
+		{
+			USkeletalMeshComponent* LocalMesh = LocalCharacter->GetMesh();
+			if (LocalMesh)
+			{
+				LocalMesh->SetRenderCustomDepth(true);
+			}
+		}
+	}
 
 	if (HasAuthority())
 		SwapCamera(false);
@@ -158,35 +170,5 @@ void AISMPlayerController::DeadCharacter()
 	{
 		MyCharacter->SetActorLocation(State->InitSpawnPointLocation);
 		MyCharacter->SetActorRotation(State->InitialSpawnPointRotator);
-	}
-}
-
-void AISMPlayerController::MulticastUpdateController_Implementation()
-{
-	SetInputMode(FInputModeGameOnly());
-	SetShowMouseCursor(false);
-	if (AISMHUD* ISMHUD = Cast<AISMHUD>(GetHUD()))
-	{
-		if (UISMOverlay* ISMSelectOverlay = ISMHUD->GetISMOverlay())
-		{
-			ISMSelectOverlay->OffSelectPanel();
-		}
-	}
-
-	if (AController* LocalController = GetWorld()->GetFirstPlayerController())
-	{
-		APawn* LocalPawn = LocalController->GetPawn();
-		if (ACharacter* LocalCharacter = Cast<ACharacter>(LocalPawn))
-		{
-			USkeletalMeshComponent* Mesh = LocalCharacter->GetMesh();
-			if (Mesh)
-			{
-				Mesh->SetRenderCustomDepth(true);
-			}
-			else
-			{
-				UE_LOG(LogTemp, Warning, TEXT("Mesh is null!"));
-			}
-		}
 	}
 }

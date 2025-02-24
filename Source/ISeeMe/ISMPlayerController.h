@@ -51,9 +51,6 @@ public:
 
 	void DeadCharacter();
 
-	UFUNCTION(NetMulticast, Unreliable)
-	void MulticastUpdateController();
-
 private:
 	bool bFirstAspect = false;
 

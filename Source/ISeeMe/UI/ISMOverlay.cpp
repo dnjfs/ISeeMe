@@ -20,8 +20,3 @@ void UISMOverlay::NativeConstruct()
 			});
 	}
 }
-
-void UISMOverlay::OffSelectPanel()
-{
-	CharacterSelectPanel->SetVisibility(ESlateVisibility::Hidden);
-}

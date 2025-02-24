@@ -37,4 +37,17 @@ public:
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Player Info")
 	int32 CustomPlayerID;
 
+	/* Switch Pawn After Select*/
+	UFUNCTION(BlueprintCallable)
+	void CallSelectPawn(TSubclassOf<APawn> NewPawn);
+
+	UFUNCTION()
+	void SelectPawn(TSubclassOf<APawn> NewPawn, int num);
+
+	UFUNCTION(Server, Reliable)
+	void ServerSelectPawn(TSubclassOf<APawn> NewPawn);
+
+protected:
+	virtual void BeginPlay();
+
 };

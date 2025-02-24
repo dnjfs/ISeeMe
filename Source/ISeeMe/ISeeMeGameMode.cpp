@@ -39,7 +39,6 @@ void AISeeMeGameMode::PostLogin(APlayerController* NewPlayer)
 
 void AISeeMeGameMode::SwapCamera()
 {
-	LOG_SCREEN("Swap");
 	int32 CurrentPlayers = GetNumPlayers();
 
 	TArray<AISMPlayerController*> PCs;
@@ -124,13 +123,6 @@ void AISeeMeGameMode::ChangePawn()
 		}
 	}
 
-	if (LocalCharacters.Num() != SelectedPawnClasses.Num())
-	{
-		UE_LOG(LogTemp, Error, TEXT("Mismatch between Characters (%d) and SelectedPawnClasses (%d) count!"),
-			LocalCharacters.Num(), SelectedPawnClasses.Num());
-		return;
-	}
-
 	for (int i = 0; i < LocalCharacters.Num(); i++)
 	{
 		AISeeMeCharacter* MyCharacter = LocalCharacters[i];
@@ -153,7 +145,6 @@ void AISeeMeGameMode::ChangePawn()
 				if (NewPawn)
 				{
 					Controller->Possess(NewPawn);
-					Controller->MulticastUpdateController();
 				}
 			}
 		}
