@@ -6,6 +6,8 @@
 #include "GameFramework/Actor.h"
 #include "ISMChapterClearTrigger.generated.h"
 
+DECLARE_DELEGATE_OneParam(FOnClearUpdated, bool);
+
 UCLASS()
 class ISEEME_API AISMChapterClearTrigger : public AActor
 {
@@ -17,6 +19,8 @@ public:
 
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+	FOnClearUpdated OnClearUpdated;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -43,5 +47,9 @@ private:
 	UPROPERTY(EditDefaultsOnly)
 	class UBoxComponent* TriggerBox;
 
+	UPROPERTY()
 	int DetectedPlayerCount;
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastDetectPlayer(bool bAdd, AActor* OtherActor);
 };

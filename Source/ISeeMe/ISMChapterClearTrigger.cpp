@@ -8,6 +8,14 @@
 #include "ISMGameInstance.h"
 #include "GameFramework/Character.h"
 #include "ISMPlayerController.h"
+#include "ISeeMe/UI/ISMOverlay.h"
+#include "Components/WidgetSwitcher.h" 
+#include <GameFramework/HUD.h>
+#include "ISeeMe/UI/ISMHUD.h"
+#include "ISMLobbyController.h"
+#include <Net/UnrealNetwork.h>
+
+
 // Sets default values
 AISMChapterClearTrigger::AISMChapterClearTrigger()
 {
@@ -24,11 +32,8 @@ void AISMChapterClearTrigger::BeginPlay()
 
 	DetectedPlayerCount = 0;
 	
-	if (HasAuthority())
-	{
-		TriggerBox->OnComponentBeginOverlap.AddDynamic(this, &AISMChapterClearTrigger::OnOverlapBegin);
-		TriggerBox->OnComponentEndOverlap.AddDynamic(this, &AISMChapterClearTrigger::OnOverlapEnd);
-	}
+	TriggerBox->OnComponentBeginOverlap.AddDynamic(this, &AISMChapterClearTrigger::OnOverlapBegin);
+	TriggerBox->OnComponentEndOverlap.AddDynamic(this, &AISMChapterClearTrigger::OnOverlapEnd);
 }
 
 // Called every frame
@@ -40,24 +45,23 @@ void AISMChapterClearTrigger::Tick(float DeltaTime)
 
 void AISMChapterClearTrigger::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (ACharacter* Character = Cast<ACharacter>(OtherActor))
-	{
-		DetectedPlayerCount++;
-	}
+	MulticastDetectPlayer(true, OtherActor);
 
 	// When all detect
 	if (DetectedPlayerCount == 2)
 	{
+		if (OnClearUpdated.IsBound())
+		{
+			OnClearUpdated.Execute(true);
+		} // Loading UI
+
 		CompleteChapter();
 	}
 }
 
 void AISMChapterClearTrigger::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (ACharacter* Character = Cast<ACharacter>(OtherActor))
-	{
-		DetectedPlayerCount--;
-	}
+	MulticastDetectPlayer(false,OtherActor);
 }
 
 void AISMChapterClearTrigger::CompleteChapter()
@@ -90,6 +94,17 @@ void AISMChapterClearTrigger::MoveToNextChapter()
 	if (HasAuthority())
 	{
 		World->ServerTravel("/Game/ISeeMe/Maps/" + NextChapter + "?listen", true);
+	}
+}
+
+void AISMChapterClearTrigger::MulticastDetectPlayer_Implementation(bool bAdd, AActor* OtherActor)
+{
+	if (ACharacter* Character = Cast<ACharacter>(OtherActor))
+	{
+		if(bAdd)
+			DetectedPlayerCount++;
+		else
+			DetectedPlayerCount--;
 	}
 }
 

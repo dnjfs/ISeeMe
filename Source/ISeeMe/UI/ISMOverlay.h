@@ -14,6 +14,13 @@ class ISEEME_API UISMOverlay : public UUserWidget
 {
 	GENERATED_BODY()
 
+public:
+	UPROPERTY(meta = (BindWidget))
+	class UWidgetSwitcher* LoadingSwitcher;
+
+	UFUNCTION()
+	void HandleClearUpdated(bool bLoading);
+
 protected:
 	virtual void NativeConstruct() override;
 
