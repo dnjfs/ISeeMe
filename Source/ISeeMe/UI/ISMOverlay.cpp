@@ -34,7 +34,7 @@ void UISMOverlay::NativeConstruct()
 	if (ChapterClearTrigger)
 	{
 		ChapterClearTrigger->OnClearUpdated.BindUObject(this, &UISMOverlay::HandleClearUpdated);
-	}
+	} // Delegate Bind
 }
 
 void UISMOverlay::HandleClearUpdated(bool bLoading)

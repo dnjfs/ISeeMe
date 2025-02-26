@@ -35,7 +35,14 @@ void AISMLobbyController::BeginPlay()
 			UIWidgetInstance = CreateWidget<UUserWidget>(PC, UIWidgetClass);
 			if (UIWidgetInstance)
 			{
-				UIWidgetInstance->AddToViewport();
+				UIWidgetInstance->AddToViewport(0);
+			}
+
+			UILoadingInstance = CreateWidget<UUserWidget>(PC, UILoadingClass);
+			if (UILoadingInstance)
+			{
+				UILoadingInstance->AddToViewport(1);
+				UILoadingInstance->SetVisibility(ESlateVisibility::Hidden);
 			}
 		}
 		else
@@ -81,6 +88,9 @@ bool AISMLobbyController::GetSessionInterface()
 
 void AISMLobbyController::CreateSession(FName ChapterName)
 {
+	if(UILoadingInstance)
+		UILoadingInstance->SetVisibility(ESlateVisibility::Visible); // Loading Screen
+
 	// 세션 인터페이스 유효성 검사
 	if (OnlineSessionInterface.IsValid() == false)
 	{
@@ -140,6 +150,9 @@ void AISMLobbyController::OnCreateSessionComplete(FName SessionName, bool bWasSu
 
 void AISMLobbyController::FindSession()
 {
+	if (UILoadingInstance)
+		UILoadingInstance->SetVisibility(ESlateVisibility::Visible); // Loading Screen
+
 	if (OnlineSessionInterface.IsValid() == false)
 	{
 		LOG_SCREEN("Session Interface is Invalid");

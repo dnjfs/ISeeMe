@@ -35,9 +35,15 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadwrite, Category = UI)
 	TSubclassOf<class UUserWidget> UIWidgetClass;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadwrite, Category = UI)
+	TSubclassOf<class UUserWidget> UILoadingClass;
+
 private:
 	UPROPERTY()
 	TObjectPtr<class UUserWidget> UIWidgetInstance;
+
+	UPROPERTY()
+	TObjectPtr<class UUserWidget> UILoadingInstance;
 
 // Online Subsystem
 protected:

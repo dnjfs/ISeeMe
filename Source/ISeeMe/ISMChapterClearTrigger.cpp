@@ -53,7 +53,7 @@ void AISMChapterClearTrigger::OnOverlapBegin(UPrimitiveComponent* OverlappedComp
 		if (OnClearUpdated.IsBound())
 		{
 			OnClearUpdated.Execute(true);
-		} // Loading UI
+		} // Delegate Execute (Loading UI)
 
 		CompleteChapter();
 	}
