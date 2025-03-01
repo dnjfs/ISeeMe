@@ -74,16 +74,13 @@ void AISMChapterClearTrigger::CompleteChapter()
 
 void AISMChapterClearTrigger::MulticastSaveChapterNo_Implementation()
 {
-	if (UISMSaveGame* SaveGameInstance = Cast<UISMSaveGame>(UGameplayStatics::CreateSaveGameObject(UISMSaveGame::StaticClass())))
+	if (UISMGameInstance* GI = GetGameInstance<UISMGameInstance>())
 	{
-		if (UISMGameInstance* GI = GetGameInstance<UISMGameInstance>())
-		{
-			GI->CurrChapterNo++;
-			SaveGameInstance->CurrChapterNo = GI->CurrChapterNo;
-			SaveGameInstance->CheckPointID = FName("None");
+		GI->MaxChapterNo = FMath::Max(GI->MaxChapterNo, NextChapterNo);
+		GI->CurrChapterNo = NextChapterNo;
+		GI->SavedCheckPointID = FName("None");
 
-			UGameplayStatics::AsyncSaveGameToSlot(SaveGameInstance, TEXT("SaveSlot"), 0);
-		}
+		GI->SaveGame();
 	}
 }
 

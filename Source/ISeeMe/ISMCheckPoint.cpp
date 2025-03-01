@@ -182,17 +182,10 @@ void AISMCheckPoint::SaveCheckPointInfo()
 	if (!HasAuthority())
 		return;
 
-	if (UISMSaveGame* SaveGameInstance = Cast<UISMSaveGame>(UGameplayStatics::CreateSaveGameObject(UISMSaveGame::StaticClass())))
+	if (UISMGameInstance* GI = GetGameInstance<UISMGameInstance>())
 	{
-		if (UISMGameInstance* GI = GetGameInstance<UISMGameInstance>())
-		{
-			GI->SavedCheckPointID = this->GetFName();
-
-			SaveGameInstance->CheckPointID = GI->SavedCheckPointID;
-			SaveGameInstance->CurrChapterNo = GI->CurrChapterNo;
-
-			UGameplayStatics::AsyncSaveGameToSlot(SaveGameInstance, TEXT("SaveSlot"), 0);
-		}
+		GI->SavedCheckPointID = this->GetFName();
+		GI->SaveGame();
 	}
 }
 

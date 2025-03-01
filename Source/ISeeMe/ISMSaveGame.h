@@ -26,6 +26,10 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	int CurrChapterNo;
 
+	// 클리어한 최대 챕터
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	int MaxChapterNo;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	FName CheckPointID; 
 };

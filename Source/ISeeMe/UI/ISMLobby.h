@@ -7,6 +7,7 @@
 #include "ISMLobby.generated.h"
 
 class UButton;
+class UISMChapterSelect;
 /**
  * 
  */
@@ -29,4 +30,7 @@ private:
 
 	UPROPERTY(meta = (BindWidget))
 	UButton* ContinueButton;
+
+	UPROPERTY(meta = (BindWidget))
+	UISMChapterSelect* WBP_ISMChapterSelect;
 };

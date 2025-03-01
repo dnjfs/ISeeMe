@@ -7,6 +7,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "ISeeMe/ISMLobbyController.h"
 #include "UMG.h"
+#include "ISMChapterSelect.h"
 
 void UISMLobby::NativeConstruct()
 {
@@ -18,15 +19,17 @@ void UISMLobby::NativeConstruct()
 		if (UISMSaveGame* LoadedGame = Cast<UISMSaveGame>(UGameplayStatics::LoadGameFromSlot("SaveSlot", 0)))
 		{
 			ContinueButton->SetIsEnabled(true);
-			GI->CurrChapterNo = LoadedGame->CurrChapterNo;
-			GI->SavedCheckPointID = LoadedGame->CheckPointID;
+			GI->LoadGame(LoadedGame);
 		}
 		else // 세이브 파일 없음
 		{
 			ContinueButton->SetIsEnabled(false);
 			GI->CurrChapterNo = 1;
+			GI->MaxChapterNo = 1;
 			GI->SavedCheckPointID = FName("None");
 		}
+
+		WBP_ISMChapterSelect->EnableChapterSelectButton(GI->MaxChapterNo);
 	}
 
 	NewGameButton->OnClicked.AddDynamic(this, &UISMLobby::NewGame);
@@ -37,17 +40,11 @@ void UISMLobby::NewGame()
 {
 	if (UISMGameInstance* GI = GetGameInstance<UISMGameInstance>())
 	{
-		// 챕터, 체크포인트 정보 초기화 후 저장
+		// 현재 챕터, 체크포인트 정보 초기화 후 저장
 		GI->CurrChapterNo = 1;
 		GI->SavedCheckPointID = FName("None");
 
-		if (UISMSaveGame* SaveGameInstance = Cast<UISMSaveGame>(UGameplayStatics::CreateSaveGameObject(UISMSaveGame::StaticClass())))
-		{
-			SaveGameInstance->CurrChapterNo = GI->CurrChapterNo;
-			SaveGameInstance->CheckPointID = GI->SavedCheckPointID;
-
-			UGameplayStatics::AsyncSaveGameToSlot(SaveGameInstance, TEXT("SaveSlot"), 0);
-		}
+		GI->SaveGame();
 
 		if (AISMLobbyController* LobbyController = GetWorld()->GetFirstPlayerController<AISMLobbyController>())
 		{
