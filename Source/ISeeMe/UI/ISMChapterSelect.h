@@ -6,7 +6,7 @@
 #include "Blueprint/UserWidget.h"
 #include "ISMChapterSelect.generated.h"
 
-class UWrapBox;
+class UPanelWidget;
 
 /**
  * 
@@ -26,5 +26,5 @@ private:
 	void SelectChapter(int ChapterNo);
 
 	UPROPERTY(meta = (BindWidget))
-	UWrapBox* ChapterListBox;
+	UPanelWidget* ChapterListBox;
 };
