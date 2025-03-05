@@ -6,8 +6,8 @@
 #include "Blueprint/UserWidget.h"
 #include "ISMChapterSelect.generated.h"
 
-class UPanelWidget;
-
+class UButton;
+class UISMChapterList;
 /**
  * 
  */
@@ -15,16 +15,25 @@ UCLASS()
 class ISEEME_API UISMChapterSelect : public UUserWidget
 {
 	GENERATED_BODY()
-
-public:
-	void EnableChapterSelectButton(int MaxChapterNo);
-
-protected:
 	
+protected:
+	virtual void NativeConstruct() override;
+
+	UFUNCTION()
+	void NewGame();
+	UFUNCTION()
+	void Continue();
+
 private:
-	UFUNCTION(BlueprintCallable)
-	void SelectChapter(int ChapterNo);
+	UPROPERTY(meta = (BindWidget))
+	UButton* NewGameButton;
 
 	UPROPERTY(meta = (BindWidget))
-	UPanelWidget* ChapterListBox;
+	UButton* ContinueButton;
+
+	UPROPERTY(meta = (BindWidget))
+	UButton* BackButton;
+
+	UPROPERTY(meta = (BindWidget))
+	UISMChapterList* WBP_ISMChapterList;
 };

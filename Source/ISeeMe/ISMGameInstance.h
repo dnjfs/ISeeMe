@@ -20,6 +20,9 @@ public:
     // 로컬 SaveGame에 저장된 데이터를 GI로 불러오기
     void LoadGame(UISMSaveGame* LoadedGame);
 
+    UFUNCTION(BlueprintCallable)
+    FORCEINLINE void ReturnToMainMenu() { Super::ReturnToMainMenu(); }
+
     UPROPERTY(BlueprintReadWrite)
     TSubclassOf<APawn> SelectedPawnClass;
 
