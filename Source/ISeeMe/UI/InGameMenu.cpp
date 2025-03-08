@@ -6,6 +6,11 @@
 #include "OnlineSubsystem.h"
 #include "Interfaces/OnlineSessionInterface.h"
 #include "Kismet/GameplayStatics.h"
+#include "Components/Slider.h"
+#include "Components/TextBlock.h"
+#include <ISeeMe/ISMSettingsSave.h>
+
+
 
 void UInGameMenu::OnBackButtonPressed()
 {
@@ -24,6 +29,16 @@ void UInGameMenu::OnGuideButtonPressed()
 
 void UInGameMenu::OnOptionButtonPressed()
 {
+}
+
+void UInGameMenu::OnGraphicOptionButtonPressed()
+{
+	
+}
+
+void UInGameMenu::OnSoundOptionButtonPressed()
+{
+
 }
 
 void UInGameMenu::OnControlButtonPressed()

@@ -18,18 +18,17 @@ public:
 	void ToggleInGameMenu(APlayerController* PlayerController);
 
 	FORCEINLINE UISMOverlay* GetISMOverlay() { return ISMOverlay; };
-
 protected:
 	virtual void BeginPlay() override;
 
 private:
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UInGameMenu> InGameMenuClass;
 
 	UPROPERTY()
 	UInGameMenu* InGameMenu;
 
-	UPROPERTY(EditDefaultsOnly)
+	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UISMOverlay> ISMOverlayClass;
 
 	UPROPERTY()

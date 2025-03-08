@@ -13,9 +13,13 @@ UCLASS()
 class ISEEME_API UISMOverlay : public UUserWidget
 {
 	GENERATED_BODY()
-	
+
 public:
-	void OffSelectPanel();
+	UPROPERTY(meta = (BindWidget))
+	class UWidgetSwitcher* LoadingSwitcher;
+
+	UFUNCTION()
+	void HandleClearUpdated(bool bLoading);
 
 protected:
 	virtual void NativeConstruct() override;
@@ -23,8 +27,5 @@ protected:
 private:
 	UPROPERTY(meta = (BindWidget))
 	class UCanvasPanel* SwapItemPanel;
-
-	UPROPERTY(meta = (BindWidget))
-	class UCanvasPanel* CharacterSelectPanel;
 
 };

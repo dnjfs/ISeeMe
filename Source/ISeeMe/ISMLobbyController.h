@@ -25,22 +25,30 @@ class ISEEME_API AISMLobbyController : public APlayerController
 
 	AISMLobbyController();
 
+public:
+	UFUNCTION(BlueprintCallable)
+	void CreateSession(FName ChapterName);
+
 protected:
 	virtual void BeginPlay() override;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadwrite, Category = UI)
 	TSubclassOf<class UUserWidget> UIWidgetClass;
 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadwrite, Category = UI)
+	TSubclassOf<class UUserWidget> UILoadingClass;
+
 private:
 	UPROPERTY()
 	TObjectPtr<class UUserWidget> UIWidgetInstance;
+
+	UPROPERTY()
+	TObjectPtr<class UUserWidget> UILoadingInstance;
 
 // Online Subsystem
 protected:
 	bool GetSessionInterface();
 
-	UFUNCTION(BlueprintCallable)
-	void CreateSession(FName ChapterName);
 	UFUNCTION(BlueprintCallable)
 	void FindSession();
 	UFUNCTION(BlueprintCallable)
@@ -53,15 +61,6 @@ protected:
 	void OnFindFriendSessionComplete(int32 LocalUserNum, bool bWasSuccessful, const TArray<FOnlineSessionSearchResult>&);
 	void OnSessionUserInviteAccepted(const bool bWasSuccessful, const int32 ControllerId, FUniqueNetIdPtr UserId, const FOnlineSessionSearchResult& InviteResult);
 	void JoinSession(const FOnlineSessionSearchResult& Result);
-
-	UFUNCTION(BlueprintCallable)
-	void CallSelectCharacter(TSubclassOf<APawn> NewPawnClass);
-
-	UFUNCTION(Server, Reliable)
-	void ServerSelectCharacter(TSubclassOf<APawn> NewPawnClass);
-
-	UFUNCTION(NetMulticast, Reliable)
-	void MulticastSelectCharacter(TSubclassOf<APawn> NewPawnClass);
 
 private:
 	IOnlineSessionPtr OnlineSessionInterface;

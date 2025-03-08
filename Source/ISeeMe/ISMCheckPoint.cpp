@@ -8,6 +8,9 @@
 #include "ISMPlayerController.h"
 #include "ISMGameState.h"
 #include <Kismet/GameplayStatics.h>
+#include "ISMSaveGame.h"
+#include "ISMGameState.h"
+#include "ISMGameInstance.h"
 
 // Sets default values
 AISMCheckPoint::AISMCheckPoint()
@@ -99,7 +102,10 @@ void AISMCheckPoint::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor*
 				DetectPlayer++;
 				
 				if (HasAuthority())
+				{
 					InitCheckPoint();
+					SaveCheckPointInfo();
+				}
 				else
 					ServerInitCheckPoint();
 			}
@@ -168,6 +174,18 @@ void AISMCheckPoint::InitCheckPoint()
 				}
 			}
 		}
+	}
+}
+
+void AISMCheckPoint::SaveCheckPointInfo()
+{
+	if (!HasAuthority())
+		return;
+
+	if (UISMGameInstance* GI = GetGameInstance<UISMGameInstance>())
+	{
+		GI->SavedCheckPointID = this->GetFName();
+		GI->SaveGame();
 	}
 }
 

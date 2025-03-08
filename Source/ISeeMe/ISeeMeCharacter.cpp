@@ -23,6 +23,7 @@
 #include "ISMGameState.h"
 #include <Net/UnrealNetwork.h>
 #include "Components/AudioComponent.h"
+#include "ISMGameInstance.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -85,9 +86,18 @@ void AISeeMeCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	// 내 캐릭터 강조를 위해 '커스텀 뎁스 패스 렌더(bRenderCustomDepth)' 켜기
-	if (GetController() && GetController()->IsLocalController())
-		if (GetMesh())
-			GetMesh()->SetRenderCustomDepth(true);
+	if (AController* LocalController = GetWorld()->GetFirstPlayerController())
+	{
+		APawn* LocalPawn = LocalController->GetPawn();
+		if (ACharacter* LocalCharacter = Cast<ACharacter>(LocalPawn))
+		{
+			USkeletalMeshComponent* LocalMesh = LocalCharacter->GetMesh();
+			if (LocalMesh)
+			{
+				LocalMesh->SetRenderCustomDepth(true);
+			}
+		}
+	}
 
 	// Save Transform 
 	if (HasAuthority()) 
@@ -102,6 +112,46 @@ void AISeeMeCharacter::BeginPlay()
 				else
 				{
 					UE_LOG(LogTemp, Warning, TEXT("Fail: PlayerState is not initialized yet."));
+				}
+
+				// 호스트에 체크포인트가 저장되어있을 경우 작동
+				if (UISMGameInstance* GI = GetGameInstance<UISMGameInstance>())
+				{
+					if (GI->SavedCheckPointID != FName("None"))
+					{
+						TArray<AActor*> CheckPoints;
+						UGameplayStatics::GetAllActorsOfClass(GetWorld(), AISMCheckPoint::StaticClass(), CheckPoints);
+						for (AActor* ACheckPoint : CheckPoints)
+						{
+							if (GI->SavedCheckPointID == ACheckPoint->GetFName()) // 체크포인트 찾음
+							{
+								AISMCheckPoint* ISMCheckPoint = Cast<AISMCheckPoint>(ACheckPoint);
+
+								if (AISMGameState* GS = Cast<AISMGameState>(UGameplayStatics::GetGameState(this)))
+								{
+									if (GS->SwapViewItem != nullptr)
+									{
+										GS->bAcqCheckPoint = true;
+										GS->SaveSwapViewItem = GS->SwapViewItem;
+									}
+									GS->UsedSwapViewItems.Empty();
+
+									ISMCheckPoint->MulticastChangeMaterial(2);
+									ISMCheckPoint->InitCheckPoint();
+
+									if (AISMPlayerController* PC = GetController<AISMPlayerController>())
+									{
+										PC->DeadCharacter();
+									}
+								}
+								break;
+							}
+							else
+							{
+								continue;
+							}
+						}
+					}
 				}
 			});
 	}
@@ -218,37 +268,6 @@ void AISeeMeCharacter::Tick(float DeltaTime)
 		bIsFalling = false;
 	}
 	*/
-}
-
-void AISeeMeCharacter::CallSelectPawn(TSubclassOf<APawn> NewPawn)
-{
-	if (HasAuthority())
-	{
-		SelectPawn(NewPawn,0);
-	}
-	else
-	{
-		ServerSelectPawn(NewPawn);
-	}
-}
-
-void AISeeMeCharacter::SelectPawn(TSubclassOf<APawn> NewPawn, int num)
-{
-	if (AISeeMeGameMode* GM = Cast<AISeeMeGameMode>(GetWorld()->GetAuthGameMode()))
-	{
-		GM->SelectedPawnClasses[num] = NewPawn;
-		GM->SelectNum++;
-		UE_LOG(LogTemp, Warning, TEXT("%s add in %d"), *NewPawn->GetName(), GM->SelectedPawnClasses.Num());
-		if (GM->SelectNum == 2)
-		{
-			GM->ChangePawn();
-		}
-	}
-}
-
-void AISeeMeCharacter::ServerSelectPawn_Implementation(TSubclassOf<APawn> NewPawn)
-{
-	SelectPawn(NewPawn, 1);
 }
 
 void AISeeMeCharacter::Move(const FInputActionValue& Value)

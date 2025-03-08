@@ -35,7 +35,14 @@ void AISMLobbyController::BeginPlay()
 			UIWidgetInstance = CreateWidget<UUserWidget>(PC, UIWidgetClass);
 			if (UIWidgetInstance)
 			{
-				UIWidgetInstance->AddToViewport();
+				UIWidgetInstance->AddToViewport(0);
+			}
+
+			UILoadingInstance = CreateWidget<UUserWidget>(PC, UILoadingClass);
+			if (UILoadingInstance)
+			{
+				UILoadingInstance->AddToViewport(1);
+				UILoadingInstance->SetVisibility(ESlateVisibility::Hidden);
 			}
 		}
 		else
@@ -53,28 +60,6 @@ void AISMLobbyController::BeginPlay()
 	{
 		LOG_SCREEN("Failed GetSessionInterface()");
 		return;
-	}
-}
-
-void AISMLobbyController::CallSelectCharacter(TSubclassOf<APawn> NewPawnClass)
-{
-	if (HasAuthority())
-		MulticastSelectCharacter(NewPawnClass);
-	else
-		ServerSelectCharacter(NewPawnClass);
-}
-
-void AISMLobbyController::ServerSelectCharacter_Implementation(TSubclassOf<APawn> NewPawnClass)
-{
-	MulticastSelectCharacter(NewPawnClass);
-}
-
-void AISMLobbyController::MulticastSelectCharacter_Implementation(TSubclassOf<APawn> NewPawnClass)
-{
-	if (UISMGameInstance* GameInstance = GetGameInstance<UISMGameInstance>())
-	{
-		GameInstance->SelectedPawnClass = NewPawnClass;
-		UE_LOG(LogTemp, Warning, TEXT("GameInstance Change : %d"), GameInstance->SelectedPawnClasses.Num());
 	}
 }
 
@@ -103,6 +88,9 @@ bool AISMLobbyController::GetSessionInterface()
 
 void AISMLobbyController::CreateSession(FName ChapterName)
 {
+	if(UILoadingInstance)
+		UILoadingInstance->SetVisibility(ESlateVisibility::Visible); // Loading Screen
+
 	// 세션 인터페이스 유효성 검사
 	if (OnlineSessionInterface.IsValid() == false)
 	{
@@ -162,6 +150,9 @@ void AISMLobbyController::OnCreateSessionComplete(FName SessionName, bool bWasSu
 
 void AISMLobbyController::FindSession()
 {
+	if (UILoadingInstance)
+		UILoadingInstance->SetVisibility(ESlateVisibility::Visible); // Loading Screen
+
 	if (OnlineSessionInterface.IsValid() == false)
 	{
 		LOG_SCREEN("Session Interface is Invalid");

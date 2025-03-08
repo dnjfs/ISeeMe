@@ -41,4 +41,5 @@ public:
 	void MulticastReturnSwapViewItem();
 
 	bool bAcqCheckPoint; // Check Check Point
+
 };

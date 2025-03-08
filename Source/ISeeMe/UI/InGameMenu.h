@@ -28,6 +28,12 @@ protected:
 	void OnOptionButtonPressed();
 
 	UFUNCTION(BlueprintCallable)
+	void OnGraphicOptionButtonPressed();
+
+	UFUNCTION(BlueprintCallable)
+	void OnSoundOptionButtonPressed();
+
+	UFUNCTION(BlueprintCallable)
 	void OnControlButtonPressed();
 
 	UFUNCTION(BlueprintCallable)

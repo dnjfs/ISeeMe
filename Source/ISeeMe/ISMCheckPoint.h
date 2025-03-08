@@ -22,11 +22,10 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
+public:
 	/* Change Material to the Server, Client*/
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastChangeMaterial(int CurDetect);
-
-public:
 
 	/*Init Check Point from the client to the server*/
 	UFUNCTION(Server, Reliable)
@@ -35,6 +34,9 @@ public:
 	/*Init Check Point to the server*/
 	UFUNCTION()
 	void InitCheckPoint();
+
+	UFUNCTION()
+	void SaveCheckPointInfo(); 
 
 	UFUNCTION()
 	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
