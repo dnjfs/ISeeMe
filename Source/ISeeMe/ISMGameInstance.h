@@ -4,12 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
+#include "AdvancedFriendsGameInstance.h"
 #include "ISMGameInstance.generated.h"
 
 class UISMSaveGame;
 
 UCLASS()
-class ISEEME_API UISMGameInstance : public UGameInstance
+class ISEEME_API UISMGameInstance : public UAdvancedFriendsGameInstance
 {
 	GENERATED_BODY()
 	
@@ -34,4 +35,6 @@ public:
     int MaxChapterNo;
 
     FName SavedCheckPointID;
+
+    FName SelectChapter; // 선택한 챕터
 };

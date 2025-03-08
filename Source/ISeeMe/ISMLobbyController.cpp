@@ -11,6 +11,7 @@
 #include "ISMCharacterState.h"
 #include "ISMGameInstance.h"
 #include <Net/UnrealNetwork.h>
+#include <AdvancedSessionsLibrary.h>
 
 AISMLobbyController::AISMLobbyController()
 	: CreateSessionCompleteDelegate(FOnCreateSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnCreateSessionComplete))
@@ -36,6 +37,7 @@ void AISMLobbyController::BeginPlay()
 			if (UIWidgetInstance)
 			{
 				UIWidgetInstance->AddToViewport(0);
+				UIWidgetInstance->SetVisibility(ESlateVisibility::Visible);
 			}
 
 			UILoadingInstance = CreateWidget<UUserWidget>(PC, UILoadingClass);
@@ -88,9 +90,6 @@ bool AISMLobbyController::GetSessionInterface()
 
 void AISMLobbyController::CreateSession(FName ChapterName)
 {
-	if(UILoadingInstance)
-		UILoadingInstance->SetVisibility(ESlateVisibility::Visible); // Loading Screen
-
 	// 세션 인터페이스 유효성 검사
 	if (OnlineSessionInterface.IsValid() == false)
 	{
@@ -143,16 +142,13 @@ void AISMLobbyController::OnCreateSessionComplete(FName SessionName, bool bWasSu
 		return;
 	}
 
+	UIWidgetInstance->SetVisibility(ESlateVisibility::Hidden);
 	LOG_SCREEN("Successful CreateSession() - %s", *SessionName.ToString());
-	
 	UGameplayStatics::OpenLevel(this, SessionName, true, "Listen");
 }
 
 void AISMLobbyController::FindSession()
 {
-	if (UILoadingInstance)
-		UILoadingInstance->SetVisibility(ESlateVisibility::Visible); // Loading Screen
-
 	if (OnlineSessionInterface.IsValid() == false)
 	{
 		LOG_SCREEN("Session Interface is Invalid");
@@ -242,10 +238,16 @@ void AISMLobbyController::OnJoinSessionComplate(FName SessionName, EOnJoinSessio
 	FString Address;
 	if (OnlineSessionInterface->GetResolvedConnectString(NAME_GameSession, Address))
 	{
-		LOG_SCREEN("IP Address: %s", *Address);
+		//LOG_SCREEN("IP Address: %s", *Address);
+		LOG_SCREEN("Join Session");
 
 		if (APlayerController* PlayerController = GetGameInstance()->GetFirstLocalPlayerController())
+		{
+			LOG_SCREEN("Client Travel");
+			UILoadingInstance->SetVisibility(ESlateVisibility::Visible);
+			UIWidgetInstance->SetVisibility(ESlateVisibility::Hidden);
 			PlayerController->ClientTravel(Address, ETravelType::TRAVEL_Absolute);
+		}
 	}
 }
 

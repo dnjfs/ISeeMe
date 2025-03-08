@@ -8,6 +8,8 @@
 #include "ISeeMe/ISMLobbyController.h"
 #include "UMG.h"
 #include "ISMChapterList.h"
+#include "ISMStartController.h"
+#include <ISeeMe/ISMLobbyGameMode.h>
 
 void UISMChapterSelect::NativeConstruct()
 {
@@ -47,10 +49,14 @@ void UISMChapterSelect::NewGame()
 
 		GI->SaveGame();
 
-		if (AISMLobbyController* LobbyController = GetWorld()->GetFirstPlayerController<AISMLobbyController>())
+		if (AISMStartController* StartController = GetWorld()->GetFirstPlayerController<AISMStartController>())
 		{
 			FString ChapterName = FString::Printf(TEXT("Chapter%d"), GI->CurrChapterNo);
-			LobbyController->CreateSession(FName(*ChapterName));
+			GI->SelectChapter = FName(*ChapterName);
+			if (AISMLobbyGameMode* GM = Cast<AISMLobbyGameMode>(GetWorld()->GetAuthGameMode()))
+				GM->ChangeSelectCharacter();
+
+			//LobbyController->CreateSession(FName(*ChapterName));
 		}
 	}
 }
@@ -59,10 +65,13 @@ void UISMChapterSelect::Continue()
 {
 	if (UISMGameInstance* GI = GetGameInstance<UISMGameInstance>())
 	{
-		if (AISMLobbyController* LobbyController = GetWorld()->GetFirstPlayerController<AISMLobbyController>())
+		if (AISMStartController* StartController = GetWorld()->GetFirstPlayerController<AISMStartController>())
 		{
 			FString ChapterName = FString::Printf(TEXT("Chapter%d"), GI->CurrChapterNo);
-			LobbyController->CreateSession(FName(*ChapterName));
+			GI->SelectChapter = FName(*ChapterName);
+			if (AISMLobbyGameMode* GM = Cast<AISMLobbyGameMode>(GetWorld()->GetAuthGameMode()))
+				GM->ChangeSelectCharacter();
+			//LobbyController->CreateSession(FName(*ChapterName));
 		}
 	}
 }
