@@ -6,8 +6,7 @@
 #include "ISeeMe/ISMSaveGame.h"
 #include "Kismet/GameplayStatics.h"
 #include "UMG.h"
-#include "ISMStartController.h"
-#include <ISeeMe/ISMLobbyGameMode.h>
+#include "ISeeMe/ISMLobbyController.h"
 
 void UISMChapterList::EnableChapterSelectButton(int MaxChapterNo)
 {
@@ -30,13 +29,10 @@ void UISMChapterList::SelectChapter(int ChapterNo)
 
 		GI->SaveGame();
 
-		if (AISMStartController* StartController = GetWorld()->GetFirstPlayerController<AISMStartController>())
+		if (AISMLobbyController* LobbyController = GetWorld()->GetFirstPlayerController<AISMLobbyController>())
 		{
 			FString ChapterName = FString::Printf(TEXT("Chapter%d"), GI->CurrChapterNo);
-			GI->SelectChapter = FName(*ChapterName);
-			if(AISMLobbyGameMode* GM = Cast<AISMLobbyGameMode>(GetWorld()->GetAuthGameMode()))
-				GM->ChangeSelectCharacter();
-			//LobbyController->CreateSession(FName(*ChapterName));
+			LobbyController->CreateSession(FName(*ChapterName));
 		}
 	}	
 }

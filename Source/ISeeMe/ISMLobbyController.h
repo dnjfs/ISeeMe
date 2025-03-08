@@ -28,6 +28,7 @@ class ISEEME_API AISMLobbyController : public APlayerController
 public:
 	UFUNCTION(BlueprintCallable)
 	void CreateSession(FName ChapterName);
+
 protected:
 	virtual void BeginPlay() override;
 
