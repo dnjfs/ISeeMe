@@ -11,7 +11,7 @@
 	if (GEngine)\
 		GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT(Format), ##__VA_ARGS__))
 
-DECLARE_DELEGATE_TwoParams(FOnCreateSessionCompleteDelegate, FName /*SessionName*/, bool /*bWasSuccessful*/);
+//DECLARE_DELEGATE_TwoParams(FOnCreateSessionCompleteDelegate, FName /*SessionName*/, bool /*bWasSuccessful*/);
 DECLARE_DELEGATE_OneParam(FOnFindSessionsCompleteDelegate, bool /*bWasSuccessful*/);
 DECLARE_DELEGATE_TwoParams(FOnJoinSessionCompleteDelegate, FName /*SessionName*/, EOnJoinSessionCompleteResult::Type /*Result*/);
 
@@ -26,24 +26,71 @@ class ISEEME_API AISMLobbyController : public APlayerController
 	AISMLobbyController();
 
 public:
-	UFUNCTION(BlueprintCallable)
-	void CreateSession(FName ChapterName);
+	/*UFUNCTION(BlueprintCallable)
+	void CreateSession(FName ChapterName);*/
+
+	UFUNCTION()
+	void CallSelectChapterUI();
+
+	UFUNCTION()
+	void ClientSelectChapterUI();
+
+	UFUNCTION()
+	void LobbyUI();
+
+	UFUNCTION()
+	void InitUI();
+
+	UFUNCTION()
+	void CallSelectCharacterUI();
 
 protected:
 	virtual void BeginPlay() override;
 
+	UFUNCTION(Client, Unreliable)
+	void ClientSelectCharacterUI();
+
 	UPROPERTY(EditDefaultsOnly, BlueprintReadwrite, Category = UI)
-	TSubclassOf<class UUserWidget> UIWidgetClass;
+	TSubclassOf<class UISMLobbyMenu> UIWidgetClass;
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadwrite, Category = UI)
 	TSubclassOf<class UUserWidget> UILoadingClass;
 
+	/*UPROPERTY(EditDefaultsOnly, BlueprintReadwrite, Category = UI)
+	TSubclassOf<class UUserWidget> UIFriendInviteClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadwrite, Category = UI)
+	TSubclassOf<class UUserWidget> UIChapterServerClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadwrite, Category = UI)
+	TSubclassOf<class UUserWidget> UIChapterClientClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadwrite, Category = UI)
+	TSubclassOf<class UUserWidget> UICharacterSelectClass;*/
+
 private:
 	UPROPERTY()
-	TObjectPtr<class UUserWidget> UIWidgetInstance;
+	TObjectPtr<class UISMLobbyMenu> UIWidgetInstance;
 
 	UPROPERTY()
 	TObjectPtr<class UUserWidget> UILoadingInstance;
+
+	/*UPROPERTY()
+	TObjectPtr<class UUserWidget> UIFriendInviteInstance;
+
+	UPROPERTY()
+	TObjectPtr<class UUserWidget> UIChapterServerInstance;
+
+	UPROPERTY()
+	TObjectPtr<class UUserWidget> UIChapterClientInstance;
+
+	UPROPERTY()
+	TObjectPtr<class UUserWidget> UICharacterSelectInstance;*/
+
+	UFUNCTION()
+	void SelectCharacterUI();
+
+	void CreateAndInitWidget(TObjectPtr<UUserWidget>& WidgetInstance, TSubclassOf<UUserWidget> WidgetClass, int32 ZOrder, APlayerController* PC);
 
 // Online Subsystem
 protected:
@@ -54,7 +101,7 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void ExitGame();
 	
-	void OnCreateSessionComplete(FName SessionName, bool bWasSuccessful);
+	/*void OnCreateSessionComplete(FName SessionName, bool bWasSuccessful);*/
 	void OnFindSessionComplete(bool bWasSuccessful);
 	void OnJoinSessionComplate(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
 	
@@ -66,7 +113,7 @@ private:
 	IOnlineSessionPtr OnlineSessionInterface;
 	TSharedPtr<FOnlineSessionSearch> SessionSearch;
 
-	FOnCreateSessionCompleteDelegate CreateSessionCompleteDelegate;
+	//FOnCreateSessionCompleteDelegate CreateSessionCompleteDelegate;
 	FOnFindSessionsCompleteDelegate FindSessionCompleteDelegate;
 	FOnJoinSessionCompleteDelegate JoinSessionCompleteDelegate;
 

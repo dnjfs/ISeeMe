@@ -8,6 +8,7 @@
 #include "ISeeMe/ISMLobbyController.h"
 #include "UMG.h"
 #include "ISMChapterList.h"
+#include <ISeeMe/ISMLobbyGameMode.h>
 
 void UISMChapterSelect::NativeConstruct()
 {
@@ -50,7 +51,11 @@ void UISMChapterSelect::NewGame()
 		if (AISMLobbyController* LobbyController = GetWorld()->GetFirstPlayerController<AISMLobbyController>())
 		{
 			FString ChapterName = FString::Printf(TEXT("Chapter%d"), GI->CurrChapterNo);
-			LobbyController->CreateSession(FName(*ChapterName));
+			if (AISMLobbyGameMode* GM = Cast<AISMLobbyGameMode>(GetWorld()->GetAuthGameMode()))
+			{
+				GM->SelectCharacter();
+			}
+			//LobbyController->CreateSession(FName(*ChapterName));
 		}
 	}
 }
@@ -62,7 +67,11 @@ void UISMChapterSelect::Continue()
 		if (AISMLobbyController* LobbyController = GetWorld()->GetFirstPlayerController<AISMLobbyController>())
 		{
 			FString ChapterName = FString::Printf(TEXT("Chapter%d"), GI->CurrChapterNo);
-			LobbyController->CreateSession(FName(*ChapterName));
+			if (AISMLobbyGameMode* GM = Cast<AISMLobbyGameMode>(GetWorld()->GetAuthGameMode()))
+			{
+				GM->SelectCharacter();
+			}
+			//LobbyController->CreateSession(FName(*ChapterName));
 		}
 	}
 }
