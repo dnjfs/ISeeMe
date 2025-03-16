@@ -22,9 +22,6 @@ AISMSwitch::AISMSwitch()
 	TriggerVolume->SetGenerateOverlapEvents(true);
 	TriggerVolume->SetupAttachment(SwitchMesh);
 
-	MoveMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MoveMesh"));
-	MoveMesh->SetupAttachment(RootComponent);
-
 	bReplicates = true;
 }
 
@@ -34,18 +31,20 @@ void AISMSwitch::BeginPlay()
 	Super::BeginPlay();
 
 	// Init Location and Speed
-	StartLocation = MoveMesh->GetComponentLocation();
-	EndLocation = StartLocation + DirectionVector;
-	TargetLocation = EndLocation;
-	MoveSpeed = FVector::Dist(StartLocation, EndLocation) / MoveTime;
-
-	MulticastChangeMaterial(false);
-	if (TriggerVolume)
+	if (TargetActor)
 	{
-		TriggerVolume->OnComponentBeginOverlap.AddDynamic(this, &AISMSwitch::OnOverlapBegin);
-		TriggerVolume->OnComponentEndOverlap.AddDynamic(this, &AISMSwitch::OnOverlapEnd);
+		MulticastChangeMaterial(false);
+		if (TriggerVolume)
+		{
+			TriggerVolume->OnComponentBeginOverlap.AddDynamic(this, &AISMSwitch::OnOverlapBegin);
+			TriggerVolume->OnComponentEndOverlap.AddDynamic(this, &AISMSwitch::OnOverlapEnd);
+		}
+		SetActorTickEnabled(false);
 	}
-	SetActorTickEnabled(false);
+	else // TargetActor가 지정되어있지 않을 경우 이 액터 제거
+	{
+		Destroy();
+	}
 }
 
 // Called every frame
@@ -61,16 +60,31 @@ void AISMSwitch::Tick(float DeltaTime)
 
 void AISMSwitch::MulticastMove_Implementation(float DeltaTime)
 {
-	FVector CurLocation = MoveMesh->GetComponentLocation();
-	float DistanceToTarget = FVector::Dist(CurLocation, TargetLocation);
-	FVector WorldNextLocation = CurLocation + ((TargetLocation - CurLocation).GetSafeNormal()) * DeltaTime * MoveSpeed;
-	MoveMesh->SetWorldLocation(WorldNextLocation);
+	FVector CurLocation = TargetActor->GetActorLocation();
+	FVector WorldNextLocation = CurLocation + CurrDirection.GetSafeNormal() * DeltaTime * MoveSpeed;
 
-	if (DistanceToTarget <= 1)
+	TargetActor->SetActorLocation(WorldNextLocation);
+
+	if (bIsForward) // 정방향 이동
 	{
-		SetActorTickEnabled(false);
-		return;
+		CurrMovedTime += DeltaTime;
+
+		if (TotalMoveTime - CurrMovedTime <= 0.f)
+		{
+			SetActorTickEnabled(false);
+			return;
+		}
 	}
+	else // 역방향 이동
+	{
+		CurrMovedTime -= DeltaTime;
+
+		if (CurrMovedTime <= 0.f)
+		{
+			SetActorTickEnabled(false);
+			return;
+		}
+	}	
 }
 
 void AISMSwitch::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -85,7 +99,7 @@ void AISMSwitch::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Oth
 		CurDetectPlayer++;
 		if (CurDetectPlayer == 1)
 		{
-			TargetLocation = EndLocation;
+			SetActorTickEnabled(true);
 			MulticastChangeMaterial(true);
 		}
 	}
@@ -113,12 +127,14 @@ void AISMSwitch::MulticastChangeMaterial_Implementation(bool bCheck)
 	SetActorTickEnabled(true);
 	if (bCheck)
 	{
-		TargetLocation = EndLocation;
+		CurrDirection = DirectionVector;
+		bIsForward = true;
 		SwitchMesh->SetMaterial(0, CheckMaterial);
 	}
 	else
 	{
-		TargetLocation = StartLocation;
+		CurrDirection = -DirectionVector;
+		bIsForward = false;
 		SwitchMesh->SetMaterial(0, BaseMaterial);
 	}
 }

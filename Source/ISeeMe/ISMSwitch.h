@@ -44,9 +44,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UBoxComponent* TriggerVolume;
 
-	/* Move Mesh */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	UStaticMeshComponent* MoveMesh;
+	/* Move Target */
+	UPROPERTY(EditInstanceOnly, Category = "Move")
+	AActor* TargetActor;
 
 	/* When don't detect, move mesh is base material */
 	UPROPERTY(EditAnywhere, Category = "Move")
@@ -60,23 +60,21 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Move")
 	FVector DirectionVector = FVector(0, 0, 0);
 
+	FVector CurrDirection;
+
 	/* MoveMesh Move Time */
 	UPROPERTY(EditAnywhere, Category = "Move")
-	float MoveTime = 3.0f;
+	float TotalMoveTime = 3.0f;
+
+	float CurrMovedTime = 0.f;
 
 private:
 	/* Current Player in TriggerVolume*/
 	int CurDetectPlayer = 0;
 
-	/* When don't detect, MoveMeshLocation*/
-	FVector StartLocation = FVector(0, 0, 0);
-
-	/* When detect, MoveMeshLocation*/
-	FVector EndLocation = FVector(0, 0, 0);
-
-	/* Target Location*/
-	FVector TargetLocation = FVector(0, 0, 0);
-
 	/* MoveMesh Speed*/
-	float MoveSpeed = 1.0f;
+	UPROPERTY(EditAnywhere, Category = "Move")
+	float MoveSpeed = 500.f;
+
+	bool bIsForward = true;
 };
