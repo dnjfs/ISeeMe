@@ -33,4 +33,7 @@ private:
 
 	UPROPERTY()
 	UISMOverlay* ISMOverlay;
+
+	UFUNCTION()
+	void InitWidgets();
 };

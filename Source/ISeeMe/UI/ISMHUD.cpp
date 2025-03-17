@@ -10,6 +10,11 @@ void AISMHUD::BeginPlay()
 {
 	Super::BeginPlay();
     
+	InitWidgets();
+}
+
+void AISMHUD::InitWidgets()
+{
 	if (UWorld* World = GetWorld())
 	{
 		APlayerController* PlayerController = World->GetFirstPlayerController();

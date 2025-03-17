@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
+#include "Components/Button.h"
 #include "Interfaces/OnlineSessionInterface.h"
 #include "ISMLobbyController.generated.h"
 
@@ -30,25 +31,37 @@ public:
 	void CreateSession(FName ChapterName);*/
 
 	UFUNCTION()
-	void CallSelectChapterUI();
-
-	UFUNCTION()
-	void ClientSelectChapterUI();
-
-	UFUNCTION()
-	void LobbyUI();
+	void SelectChapterUI(); // Change Chpater UI in Server
 
 	UFUNCTION()
 	void InitUI();
 
 	UFUNCTION()
-	void CallSelectCharacterUI();
+	void CallSelectCharacterUI(); // Call Change Character UI
+
+	////////////////////////////////////////////////////////
+
+	UFUNCTION(BlueprintCallable)
+	void CallChangeCharacterButton(FString CharacterSelect);
+
+	UFUNCTION(Server, Reliable, BlueprintCallable)
+	void ServerChangeCharacterButton(const FString& CharacterSelect);
+
+	UFUNCTION(NetMulticast, Unreliable, BlueprintCallable)
+	void MulticastChangeCharacterButton(const FString& CharacterSelect, FLinearColor Color);
+
+	/// ///////////////////////////////////////////////////
+
+	UPROPERTY()
+	TObjectPtr<class UISMLobbyMenu> UIWidgetInstance;
+
 
 protected:
 	virtual void BeginPlay() override;
 
 	UFUNCTION(Client, Unreliable)
-	void ClientSelectCharacterUI();
+	void ClientSelectCharacterUI(); // Change Character UI in Client
+
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadwrite, Category = UI)
 	TSubclassOf<class UISMLobbyMenu> UIWidgetClass;
@@ -56,42 +69,12 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadwrite, Category = UI)
 	TSubclassOf<class UUserWidget> UILoadingClass;
 
-	/*UPROPERTY(EditDefaultsOnly, BlueprintReadwrite, Category = UI)
-	TSubclassOf<class UUserWidget> UIFriendInviteClass;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadwrite, Category = UI)
-	TSubclassOf<class UUserWidget> UIChapterServerClass;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadwrite, Category = UI)
-	TSubclassOf<class UUserWidget> UIChapterClientClass;
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadwrite, Category = UI)
-	TSubclassOf<class UUserWidget> UICharacterSelectClass;*/
-
 private:
-	UPROPERTY()
-	TObjectPtr<class UISMLobbyMenu> UIWidgetInstance;
-
 	UPROPERTY()
 	TObjectPtr<class UUserWidget> UILoadingInstance;
 
-	/*UPROPERTY()
-	TObjectPtr<class UUserWidget> UIFriendInviteInstance;
-
-	UPROPERTY()
-	TObjectPtr<class UUserWidget> UIChapterServerInstance;
-
-	UPROPERTY()
-	TObjectPtr<class UUserWidget> UIChapterClientInstance;
-
-	UPROPERTY()
-	TObjectPtr<class UUserWidget> UICharacterSelectInstance;*/
-
 	UFUNCTION()
-	void SelectCharacterUI();
-
-	void CreateAndInitWidget(TObjectPtr<UUserWidget>& WidgetInstance, TSubclassOf<UUserWidget> WidgetClass, int32 ZOrder, APlayerController* PC);
-
+	void SelectCharacterUI(); // Change Character UI in Server
 // Online Subsystem
 protected:
 	bool GetSessionInterface();

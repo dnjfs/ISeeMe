@@ -3,6 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
+#include "ISMLobbyController.h"
 #include "GameFramework/GameModeBase.h"
 #include "ISMLobbyGameMode.generated.h"
 
@@ -15,11 +16,15 @@ class ISEEME_API AISMLobbyGameMode : public AGameModeBase
 	GENERATED_BODY()
 
 public:
-	int32 PlayerNums = 0;
+	UFUNCTION()
+	void SelectCharacterUI(); // When two players, Call SelectCharacterUI()
 
 	UFUNCTION()
-	void SelectCharacter();
+	void ChangeCharacterButton(FString CharacterSelect,int index);
 	
 protected:
 	virtual void PostLogin(APlayerController* NewPlayer) override;
+
+private:
+	TArray<AISMLobbyController*> PCs = {nullptr, nullptr};
 };

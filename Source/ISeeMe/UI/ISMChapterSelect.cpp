@@ -53,7 +53,7 @@ void UISMChapterSelect::NewGame()
 			FString ChapterName = FString::Printf(TEXT("Chapter%d"), GI->CurrChapterNo);
 			if (AISMLobbyGameMode* GM = Cast<AISMLobbyGameMode>(GetWorld()->GetAuthGameMode()))
 			{
-				GM->SelectCharacter();
+				GM->SelectCharacterUI();
 			}
 			//LobbyController->CreateSession(FName(*ChapterName));
 		}
@@ -69,7 +69,7 @@ void UISMChapterSelect::Continue()
 			FString ChapterName = FString::Printf(TEXT("Chapter%d"), GI->CurrChapterNo);
 			if (AISMLobbyGameMode* GM = Cast<AISMLobbyGameMode>(GetWorld()->GetAuthGameMode()))
 			{
-				GM->SelectCharacter();
+				GM->SelectCharacterUI();
 			}
 			//LobbyController->CreateSession(FName(*ChapterName));
 		}

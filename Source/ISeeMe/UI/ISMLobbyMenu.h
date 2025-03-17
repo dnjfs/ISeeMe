@@ -31,7 +31,7 @@ public:
 	UFUNCTION(BlueprintCallable)
 	void ChangeCaracterUI();
 
-private:
 	UPROPERTY(meta = (BindWidget))
 	UWidgetSwitcher* LobbySwitcher;
 };
+

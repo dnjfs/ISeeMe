@@ -10,7 +10,10 @@
 #include "Kismet/GameplayStatics.h"
 #include <Net/UnrealNetwork.h>
 #include "UI/ISMLobbyMenu.h"
+#include "UI/ISMCharacterSelect.h"
 #include "ISMLobbyGameMode.h"
+#include "ISMLobbyGameState.h"
+
 
 AISMLobbyController::AISMLobbyController()
 	: //CreateSessionCompleteDelegate(FOnCreateSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnCreateSessionComplete)),
@@ -45,20 +48,9 @@ void AISMLobbyController::BeginPlay()
 	}
 }
 
-void AISMLobbyController::LobbyUI()
-{
-	if (UIWidgetInstance)
-		UIWidgetInstance->SetVisibility(ESlateVisibility::Visible);
-}
-
-void AISMLobbyController::CallSelectChapterUI()
+void AISMLobbyController::SelectChapterUI()
 {
 	UIWidgetInstance->ChangeChpaterServer();
-}
-
-void AISMLobbyController::ClientSelectChapterUI()
-{
-	UIWidgetInstance->ChangeChapterClient();
 }
 
 void AISMLobbyController::CallSelectCharacterUI()
@@ -71,9 +63,6 @@ void AISMLobbyController::CallSelectCharacterUI()
 
 void AISMLobbyController::SelectCharacterUI()
 {
-	/*UIChapterServerInstance->SetVisibility(ESlateVisibility::Collapsed);
-	UIChapterClientInstance->SetVisibility(ESlateVisibility::Collapsed);
-	UICharacterSelectInstance->SetVisibility(ESlateVisibility::Visible);*/
 	UIWidgetInstance->ChangeCaracterUI();
 }
 
@@ -82,9 +71,69 @@ void AISMLobbyController::ClientSelectCharacterUI_Implementation()
 	SelectCharacterUI();
 }
 
+/// <summary>
+/// /////////////////////////////////////////////////////////////////////
+/// </summary>
+
+void AISMLobbyController::CallChangeCharacterButton(FString CharacterSelect)
+{
+	if (!HasAuthority())
+	{
+		ServerChangeCharacterButton(CharacterSelect);
+	}
+	else
+	{
+		if (AISMLobbyGameMode* GM = Cast<AISMLobbyGameMode>(GetWorld()->GetAuthGameMode()))
+		{
+			GM->ChangeCharacterButton(CharacterSelect,0);
+		}
+	}
+}
+
+void AISMLobbyController::MulticastChangeCharacterButton_Implementation(const FString& CharacterSelect, FLinearColor Color)
+{
+	AISMLobbyGameState* GS = Cast<AISMLobbyGameState>(GetWorld()->GetGameState());
+
+	if (GS == nullptr)
+		return;
+
+	UWidgetSwitcher* Switcher = UIWidgetInstance->LobbySwitcher;
+	if (Switcher)
+	{
+		UWidget* ActiveWidget = Switcher->GetActiveWidget();
+		if (ActiveWidget && ActiveWidget->IsA(UISMCharacterSelect::StaticClass()))
+		{
+			UISMCharacterSelect* CharacterSelectWidget = Cast<UISMCharacterSelect>(ActiveWidget);
+			if (CharacterSelectWidget && IsLocalController())
+			{				
+				if (CharacterSelect == "Hojin")
+				{
+					CharacterSelectWidget->HojinButton->SetBackgroundColor(Color);
+				}
+				else if (CharacterSelect == "Mimi")
+				{
+					CharacterSelectWidget->MimiButton->SetBackgroundColor(Color);
+				}
+			}
+
+			if (HasAuthority())
+			{
+				CharacterSelectWidget->VisibleApply();
+			}
+		}
+	}
+}
+
+void AISMLobbyController::ServerChangeCharacterButton_Implementation(const FString& CharacterSelect)
+{
+	if (AISMLobbyGameMode* GM = Cast<AISMLobbyGameMode>(GetWorld()->GetAuthGameMode()))
+	{
+		GM->ChangeCharacterButton(CharacterSelect,1);
+	}
+}
+
 void AISMLobbyController::InitUI()
 {
-	//IsLocalPlayerController()
 	if (APlayerController* PC = GetWorld()->GetFirstPlayerController())
 	{
 		if (UIWidgetClass)
@@ -96,28 +145,10 @@ void AISMLobbyController::InitUI()
 				UIWidgetInstance->SetVisibility(ESlateVisibility::Visible);
 			}
 		}
-
-		/*CreateAndInitWidget(UIFriendInviteInstance, UIFriendInviteClass, 1, PC);
-		CreateAndInitWidget(UIChapterServerInstance, UIChapterServerClass, 2, PC);
-		CreateAndInitWidget(UIChapterClientInstance, UIChapterClientClass, 2, PC);
-		CreateAndInitWidget(UICharacterSelectInstance, UICharacterSelectClass, 3, PC);*/
 	}
 	else
 	{
 		UE_LOG(LogTemp, Warning, TEXT("Attempted to create widget on non-local controller!"));
-	}
-}
-
-void AISMLobbyController::CreateAndInitWidget(TObjectPtr<UUserWidget>& WidgetInstance, TSubclassOf<UUserWidget> WidgetClass, int32 ZOrder, APlayerController* PC)
-{
-	if (WidgetClass)
-	{
-		WidgetInstance = CreateWidget<UUserWidget>(PC, WidgetClass);
-		if (WidgetInstance)
-		{
-			WidgetInstance->AddToViewport();
-			WidgetInstance->SetVisibility(ESlateVisibility::Hidden);
-		}
 	}
 }
 
@@ -143,68 +174,6 @@ bool AISMLobbyController::GetSessionInterface()
 
 	return true;
 }
-
-//void AISMLobbyController::CreateSession(FName ChapterName)
-//{
-//	if(UILoadingInstance)
-//		UILoadingInstance->SetVisibility(ESlateVisibility::Visible); // Loading Screen
-//
-//	// 세션 인터페이스 유효성 검사
-//	if (OnlineSessionInterface.IsValid() == false)
-//	{
-//		LOG_SCREEN("Session Interface is Invalid");
-//		return;
-//	}
-//
-//	// NAME_GameSession 이름의 세션이 존재하는지 검사하여 파괴
-//	if (FNamedOnlineSession* ExistingSession = OnlineSessionInterface->GetNamedSession(ChapterName))
-//	{
-//		OnlineSessionInterface->DestroySession(ChapterName);
-//		//LOG_SCREEN("Destroy session: %s", NAME_GameSession);
-//	}
-//
-//	// 델리게이트 연결
-//	OnlineSessionInterface->AddOnCreateSessionCompleteDelegate_Handle(CreateSessionCompleteDelegate);
-//
-//	TSharedPtr<FOnlineSessionSettings> SessionSettings = MakeShareable(new FOnlineSessionSettings());
-//	SessionSettings->NumPublicConnections = 2;		// 허용되는 플레이어 수
-//	SessionSettings->bShouldAdvertise = true;		// 광고되는 세션인지 개인 세션인지
-//	SessionSettings->bAllowJoinInProgress = true;	// 세션 진행중에 참여 허용
-//	if (IOnlineSubsystem::Get()->GetSubsystemName() == "NULL")
-//	{
-//		SessionSettings->bIsLANMatch = true;
-//	}
-//	else
-//	{
-//		SessionSettings->bIsLANMatch = false;
-//	}
-//	SessionSettings->bIsDedicated = false;			// 데디케이티드 서버인지 (리슨 서버가 아닌지)
-//	SessionSettings->bUsesPresence = true;			// Presence 사용 (유저 정보에 세션 정보를 표시하는듯)
-//	SessionSettings->bAllowJoinViaPresence = true;	// Presence를 통해 참여 허용
-//	SessionSettings->bUseLobbiesIfAvailable = true; // 플랫폼이 지원하는 경우 로비 API 사용
-//	SessionSettings->bUseLobbiesVoiceChatIfAvailable = true;  // 음성 채팅 사용
-//
-//	// FOnlineSessionSettings() 코드 참고
-//	// 세션의 MatchType을 모두에게 열림, 온라인 서비스와 핑 데이터를 통해 세션 홍보 옵션으로 설정
-//	SessionSettings->Set(FName("MatchType"), FString("FreeForAll"), EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
-//
-//	// 세션 생성
-//	if (const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController())
-//		OnlineSessionInterface->CreateSession(*LocalPlayer->GetPreferredUniqueNetId(), ChapterName, *SessionSettings);
-//}
-//
-//void AISMLobbyController::OnCreateSessionComplete(FName SessionName, bool bWasSuccessful)
-//{
-//	if (!bWasSuccessful)
-//	{
-//		LOG_SCREEN("Failed CreateSession()");
-//		return;
-//	}
-//
-//	LOG_SCREEN("Successful CreateSession() - %s", *SessionName.ToString());
-//	
-//	UGameplayStatics::OpenLevel(this, SessionName, true, "Listen");
-//}
 
 void AISMLobbyController::FindSession()
 {
