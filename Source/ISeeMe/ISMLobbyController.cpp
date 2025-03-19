@@ -20,6 +20,7 @@ AISMLobbyController::AISMLobbyController()
 	, JoinSessionCompleteDelegate(FOnJoinSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnJoinSessionComplate))
 	, FindFriendSessionCompleteDelegate(FOnFindFriendSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnFindFriendSessionComplete))
 	, SessionUserInviteAcceptedDelegate(FOnSessionUserInviteAcceptedDelegate::CreateUObject(this, &ThisClass::OnSessionUserInviteAccepted))
+	, DestroySessionCompleteDelegate(FOnDestroySessionCompleteDelegate::CreateUObject(this, &ThisClass::OnDestroySessionComplete))
 {
 }
 
@@ -282,39 +283,20 @@ void AISMLobbyController::OnFindSessionComplete(bool bWasSuccessful)
 		{
 			LOG_SCREEN("Joining Match Type: %s", *MatchType);
 
-			// 델리게이트 연결
-			OnlineSessionInterface->AddOnJoinSessionCompleteDelegate_Handle(JoinSessionCompleteDelegate);
-
-			// 세션 참가
-			if (const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController())
-				OnlineSessionInterface->JoinSession(*LocalPlayer->GetPreferredUniqueNetId(), NAME_GameSession, Result);
-		}
-	}
-}
-
-void AISMLobbyController::OnJoinSessionComplate(FName SessionName, EOnJoinSessionCompleteResult::Type Result)
-{
-	if (OnlineSessionInterface.IsValid() == false)
-	{
-		LOG_SCREEN("Session Interface is Invalid");
-		return;
-	}
-
-	if (Result != EOnJoinSessionCompleteResult::Type::Success)
-	{
-		LOG_SCREEN("Failed JoinSession() - %d", Result);
-		return;
-	}
-
-	// 세션에 정상적으로 참가하면 IP Address 얻어와서 해당 서버에 접속
-	FString Address;
-	if (OnlineSessionInterface->GetResolvedConnectString(NAME_GameSession, Address))
-	{
-		LOG_SCREEN("IP Address: %s", *Address);
-
-		if (APlayerController* PlayerController = GetGameInstance()->GetFirstLocalPlayerController())
-		{
-			PlayerController->ClientTravel(Address, ETravelType::TRAVEL_Absolute);
+			CachedInviteResult = Result;
+			if (OnlineSessionInterface->GetNamedSession(NAME_GameSession))
+			{
+				LOG_SCREEN("Existing Session Found - Destroying...");
+				OnlineSessionInterface->AddOnDestroySessionCompleteDelegate_Handle(DestroySessionCompleteDelegate);
+				OnlineSessionInterface->DestroySession(NAME_GameSession);
+			}
+			else
+			{
+				OnlineSessionInterface->AddOnJoinSessionCompleteDelegate_Handle(JoinSessionCompleteDelegate);
+				// 세션 참가
+				if (const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController())
+					OnlineSessionInterface->JoinSession(*LocalPlayer->GetPreferredUniqueNetId(), NAME_GameSession, Result);
+			}
 		}
 	}
 }
@@ -356,10 +338,19 @@ void AISMLobbyController::OnFindFriendSessionComplete(int32 LocalUserNum, bool b
 
 	check(SearchResult.Num() == 1); // 세션이 1개여야 정상
 
-	FOnlineSessionSearchResult Result = SearchResult[0];
-	JoinSession(Result);
+	CachedInviteResult = SearchResult[0];
+	if (OnlineSessionInterface->GetNamedSession(NAME_GameSession))
+	{
+		LOG_SCREEN("Existing Session Found - Destroying...");
+		OnlineSessionInterface->AddOnDestroySessionCompleteDelegate_Handle(DestroySessionCompleteDelegate);
+		OnlineSessionInterface->DestroySession(NAME_GameSession);
+	}
+	else
+	{
+		// 세션 참가
+		JoinSession(CachedInviteResult);
+	}
 }
-
 
 void AISMLobbyController::OnSessionUserInviteAccepted(const bool bWasSuccessful, const int32 ControllerId, FUniqueNetIdPtr UserId, const FOnlineSessionSearchResult& InviteResult)
 {
@@ -377,7 +368,31 @@ void AISMLobbyController::OnSessionUserInviteAccepted(const bool bWasSuccessful,
 		return;
 	}
 
-	JoinSession(InviteResult);
+	CachedInviteResult = InviteResult;
+	if (OnlineSessionInterface->GetNamedSession(NAME_GameSession))
+	{
+		LOG_SCREEN("Existing Session Found - Destroying...");
+		OnlineSessionInterface->AddOnDestroySessionCompleteDelegate_Handle(DestroySessionCompleteDelegate);
+		OnlineSessionInterface->DestroySession(NAME_GameSession);
+	}
+	else
+	{
+		// 세션 참가
+		JoinSession(CachedInviteResult);
+	}
+}
+
+void AISMLobbyController::OnDestroySessionComplete(FName SessionName, bool bWasSuccessful)
+{
+	if (bWasSuccessful)
+	{
+		LOG_SCREEN("Successfully destroyed session: %s", *SessionName.ToString());
+		JoinSession(CachedInviteResult);
+	}
+	else
+	{
+		LOG_SCREEN("Failed to destroy session");
+	}
 }
 
 void AISMLobbyController::JoinSession(const FOnlineSessionSearchResult& Result)
@@ -396,3 +411,29 @@ void AISMLobbyController::JoinSession(const FOnlineSessionSearchResult& Result)
 		OnlineSessionInterface->JoinSession(*LocalPlayer->GetPreferredUniqueNetId(), NAME_GameSession, Result);
 }
 
+void AISMLobbyController::OnJoinSessionComplate(FName SessionName, EOnJoinSessionCompleteResult::Type Result)
+{
+	if (OnlineSessionInterface.IsValid() == false)
+	{
+		LOG_SCREEN("Session Interface is Invalid");
+		return;
+	}
+
+	if (Result != EOnJoinSessionCompleteResult::Type::Success)
+	{
+		LOG_SCREEN("Failed JoinSession() - %d", Result);
+		return;
+	}
+
+	// 세션에 정상적으로 참가하면 IP Address 얻어와서 해당 서버에 접속
+	FString Address;
+	if (OnlineSessionInterface->GetResolvedConnectString(NAME_GameSession, Address))
+	{
+		LOG_SCREEN("IP Address: %s", *Address);
+
+		if (APlayerController* PlayerController = GetGameInstance()->GetFirstLocalPlayerController())
+		{
+			PlayerController->ClientTravel(Address, ETravelType::TRAVEL_Absolute);
+		}
+	}
+}

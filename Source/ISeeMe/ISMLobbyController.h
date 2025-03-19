@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/PlayerController.h"
 #include "Components/Button.h"
+#include "OnlineSessionSettings.h"
 #include "Interfaces/OnlineSessionInterface.h"
 #include "ISMLobbyController.generated.h"
 
@@ -12,9 +13,9 @@
 	if (GEngine)\
 		GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT(Format), ##__VA_ARGS__))
 
-//DECLARE_DELEGATE_TwoParams(FOnCreateSessionCompleteDelegate, FName /*SessionName*/, bool /*bWasSuccessful*/);
 DECLARE_DELEGATE_OneParam(FOnFindSessionsCompleteDelegate, bool /*bWasSuccessful*/);
 DECLARE_DELEGATE_TwoParams(FOnJoinSessionCompleteDelegate, FName /*SessionName*/, EOnJoinSessionCompleteResult::Type /*Result*/);
+DECLARE_DELEGATE_TwoParams(OnDestroySessionComplete, FName /*SessionName*/, bool /*bWasSuccessful*/);
 
 /**
  * 
@@ -82,11 +83,13 @@ protected:
 	
 	void OnFindSessionComplete(bool bWasSuccessful);
 	void OnJoinSessionComplate(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
+	void OnDestroySessionComplete(FName SessionName, bool bWasSuccessful);
 	
 	void OnFindFriendSessionComplete(int32 LocalUserNum, bool bWasSuccessful, const TArray<FOnlineSessionSearchResult>&);
 	void OnSessionUserInviteAccepted(const bool bWasSuccessful, const int32 ControllerId, FUniqueNetIdPtr UserId, const FOnlineSessionSearchResult& InviteResult);
 	void JoinSession(const FOnlineSessionSearchResult& Result);
 
+	FOnlineSessionSearchResult CachedInviteResult;
 private:
 	UPROPERTY()
 	TObjectPtr<class UUserWidget> UILoadingInstance;
@@ -99,4 +102,6 @@ private:
 
 	FOnFindFriendSessionCompleteDelegate FindFriendSessionCompleteDelegate;
 	FOnSessionUserInviteAcceptedDelegate SessionUserInviteAcceptedDelegate;
+
+	FOnDestroySessionCompleteDelegate DestroySessionCompleteDelegate;
 };
