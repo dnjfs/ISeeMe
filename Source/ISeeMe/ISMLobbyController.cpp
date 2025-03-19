@@ -16,8 +16,7 @@
 
 
 AISMLobbyController::AISMLobbyController()
-	: //CreateSessionCompleteDelegate(FOnCreateSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnCreateSessionComplete)),
-	 FindSessionCompleteDelegate(FOnFindSessionsCompleteDelegate::CreateUObject(this, &ThisClass::OnFindSessionComplete))
+	: FindSessionCompleteDelegate(FOnFindSessionsCompleteDelegate::CreateUObject(this, &ThisClass::OnFindSessionComplete))
 	, JoinSessionCompleteDelegate(FOnJoinSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnJoinSessionComplate))
 	, FindFriendSessionCompleteDelegate(FOnFindFriendSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnFindFriendSessionComplete))
 	, SessionUserInviteAcceptedDelegate(FOnSessionUserInviteAcceptedDelegate::CreateUObject(this, &ThisClass::OnSessionUserInviteAccepted))
@@ -44,92 +43,8 @@ void AISMLobbyController::BeginPlay()
 	if (!HasAuthority())
 	{
 		UIWidgetInstance->SetVisibility(ESlateVisibility::Visible);
-		UIWidgetInstance->ChangeChapterClient();
-	}
-}
-
-void AISMLobbyController::SelectChapterUI()
-{
-	UIWidgetInstance->ChangeChpaterServer();
-}
-
-void AISMLobbyController::CallSelectCharacterUI()
-{
-	SelectCharacterUI();
-
-	if (HasAuthority())
-		ClientSelectCharacterUI();
-}
-
-void AISMLobbyController::SelectCharacterUI()
-{
-	UIWidgetInstance->ChangeCaracterUI();
-}
-
-void AISMLobbyController::ClientSelectCharacterUI_Implementation()
-{
-	SelectCharacterUI();
-}
-
-/// <summary>
-/// /////////////////////////////////////////////////////////////////////
-/// </summary>
-
-void AISMLobbyController::CallChangeCharacterButton(FString CharacterSelect)
-{
-	if (!HasAuthority())
-	{
-		ServerChangeCharacterButton(CharacterSelect);
-	}
-	else
-	{
-		if (AISMLobbyGameMode* GM = Cast<AISMLobbyGameMode>(GetWorld()->GetAuthGameMode()))
-		{
-			GM->ChangeCharacterButton(CharacterSelect,0);
-		}
-	}
-}
-
-void AISMLobbyController::MulticastChangeCharacterButton_Implementation(const FString& CharacterSelect, FLinearColor Color)
-{
-	AISMLobbyGameState* GS = Cast<AISMLobbyGameState>(GetWorld()->GetGameState());
-
-	if (GS == nullptr)
-		return;
-
-	UWidgetSwitcher* Switcher = UIWidgetInstance->LobbySwitcher;
-	if (Switcher)
-	{
-		UWidget* ActiveWidget = Switcher->GetActiveWidget();
-		if (ActiveWidget && ActiveWidget->IsA(UISMCharacterSelect::StaticClass()))
-		{
-			UISMCharacterSelect* CharacterSelectWidget = Cast<UISMCharacterSelect>(ActiveWidget);
-			if (CharacterSelectWidget && IsLocalController())
-			{				
-				if (CharacterSelect == "Hojin")
-				{
-					CharacterSelectWidget->HojinButton->SetBackgroundColor(Color);
-				}
-				else if (CharacterSelect == "Mimi")
-				{
-					CharacterSelectWidget->MimiButton->SetBackgroundColor(Color);
-				}
-			}
-
-			if (HasAuthority())
-			{
-				CharacterSelectWidget->VisibleApply();
-			}
-		}
-	}
-}
-
-void AISMLobbyController::ServerChangeCharacterButton_Implementation(const FString& CharacterSelect)
-{
-	if (AISMLobbyGameMode* GM = Cast<AISMLobbyGameMode>(GetWorld()->GetAuthGameMode()))
-	{
-		GM->ChangeCharacterButton(CharacterSelect,1);
-	}
+		UIWidgetInstance->ChangeLobbyUI(3);
+	} // Show Select Chpater UI after join client
 }
 
 void AISMLobbyController::InitUI()
@@ -152,6 +67,140 @@ void AISMLobbyController::InitUI()
 	}
 }
 
+void AISMLobbyController::ControllerChangeLobbyUI(int32 Index)
+{
+	UIWidgetInstance->ChangeLobbyUI(Index);
+} // Change Lobby UI
+
+void AISMLobbyController::MulticastControllerChangeUI_Implementation(int32 Index)
+{
+	UIWidgetInstance->ChangeLobbyUI(Index);
+} // Multicast Change Chapter UI After Select Chapter
+
+// When BackButto is Clicked
+void AISMLobbyController::CallBackUI(const FString& Name)
+{
+	if (!HasAuthority())
+	{
+		ServerBackUI(Name);
+	}
+	else
+	{
+		if (Name == "Chapter")
+		{
+			if (AISMLobbyGameMode* GM = Cast<AISMLobbyGameMode>(GetWorld()->GetAuthGameMode()))
+			{
+				GM->BackChapterUI();
+			}
+		} // From Select Character UI To Select Chapter UI
+		else
+		{
+			UGameplayStatics::OpenLevel(this, "LoadingMap");
+		} // From Select Chapter UI To Lobby UI (But Level is LoadingMap)
+	}
+}
+
+void AISMLobbyController::ServerBackUI_Implementation(const FString& Name)
+{
+	if (Name == "Chapter")
+	{
+		if (AISMLobbyGameMode* GM = Cast<AISMLobbyGameMode>(GetWorld()->GetAuthGameMode()))
+		{
+			GM->BackChapterUI();
+		}
+	}
+	else
+	{
+		UGameplayStatics::OpenLevel(this, "LoadingMap");
+	}
+}
+
+// Show Select Character UI
+void AISMLobbyController::CallSelectCharacterUI()
+{
+	ControllerChangeLobbyUI(4);
+
+	if (HasAuthority())
+		ClientSelectCharacterUI();
+}
+
+void AISMLobbyController::ClientSelectCharacterUI_Implementation()
+{
+	ControllerChangeLobbyUI(4);
+}
+
+
+// Show Select Character Buttons
+void AISMLobbyController::CallChangeCharacterButton(FString CharacterSelect)
+{
+	if (!HasAuthority())
+	{
+		ServerChangeCharacterButton(CharacterSelect);
+	}
+	else
+	{
+		if (AISMLobbyGameMode* GM = Cast<AISMLobbyGameMode>(GetWorld()->GetAuthGameMode()))
+		{
+			// Host
+			GM->ChangeCharacterButton(CharacterSelect,0); 
+		}
+	}
+}
+
+void AISMLobbyController::ServerChangeCharacterButton_Implementation(const FString& CharacterSelect)
+{
+	if (AISMLobbyGameMode* GM = Cast<AISMLobbyGameMode>(GetWorld()->GetAuthGameMode()))
+	{
+		// Client
+		GM->ChangeCharacterButton(CharacterSelect, 1);
+	}
+}
+
+// Multicast Change Character Buttons
+void AISMLobbyController::MulticastChangeCharacterButton_Implementation(const FString& CharacterSelect, FLinearColor Color)
+{
+	UWidgetSwitcher* Switcher = UIWidgetInstance->LobbySwitcher;
+	if (Switcher)
+	{
+		UWidget* ActiveWidget = Switcher->GetActiveWidget();
+		if (ActiveWidget && ActiveWidget->IsA(UISMCharacterSelect::StaticClass()))
+		{
+			UISMCharacterSelect* CharacterSelectWidget = Cast<UISMCharacterSelect>(ActiveWidget);
+			if (CharacterSelectWidget && IsLocalController())
+			{				
+				if (CharacterSelect == "Hojin")
+				{
+					CharacterSelectWidget->HojinButton->SetBackgroundColor(Color);
+				}
+				else if (CharacterSelect == "Mimi")
+				{
+					CharacterSelectWidget->MimiButton->SetBackgroundColor(Color);
+				}
+				else if (CharacterSelect == "None")
+				{
+					CharacterSelectWidget->InitButton();
+				}
+			}
+
+			if (HasAuthority())
+			{
+				CharacterSelectWidget->VisibleApply();
+			}
+		}
+	}
+}
+
+void AISMLobbyController::ExitGame()
+{
+	if (UWorld* World = GetWorld())
+	{
+		UKismetSystemLibrary::QuitGame(World, this, EQuitPreference::Quit, true);
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////
+
+// Online Session
 bool AISMLobbyController::GetSessionInterface()
 {
 	IOnlineSubsystem* OSS = IOnlineSubsystem::Get();
@@ -198,14 +247,6 @@ void AISMLobbyController::FindSession()
 	// 세션 검색
 	if (const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController())
 		OnlineSessionInterface->FindSessions(*LocalPlayer->GetPreferredUniqueNetId(), SessionSearch.ToSharedRef());
-}
-
-void AISMLobbyController::ExitGame()
-{
-	if (UWorld* World = GetWorld())
-	{
-		UKismetSystemLibrary::QuitGame(World, this, EQuitPreference::Quit, true);
-	}	
 }
 
 void AISMLobbyController::OnFindSessionComplete(bool bWasSuccessful)
@@ -273,7 +314,6 @@ void AISMLobbyController::OnJoinSessionComplate(FName SessionName, EOnJoinSessio
 
 		if (APlayerController* PlayerController = GetGameInstance()->GetFirstLocalPlayerController())
 		{
-			//UILoadingInstance->SetVisibility(ESlateVisibility::Visible);
 			PlayerController->ClientTravel(Address, ETravelType::TRAVEL_Absolute);
 		}
 	}

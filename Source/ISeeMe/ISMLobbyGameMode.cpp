@@ -20,10 +20,11 @@ void AISMLobbyGameMode::PostLogin(APlayerController* NewPlayer)
 
 	if (PlayerNums == 2)
 	{
-		PC->SelectChapterUI();
+		PC->ControllerChangeLobbyUI(2);
 	}
 
 	int index = 0;
+	// Init Player Controllers
 	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 	{
 		AISMLobbyController* Controller = Cast<AISMLobbyController>(Iterator->Get());
@@ -37,6 +38,7 @@ void AISMLobbyGameMode::PostLogin(APlayerController* NewPlayer)
 
 void AISMLobbyGameMode::SelectCharacterUI()
 {
+	// Show Select Character UI
 	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 	{
 		AISMLobbyController* PC = Cast<AISMLobbyController>(Iterator->Get());
@@ -44,15 +46,28 @@ void AISMLobbyGameMode::SelectCharacterUI()
 			continue;
 
 		PC->CallSelectCharacterUI();
-	}
+	} 
 }
 
 void AISMLobbyGameMode::ChangeCharacterButton(FString CharacterSelect, int index)
 {
+	int OtherIndex = (index + 1) % 2;
+
+	// Init Select Character
+	if (CharacterSelect == "None")
+	{
+		if (AISMLobbyGameState* GS = Cast<AISMLobbyGameState>(GetWorld()->GetGameState()))
+		{
+			GS->InitSelect();
+		}
+
+		PCs[index]->MulticastChangeCharacterButton(CharacterSelect, FLinearColor(1, 1, 1, 0.1f));
+		PCs[OtherIndex]->MulticastChangeCharacterButton(CharacterSelect, FLinearColor(1, 1, 1, 0.1f));
+		return;
+	} 
+
 	if (AISMLobbyGameState* GS = Cast<AISMLobbyGameState>(GetWorld()->GetGameState()))
 	{
-		int OtherIndex = (index + 1) % 2;
-
 		// Determine character selection
 		bool& bSelectedCurrent = (CharacterSelect == "Hojin") ? GS->bSelectedHojin[index] : GS->bSelectedMimi[index];
 		bool& bSelectedOther = (CharacterSelect == "Hojin") ? GS->bSelectedHojin[OtherIndex] : GS->bSelectedMimi[OtherIndex];
@@ -92,4 +107,10 @@ void AISMLobbyGameMode::ChangeCharacterButton(FString CharacterSelect, int index
 			PCs[OtherIndex]->MulticastChangeCharacterButton(CharacterSelect == "Hojin" ? "Mimi" : "Hojin", FLinearColor(1, 1, 1, 0.1f));
 		}
 	}
+}
+
+void AISMLobbyGameMode::BackChapterUI()
+{
+	PCs[0]->MulticastControllerChangeUI(2);
+	PCs[1]->MulticastControllerChangeUI(3);
 }

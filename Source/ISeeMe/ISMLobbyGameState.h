@@ -26,5 +26,5 @@ public:
 	TArray<bool> bSelectedMimi = { false,false };
 
 	UFUNCTION()
-	void InitSelect();
+	void InitSelect(); // Init Selection Button
 };

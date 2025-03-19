@@ -25,8 +25,14 @@ public:
 	UPROPERTY(meta = (BindWidget), BlueprintReadWrite, EditAnywhere)
 	UButton* ApplyButton;
 
+	UPROPERTY(meta = (BindWidget), BlueprintReadWrite, EditAnywhere)
+	UButton* BackButton;
+
 	UFUNCTION()
-	void VisibleApply();
+	void VisibleApply(); // ApplyButton(StartButton) Visible
+
+	UFUNCTION()
+	void InitButton(); // Hojin, Mimi Button Reset
 
 protected:
 	virtual void NativeConstruct() override;
@@ -36,6 +42,9 @@ protected:
 
 	UFUNCTION()
 	void MimiSelect();
+
+	UFUNCTION()
+	void BackSelect();
 
 	UFUNCTION()
 	void MoveLevel();

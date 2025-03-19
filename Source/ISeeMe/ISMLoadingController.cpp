@@ -10,7 +10,8 @@
 #include <Kismet/GameplayStatics.h>
 
 AISMLoadingController::AISMLoadingController()
-	: CreateSessionCompleteDelegate(FOnCreateSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnCreateSessionComplete))
+	: CreateSessionCompleteDelegate(FOnCreateSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnCreateSessionComplete)),
+	DestroySessionCompleteDelegate(FOnDestroySessionCompleteDelegate::CreateUObject(this, &ThisClass::OnDestroySessionComplete)) // 추가된 부분
 {
 }
 
@@ -49,55 +50,74 @@ void AISMLoadingController::BeginPlay()
 void AISMLoadingController::CreateSession(FName ChapterName)
 {
 	if (UILoadingInstance)
-		UILoadingInstance->SetVisibility(ESlateVisibility::Visible); // Loading Screen
+		UILoadingInstance->SetVisibility(ESlateVisibility::Visible);
 
 	if (const IOnlineSubsystem* Subsystem = IOnlineSubsystem::Get())
 	{
 		OnlineSessionInterface = Subsystem->GetSessionInterface();
 
-		// 세션 인터페이스 유효성 검사
 		if (OnlineSessionInterface.IsValid() == false)
 		{
 			LOG_SCREEN("Session Interface is Invalid");
 			return;
 		}
 
-		// NAME_GameSession 이름의 세션이 존재하는지 검사하여 파괴
+		// Check Origin Session
 		if (FNamedOnlineSession* ExistingSession = OnlineSessionInterface->GetNamedSession(ChapterName))
 		{
+			LOG_SCREEN("Destroying Existing Session...");
+			OnlineSessionInterface->AddOnDestroySessionCompleteDelegate_Handle(DestroySessionCompleteDelegate);
 			OnlineSessionInterface->DestroySession(ChapterName);
-			//LOG_SCREEN("Destroy session: %s", NAME_GameSession);
-		}
-
-		// 델리게이트 연결
-		OnlineSessionInterface->AddOnCreateSessionCompleteDelegate_Handle(CreateSessionCompleteDelegate);
-
-		TSharedPtr<FOnlineSessionSettings> SessionSettings = MakeShareable(new FOnlineSessionSettings());
-		SessionSettings->NumPublicConnections = 2;		// 허용되는 플레이어 수
-		SessionSettings->bShouldAdvertise = true;		// 광고되는 세션인지 개인 세션인지
-		SessionSettings->bAllowJoinInProgress = true;	// 세션 진행중에 참여 허용
-		if (IOnlineSubsystem::Get()->GetSubsystemName() == "NULL")
-		{
-			SessionSettings->bIsLANMatch = true;
 		}
 		else
 		{
-			SessionSettings->bIsLANMatch = false;
+			StartCreatingSession(ChapterName);
 		}
-		SessionSettings->bIsDedicated = false;			// 데디케이티드 서버인지 (리슨 서버가 아닌지)
-		SessionSettings->bUsesPresence = true;			// Presence 사용 (유저 정보에 세션 정보를 표시하는듯)
-		SessionSettings->bAllowJoinViaPresence = true;	// Presence를 통해 참여 허용
-		SessionSettings->bUseLobbiesIfAvailable = true; // 플랫폼이 지원하는 경우 로비 API 사용
-		SessionSettings->bUseLobbiesVoiceChatIfAvailable = true;  // 음성 채팅 사용
-
-		// FOnlineSessionSettings() 코드 참고
-		// 세션의 MatchType을 모두에게 열림, 온라인 서비스와 핑 데이터를 통해 세션 홍보 옵션으로 설정
-		SessionSettings->Set(FName("MatchType"), FString("FreeForAll"), EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
-
-		// 세션 생성
-		if (const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController())
-			OnlineSessionInterface->CreateSession(*LocalPlayer->GetPreferredUniqueNetId(), ChapterName, *SessionSettings);
 	}
+}
+
+void AISMLoadingController::OnDestroySessionComplete(FName SessionName, bool bWasSuccessful)
+{
+	if (bWasSuccessful)
+	{
+		LOG_SCREEN("Successfully destroyed session: %s", *SessionName.ToString());
+		StartCreatingSession(SessionName);  
+	}
+	else
+	{
+		LOG_SCREEN("Failed to destroy session");
+	}
+}
+
+// Real Create Session
+void AISMLoadingController::StartCreatingSession(FName ChapterName)
+{
+	LOG_SCREEN("Creating New Session...");
+
+	OnlineSessionInterface->AddOnCreateSessionCompleteDelegate_Handle(CreateSessionCompleteDelegate);
+
+	TSharedPtr<FOnlineSessionSettings> SessionSettings = MakeShareable(new FOnlineSessionSettings());
+	SessionSettings->NumPublicConnections = 2;
+	SessionSettings->bShouldAdvertise = true;
+	SessionSettings->bAllowJoinInProgress = true;
+	if (IOnlineSubsystem::Get()->GetSubsystemName() == "NULL")
+	{
+		SessionSettings->bIsLANMatch = true;
+	}
+	else
+	{
+		SessionSettings->bIsLANMatch = false;
+	}
+	SessionSettings->bIsDedicated = false;
+	SessionSettings->bUsesPresence = true;
+	SessionSettings->bAllowJoinViaPresence = true;
+	SessionSettings->bUseLobbiesIfAvailable = true;
+	SessionSettings->bUseLobbiesVoiceChatIfAvailable = true;
+
+	SessionSettings->Set(FName("MatchType"), FString("FreeForAll"), EOnlineDataAdvertisementType::ViaOnlineServiceAndPing);
+
+	if (const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController())
+		OnlineSessionInterface->CreateSession(*LocalPlayer->GetPreferredUniqueNetId(), ChapterName, *SessionSettings);
 }
 
 void AISMLoadingController::OnCreateSessionComplete(FName SessionName, bool bWasSuccessful)

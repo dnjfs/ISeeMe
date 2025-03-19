@@ -24,6 +24,8 @@ protected:
 	void NewGame();
 	UFUNCTION()
 	void Continue();
+	UFUNCTION()
+	void BackLobbyUI();
 
 private:
 	UPROPERTY(meta = (BindWidget))

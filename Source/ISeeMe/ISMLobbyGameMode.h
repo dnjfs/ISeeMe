@@ -20,8 +20,11 @@ public:
 	void SelectCharacterUI(); // When two players, Call SelectCharacterUI()
 
 	UFUNCTION()
-	void ChangeCharacterButton(FString CharacterSelect,int index);
-	
+	void ChangeCharacterButton(FString CharacterSelect,int index); 
+
+	UFUNCTION()
+	void BackChapterUI(); // Move to Chapter UI
+
 protected:
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 

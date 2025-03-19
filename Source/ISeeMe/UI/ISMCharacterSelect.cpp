@@ -14,19 +14,15 @@ void UISMCharacterSelect::NativeConstruct()
 	ApplyButton->SetVisibility(ESlateVisibility::Hidden);
 
 	ApplyButton->OnClicked.AddDynamic(this, &UISMCharacterSelect::MoveLevel);
+	BackButton->OnClicked.AddDynamic(this, &UISMCharacterSelect::BackSelect);
 	HojinButton->OnClicked.AddDynamic(this, &UISMCharacterSelect::HojinSelect);
 	MimiButton->OnClicked.AddDynamic(this, &UISMCharacterSelect::MimiSelect);
 }
 
 void UISMCharacterSelect::HojinSelect()
 {
-	if (AISMLobbyGameState* GS = Cast<AISMLobbyGameState>(GetWorld()->GetGameState()))
+	if (AISMLobbyController* Controller = Cast<AISMLobbyController>(GetOwningPlayer()))
 	{
-		AISMLobbyController* Controller = Cast<AISMLobbyController>(GetOwningPlayer());
-
-		if (Controller == nullptr)
-			return;
-
 		Controller->CallChangeCharacterButton("Hojin");
 		HojinButton->SetIsEnabled(false);
 		MimiButton->SetIsEnabled(true);
@@ -35,16 +31,20 @@ void UISMCharacterSelect::HojinSelect()
 
 void UISMCharacterSelect::MimiSelect()
 {
-	if (AISMLobbyGameState* GS = Cast<AISMLobbyGameState>(GetWorld()->GetGameState()))
+	if (AISMLobbyController* Controller = Cast<AISMLobbyController>(GetOwningPlayer()))
 	{
-		AISMLobbyController* Controller = Cast<AISMLobbyController>(GetOwningPlayer());
-
-		if (Controller == nullptr)
-			return;
-
 		Controller->CallChangeCharacterButton("Mimi");
 		HojinButton->SetIsEnabled(true);
 		MimiButton->SetIsEnabled(false);
+	}
+}
+
+void UISMCharacterSelect::BackSelect()
+{
+	if (AISMLobbyController* Controller = Cast<AISMLobbyController>(GetOwningPlayer()))
+	{
+		Controller->CallChangeCharacterButton("None");
+		Controller->CallBackUI("Chapter");
 	}
 }
 
@@ -73,4 +73,12 @@ void UISMCharacterSelect::VisibleApply()
 			ApplyButton->SetVisibility(ESlateVisibility::Hidden);
 		}
 	}
+}
+
+void UISMCharacterSelect::InitButton()
+{
+	HojinButton->SetIsEnabled(true);
+	MimiButton->SetIsEnabled(true);
+	HojinButton->SetBackgroundColor(FLinearColor(1, 1, 1, 0.1f));
+	MimiButton->SetBackgroundColor(FLinearColor(1, 1, 1, 0.1f));
 }

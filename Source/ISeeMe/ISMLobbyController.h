@@ -27,22 +27,20 @@ class ISEEME_API AISMLobbyController : public APlayerController
 	AISMLobbyController();
 
 public:
-	/*UFUNCTION(BlueprintCallable)
-	void CreateSession(FName ChapterName);*/
-
-	UFUNCTION()
-	void SelectChapterUI(); // Change Chpater UI in Server
-
 	UFUNCTION()
 	void InitUI();
+
+	UFUNCTION(BlueprintCallable)
+	void ControllerChangeLobbyUI(int32 Index); // Change Lobby UI (Switcher UI)
+
+	UFUNCTION(NetMulticast, Unreliable, BlueprintCallable)
+	void MulticastControllerChangeUI(int32 Index); // Multicast Change Lobby UI (Switcher UI)
 
 	UFUNCTION()
 	void CallSelectCharacterUI(); // Call Change Character UI
 
-	////////////////////////////////////////////////////////
-
 	UFUNCTION(BlueprintCallable)
-	void CallChangeCharacterButton(FString CharacterSelect);
+	void CallChangeCharacterButton(FString CharacterSelect); // Call Change Character Button
 
 	UFUNCTION(Server, Reliable, BlueprintCallable)
 	void ServerChangeCharacterButton(const FString& CharacterSelect);
@@ -55,6 +53,9 @@ public:
 	UPROPERTY()
 	TObjectPtr<class UISMLobbyMenu> UIWidgetInstance;
 
+	UFUNCTION(BlueprintCallable)
+	void CallBackUI(const FString& Name);
+
 
 protected:
 	virtual void BeginPlay() override;
@@ -62,6 +63,8 @@ protected:
 	UFUNCTION(Client, Unreliable)
 	void ClientSelectCharacterUI(); // Change Character UI in Client
 
+	UFUNCTION(Server,Reliable)
+	void ServerBackUI(const FString& Name);
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadwrite, Category = UI)
 	TSubclassOf<class UISMLobbyMenu> UIWidgetClass;
@@ -69,14 +72,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadwrite, Category = UI)
 	TSubclassOf<class UUserWidget> UILoadingClass;
 
-private:
-	UPROPERTY()
-	TObjectPtr<class UUserWidget> UILoadingInstance;
-
-	UFUNCTION()
-	void SelectCharacterUI(); // Change Character UI in Server
-// Online Subsystem
-protected:
+	// Online Subsystem
 	bool GetSessionInterface();
 
 	UFUNCTION(BlueprintCallable)
@@ -84,7 +80,6 @@ protected:
 	UFUNCTION(BlueprintCallable)
 	void ExitGame();
 	
-	/*void OnCreateSessionComplete(FName SessionName, bool bWasSuccessful);*/
 	void OnFindSessionComplete(bool bWasSuccessful);
 	void OnJoinSessionComplate(FName SessionName, EOnJoinSessionCompleteResult::Type Result);
 	
@@ -93,10 +88,12 @@ protected:
 	void JoinSession(const FOnlineSessionSearchResult& Result);
 
 private:
+	UPROPERTY()
+	TObjectPtr<class UUserWidget> UILoadingInstance;
+
 	IOnlineSessionPtr OnlineSessionInterface;
 	TSharedPtr<FOnlineSessionSearch> SessionSearch;
 
-	//FOnCreateSessionCompleteDelegate CreateSessionCompleteDelegate;
 	FOnFindSessionsCompleteDelegate FindSessionCompleteDelegate;
 	FOnJoinSessionCompleteDelegate JoinSessionCompleteDelegate;
 

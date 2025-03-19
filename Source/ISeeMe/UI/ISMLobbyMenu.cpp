@@ -4,28 +4,7 @@
 #include "ISMLobbyMenu.h"
 #include <ISeeMe/ISMLobbyController.h>
 
-void UISMLobbyMenu::ChangeLobbyUI()
+void UISMLobbyMenu::ChangeLobbyUI(int32 Index)
 {
-	LobbySwitcher->SetActiveWidgetIndex(0);
-}
-
-void UISMLobbyMenu::ChangeInviteFriendUI()
-{
-	LobbySwitcher->SetActiveWidget(LobbySwitcher->GetWidgetAtIndex(1));
-	LobbySwitcher->GetWidgetAtIndex(0)->SetVisibility(ESlateVisibility::Hidden);
-}
-
-void UISMLobbyMenu::ChangeChpaterServer()
-{
-	LobbySwitcher->SetActiveWidget(LobbySwitcher->GetWidgetAtIndex(2));
-}
-
-void UISMLobbyMenu::ChangeChapterClient()
-{
-	LobbySwitcher->SetActiveWidget(LobbySwitcher->GetWidgetAtIndex(3));
-}
-
-void UISMLobbyMenu::ChangeCaracterUI()
-{
-	LobbySwitcher->SetActiveWidgetIndex(4);
+	LobbySwitcher->SetActiveWidget(LobbySwitcher->GetWidgetAtIndex(Index)); 
 }

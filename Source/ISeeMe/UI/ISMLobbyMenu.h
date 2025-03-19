@@ -16,20 +16,9 @@ class ISEEME_API UISMLobbyMenu : public UUserWidget
 	GENERATED_BODY()
 	
 public:
-	UFUNCTION(BlueprintCallable)
-	void ChangeLobbyUI();
 
 	UFUNCTION(BlueprintCallable)
-	void ChangeInviteFriendUI();
-
-	UFUNCTION(BlueprintCallable)
-	void ChangeChpaterServer();
-
-	UFUNCTION(BlueprintCallable)
-	void ChangeChapterClient();
-
-	UFUNCTION(BlueprintCallable)
-	void ChangeCaracterUI();
+	void ChangeLobbyUI(int32 Index);
 
 	UPROPERTY(meta = (BindWidget))
 	UWidgetSwitcher* LobbySwitcher;

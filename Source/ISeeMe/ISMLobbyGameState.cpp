@@ -2,6 +2,7 @@
 
 
 #include "ISMLobbyGameState.h"
+#include "ISMLobbyController.h"
 
 void AISMLobbyGameState::InitSelect()
 {
@@ -10,4 +11,4 @@ void AISMLobbyGameState::InitSelect()
 		bSelectedHojin[i] = false;
 		bSelectedMimi[i] = false;
 	}
-}
+} 

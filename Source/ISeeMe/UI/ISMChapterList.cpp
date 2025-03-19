@@ -30,14 +30,10 @@ void UISMChapterList::SelectChapter(int ChapterNo)
 
 		GI->SaveGame();
 
-		if (AISMLobbyController* LobbyController = GetWorld()->GetFirstPlayerController<AISMLobbyController>())
+		FString ChapterName = FString::Printf(TEXT("Chapter%d"), GI->CurrChapterNo);
+		if (AISMLobbyGameMode* GM = Cast<AISMLobbyGameMode>(GetWorld()->GetAuthGameMode()))
 		{
-			FString ChapterName = FString::Printf(TEXT("Chapter%d"), GI->CurrChapterNo);
-			if (AISMLobbyGameMode* GM = Cast<AISMLobbyGameMode>(GetWorld()->GetAuthGameMode()))
-			{
-				GM->SelectCharacterUI();
-			}
-			//LobbyController->CreateSession(FName(*ChapterName));
+			GM->SelectCharacterUI();
 		}
 	}	
 }

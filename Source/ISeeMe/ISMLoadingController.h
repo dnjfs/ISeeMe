@@ -15,6 +15,7 @@
  * 
  */
 DECLARE_DELEGATE_TwoParams(FOnCreateSessionCompleteDelegate, FName /*SessionName*/, bool /*bWasSuccessful*/);
+DECLARE_DELEGATE_TwoParams(OnDestroySessionComplete, FName /*SessionName*/, bool /*bWasSuccessful*/);
 
 UCLASS()
 class ISEEME_API AISMLoadingController : public APlayerController
@@ -26,11 +27,14 @@ class ISEEME_API AISMLoadingController : public APlayerController
 public:
 	UFUNCTION(BlueprintCallable)
 	void CreateSession(FName ChapterName);
+	UFUNCTION()
+	void StartCreatingSession(FName ChapterName);
 
 protected:
 	virtual void BeginPlay() override;
 
 	void OnCreateSessionComplete(FName SessionName, bool bWasSuccessful);
+	void OnDestroySessionComplete(FName SessionName, bool bWasSuccessful);
 	
 	UPROPERTY(EditDefaultsOnly, BlueprintReadwrite, Category = UI)
 	TSubclassOf<class UUserWidget> UILoadingClass;
@@ -41,4 +45,5 @@ private:
 
 	IOnlineSessionPtr OnlineSessionInterface;
 	FOnCreateSessionCompleteDelegate CreateSessionCompleteDelegate;
+	FOnDestroySessionCompleteDelegate DestroySessionCompleteDelegate;
 };
