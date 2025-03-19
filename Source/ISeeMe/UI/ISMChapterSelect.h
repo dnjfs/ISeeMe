@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Blueprint/UserWidget.h"
+#include "Components/Button.h"
 #include "ISMChapterSelect.generated.h"
 
 class UButton;
@@ -23,6 +24,8 @@ protected:
 	void NewGame();
 	UFUNCTION()
 	void Continue();
+	UFUNCTION()
+	void BackLobbyUI();
 
 private:
 	UPROPERTY(meta = (BindWidget))
