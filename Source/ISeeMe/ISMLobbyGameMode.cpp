@@ -31,6 +31,9 @@ void AISMLobbyGameMode::PostLogin(APlayerController* NewPlayer)
 		if (Controller == nullptr)
 			continue;
 
+		if (index >= PCs.Num())
+			break;
+
 		PCs[index] = Controller;
 		index++;
 	}
