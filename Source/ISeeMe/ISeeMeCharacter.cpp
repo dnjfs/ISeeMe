@@ -156,10 +156,6 @@ void AISeeMeCharacter::BeginPlay()
 			});
 	}
 
-	if (InitVoiceChat())
-	{
-		LOG_SCREEN("Init voice chat success");
-	}
 
 	if (FocusCurve)
 	{
@@ -170,24 +166,6 @@ void AISeeMeCharacter::BeginPlay()
 		FocusTimeline->SetLooping(false);
 		FocusTimeline->SetIgnoreTimeDilation(true);
 	}
-}
-
-bool AISeeMeCharacter::InitVoiceChat()
-{
-	if (IOnlineSubsystem* OSS = IOnlineSubsystem::Get())
-	{
-		if (OnlineVoicePtr = OSS->GetVoiceInterface())
-		{
-			if (const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController())
-			{
-				if (OnlineVoicePtr->RegisterRemoteTalker(*LocalPlayer->GetPreferredUniqueNetId()))
-				{
-					return true;
-				}
-			}
-		}
-	}
-	return false;
 }
 
 
@@ -220,10 +198,6 @@ void AISeeMeCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 		// Focus
 		EnhancedInputComponent->BindAction(FocusAction, ETriggerEvent::Triggered, this, &AISeeMeCharacter::Focus);
-
-		// ToggleVoice
-		EnhancedInputComponent->BindAction(ToggleVoiceAction, ETriggerEvent::Started, this, &AISeeMeCharacter::EnableVoice);
-		EnhancedInputComponent->BindAction(ToggleVoiceAction, ETriggerEvent::Triggered, this, &AISeeMeCharacter::DisableVoice);
 	
 		EnhancedInputComponent->BindAction(SwapCameraAction, ETriggerEvent::Started, this, &AISeeMeCharacter::SwapCamera);
 		EnhancedInputComponent->BindAction(SwapAspectAction, ETriggerEvent::Started, this, &AISeeMeCharacter::SwapAspect);
@@ -342,28 +316,6 @@ void AISeeMeCharacter::OnRep_IsCameraRestored()
 	else
 	{
 		CameraBoom->bInheritPitch = false;
-	}
-}
-
-void AISeeMeCharacter::EnableVoice()
-{
-	if (OnlineVoicePtr)
-	{
-		if (const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController())
-		{
-			OnlineVoicePtr->StartNetworkedVoice(LocalPlayer->GetLocalPlayerIndex());
-		}
-	}
-}
-
-void AISeeMeCharacter::DisableVoice()
-{
-	if (OnlineVoicePtr)
-	{
-		if (const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController())
-		{
-			OnlineVoicePtr->StopNetworkedVoice(LocalPlayer->GetLocalPlayerIndex());
-		}
 	}
 }
 

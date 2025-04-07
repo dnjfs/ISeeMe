@@ -75,12 +75,6 @@ protected:
 	/** Called for focus input */
 	void Focus();
 
-	/** Called for enable voice */
-	void EnableVoice();
-
-	/** Called for disable voice */
-	void DisableVoice();
-
 	/** Called for swap aspect */
 	void SwapAspect();
 
@@ -101,8 +95,6 @@ protected:
 
 	// To add mapping context
 	virtual void BeginPlay();
-
-	bool InitVoiceChat();
 
 private:
 	/** Camera boom positioning the camera behind the character */
@@ -133,10 +125,6 @@ private:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* FocusAction;
 
-	/** Toggle Voice Input Action */
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
-	UInputAction* ToggleVoiceAction;
-
 	/** Swap Camera Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* SwapCameraAction;
@@ -156,9 +144,6 @@ private:
 	/** Go Check Point Input Action */
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = Input, meta = (AllowPrivateAccess = "true"))
 	UInputAction* ControlPitchAction;
-
-	/* Voice Chat */
-	IOnlineVoicePtr OnlineVoicePtr;
 
 	/* Focus */
 	UPROPERTY(EditDefaultsOnly, Category = Timeline, meta = (AllowPrivateAccess = "true"))
