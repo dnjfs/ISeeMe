@@ -32,4 +32,7 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	FName CheckPointID; 
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	TArray<FName> AcquiredRecollectionIDs;
 };

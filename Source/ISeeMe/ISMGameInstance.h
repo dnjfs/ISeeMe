@@ -31,4 +31,6 @@ public:
     int MaxChapterNo;
 
     FName SavedCheckPointID;
+
+    TArray<FName> AcquiredRecollectionIDs;
 };

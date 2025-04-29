@@ -4,12 +4,6 @@
 #include "ISeeMe/ISMSaveGame.h"
 #include "Kismet/GameplayStatics.h"
 
-void UISMGameInstance::LoadGame(UISMSaveGame* LoadedGame)
-{
-	CurrChapterNo = LoadedGame->CurrChapterNo;
-	MaxChapterNo = LoadedGame->MaxChapterNo;
-	SavedCheckPointID = LoadedGame->CheckPointID;
-}
 
 void UISMGameInstance::SaveGame()
 {
@@ -18,7 +12,17 @@ void UISMGameInstance::SaveGame()
 		SaveGameInstance->CurrChapterNo = this->CurrChapterNo;
 		SaveGameInstance->MaxChapterNo = this->MaxChapterNo;
 		SaveGameInstance->CheckPointID = this->SavedCheckPointID;
+		SaveGameInstance->AcquiredRecollectionIDs = this->AcquiredRecollectionIDs;
 
 		UGameplayStatics::AsyncSaveGameToSlot(SaveGameInstance, TEXT("SaveSlot"), 0);
 	}
+}
+
+
+void UISMGameInstance::LoadGame(UISMSaveGame* LoadedGame)
+{
+	CurrChapterNo = LoadedGame->CurrChapterNo;
+	MaxChapterNo = LoadedGame->MaxChapterNo;
+	SavedCheckPointID = LoadedGame->CheckPointID;
+	AcquiredRecollectionIDs = LoadedGame->AcquiredRecollectionIDs;
 }

@@ -47,7 +47,7 @@ void AISMJumpPad::BeginPlay()
 
 void AISMJumpPad::PlayShakeTimeline(float Value)
 {
-	FVector NextLocation = FVector(OriginalLocation.X, OriginalLocation.Y, OriginalLocation.Z + Value * 50.f);
+	FVector NextLocation = FVector(OriginalLocation.X, OriginalLocation.Y, OriginalLocation.Z + Value * ShakeScale);
 
 	JumpPad->SetRelativeLocation(NextLocation);
 }

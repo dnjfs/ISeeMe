@@ -39,4 +39,6 @@ private:
 
 	UFUNCTION()
 	void PlayShakeTimeline(float Value);
+
+	float ShakeScale = 50.f;
 };
