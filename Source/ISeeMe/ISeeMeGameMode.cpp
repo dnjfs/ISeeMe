@@ -11,6 +11,7 @@
 #include <Kismet/GameplayStatics.h>
 #include "UI/ISMHUD.h"
 #include "ISeeMe/UI/ISMOverlay.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 AISeeMeGameMode::AISeeMeGameMode()
 {
@@ -35,6 +36,9 @@ void AISeeMeGameMode::PostLogin(APlayerController* NewPlayer)
 		int32 CurrentPlayerCount = GetNumPlayers();
 		State->CustomPlayerID = CurrentPlayerCount;
 	}
+
+	UISMGameInstance* GI = Cast<UISMGameInstance>(GetGameInstance());
+	AISMPlayerController* PC = Cast<AISMPlayerController>(NewPlayer);
 }
 
 void AISeeMeGameMode::SwapCamera()

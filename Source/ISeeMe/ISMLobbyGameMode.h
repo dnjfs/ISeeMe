@@ -25,6 +25,16 @@ public:
 	UFUNCTION()
 	void BackChapterUI(); // Move to Chapter UI
 
+	bool bTutorial = true; // Have you been Tutorial?
+
+	int ReadTutorial = 0;
+
+	UFUNCTION()
+	void CountReadTutorial();
+
+	UFUNCTION()
+	void ChangeTutorial();
+
 protected:
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 
