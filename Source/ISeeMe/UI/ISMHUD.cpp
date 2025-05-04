@@ -5,6 +5,7 @@
 #include "ISeeMe/UI/InGameMenu.h"
 #include "ISeeMe/UI/ISMOverlay.h"
 #include <ISeeMe/ISMLobbyController.h>
+#include <ISeeMe/ISMPlayerController.h>
 
 void AISMHUD::BeginPlay()
 {
@@ -35,3 +36,4 @@ void AISMHUD::ToggleInGameMenu(APlayerController* PlayerController)
 {
 	InGameMenu->ToggleWidget(PlayerController);
 }
+

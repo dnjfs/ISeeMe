@@ -7,6 +7,7 @@
 #include "Components/Button.h"
 #include "OnlineSessionSettings.h"
 #include "Interfaces/OnlineSessionInterface.h"
+#include "UI/ISMPrologue.h"
 #include "ISMLobbyController.generated.h"
 
 #define	LOG_SCREEN(Format, ...) \
@@ -49,6 +50,25 @@ public:
 	UFUNCTION(NetMulticast, Unreliable, BlueprintCallable)
 	void MulticastChangeCharacterButton(const FString& CharacterSelect, FLinearColor Color);
 
+	UFUNCTION()
+	void CallTutorial();
+
+	UFUNCTION(Client, Reliable)
+	void ClientTutorial();
+
+	bool bTutorial = true;
+
+	bool bDoneRead = false;
+
+	UFUNCTION()
+	void CallReadTutorial();
+
+	UFUNCTION()
+	void ReadTutorial();
+
+	UFUNCTION(Server, Unreliable)
+	void ServerReadTutorial();
+
 	/// ///////////////////////////////////////////////////
 
 	UPROPERTY()
@@ -56,7 +76,6 @@ public:
 
 	UFUNCTION(BlueprintCallable)
 	void CallBackUI(const FString& Name);
-
 
 protected:
 	virtual void BeginPlay() override;

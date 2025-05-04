@@ -30,6 +30,10 @@ public:
     UPROPERTY(BlueprintReadWrite)
     int MaxChapterNo;
 
+    // Have been Tutorial?
+    UPROPERTY(BlueprintReadWrite)
+    bool bTutorial = false;
+
     FName SavedCheckPointID;
 
     TArray<FName> AcquiredRecollectionIDs;

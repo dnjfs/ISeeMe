@@ -48,6 +48,7 @@ void UISMChapterSelect::NewGame()
 		GI->SavedCheckPointID = FName("None");
 
 		GI->SaveGame();
+		GI->bTutorial = false;
 
 		FString ChapterName = FString::Printf(TEXT("Chapter%d"), GI->CurrChapterNo);
 		if (AISMLobbyGameMode* GM = Cast<AISMLobbyGameMode>(GetWorld()->GetAuthGameMode()))
@@ -62,6 +63,7 @@ void UISMChapterSelect::Continue()
 	if (UISMGameInstance* GI = GetGameInstance<UISMGameInstance>())
 	{
 		FString ChapterName = FString::Printf(TEXT("Chapter%d"), GI->CurrChapterNo);
+		GI->bTutorial = true;
 		if (AISMLobbyGameMode* GM = Cast<AISMLobbyGameMode>(GetWorld()->GetAuthGameMode()))
 		{
 			GM->SelectCharacterUI();

@@ -7,6 +7,7 @@
 #include <Components/WidgetSwitcher.h>
 #include "UI/ISMCharacterSelect.h"
 #include "ISMLobbyGameState.h"
+#include "ISMGameInstance.h"
 
 void AISMLobbyGameMode::PostLogin(APlayerController* NewPlayer)
 {
@@ -116,4 +117,28 @@ void AISMLobbyGameMode::BackChapterUI()
 {
 	PCs[0]->MulticastControllerChangeUI(2);
 	PCs[1]->MulticastControllerChangeUI(3);
+}
+
+void AISMLobbyGameMode::CountReadTutorial()
+{
+	ReadTutorial++;
+
+	if (ReadTutorial == 2)
+	{
+		if (UISMGameInstance* GI = GetGameInstance<UISMGameInstance>())
+		{
+			FString ChapterName = FString::Printf(TEXT("Chapter%d"), GI->CurrChapterNo);
+			UWorld* World = GetWorld();
+			PCs[0]->MulticastControllerChangeUI(6);
+			PCs[1]->MulticastControllerChangeUI(6);
+			World->ServerTravel("/Game/ISeeMe/Maps/" + ChapterName + "?listen", true);
+		}
+	}
+}
+
+// Show Tutorial Widget
+void AISMLobbyGameMode::ChangeTutorial()
+{
+	PCs[0]->CallTutorial();
+	PCs[1]->CallTutorial();
 }

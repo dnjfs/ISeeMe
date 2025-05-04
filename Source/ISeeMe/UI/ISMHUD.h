@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/HUD.h"
+#include "ISMPrologue.h"
 #include "ISMHUD.generated.h"
 
 class UInGameMenu;

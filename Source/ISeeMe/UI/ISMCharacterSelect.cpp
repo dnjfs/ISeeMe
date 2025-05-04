@@ -6,6 +6,7 @@
 #include <ISeeMe/ISMGameInstance.h>
 #include <ISeeMe/ISMLobbyController.h>
 #include "ISeeMe/ISMLobbyGameState.h"
+#include <ISeeMe/ISMLobbyGameMode.h>
 
 void UISMCharacterSelect::NativeConstruct()
 {
@@ -55,7 +56,17 @@ void UISMCharacterSelect::MoveLevel()
 		FString ChapterName = FString::Printf(TEXT("Chapter%d"), GI->CurrChapterNo);
 		UWorld* World = GetWorld();
 
-		World->ServerTravel("/Game/ISeeMe/Maps/" + ChapterName + "?listen", true);
+		if (!GI->bTutorial)
+		{
+			if (AISMLobbyGameMode* GM = Cast<AISMLobbyGameMode>(GetWorld()->GetAuthGameMode()))
+			{
+				GM->ChangeTutorial();
+			}
+		} // Go Tutorial
+		else
+		{
+			World->ServerTravel("/Game/ISeeMe/Maps/" + ChapterName + "?listen", true);
+		} // Go Next Server
 	}
 }
 

@@ -13,6 +13,7 @@
 #include "UI/ISMCharacterSelect.h"
 #include "ISMLobbyGameMode.h"
 #include "ISMLobbyGameState.h"
+#include "ISMGameInstance.h"
 
 
 AISMLobbyController::AISMLobbyController()
@@ -198,6 +199,53 @@ void AISMLobbyController::ExitGame()
 		UKismetSystemLibrary::QuitGame(World, this, EQuitPreference::Quit, true);
 	}
 }
+
+// Show Tutorial Widget
+void AISMLobbyController::CallTutorial()
+{
+	ControllerChangeLobbyUI(5);
+
+	if (HasAuthority())
+	{
+		ClientTutorial();
+	}
+}
+
+void AISMLobbyController::ClientTutorial_Implementation()
+{
+	ControllerChangeLobbyUI(5);
+}
+
+// Check Reading Tutorial
+void AISMLobbyController::CallReadTutorial()
+{
+	if (!bDoneRead)
+	{
+		bDoneRead = true;
+		if (HasAuthority())
+		{
+			ReadTutorial();
+		}
+		else
+		{
+			ServerReadTutorial();
+		}
+	}
+}
+
+void AISMLobbyController::ReadTutorial()
+{
+	if (AISMLobbyGameMode* GM = Cast<AISMLobbyGameMode>(GetWorld()->GetAuthGameMode()))
+	{
+		GM->CountReadTutorial();
+	}
+}
+
+void AISMLobbyController::ServerReadTutorial_Implementation()
+{
+	ReadTutorial();
+}
+
 
 //////////////////////////////////////////////////////////////////////////////////////////////////
 
