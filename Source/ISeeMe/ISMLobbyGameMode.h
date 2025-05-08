@@ -35,6 +35,9 @@ public:
 	UFUNCTION()
 	void ChangeTutorial();
 
+	UFUNCTION()
+	void LoadingNextLevel();
+
 protected:
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 

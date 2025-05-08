@@ -65,7 +65,10 @@ void UISMCharacterSelect::MoveLevel()
 		} // Go Tutorial
 		else
 		{
-			World->ServerTravel("/Game/ISeeMe/Maps/" + ChapterName + "?listen", true);
+			if (AISMLobbyGameMode* GM = Cast<AISMLobbyGameMode>(GetWorld()->GetAuthGameMode()))
+			{
+				GM->LoadingNextLevel();
+			}
 		} // Go Next Server
 	}
 }

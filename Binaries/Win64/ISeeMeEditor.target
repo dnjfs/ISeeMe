@@ -50,10 +50,6 @@
 			"Type": "DynamicLibrary"
 		},
 		{
-			"Path": "$(EngineDir)/Binaries/Win64/OpenImageDenoise.dll",
-			"Type": "DynamicLibrary"
-		},
-		{
 			"Path": "$(EngineDir)/Binaries/Win64/UnrealEditor-AIGraph.dll",
 			"Type": "DynamicLibrary"
 		},
@@ -1786,10 +1782,6 @@
 			"Type": "DynamicLibrary"
 		},
 		{
-			"Path": "$(EngineDir)/Binaries/Win64/tbb12.dll",
-			"Type": "DynamicLibrary"
-		},
-		{
 			"Path": "$(EngineDir)/Plugins/2D/Paper2D/Binaries/Win64/UnrealEditor-Paper2D.dll",
 			"Type": "DynamicLibrary"
 		},
@@ -2715,14 +2707,6 @@
 		},
 		{
 			"Path": "$(EngineDir)/Plugins/Experimental/MetaHuman/MetaHumanProjectUtilities/Binaries/Win64/UnrealEditor.modules",
-			"Type": "RequiredResource"
-		},
-		{
-			"Path": "$(EngineDir)/Plugins/Experimental/OpenImageDenoise/Binaries/Win64/UnrealEditor-OpenImageDenoise.dll",
-			"Type": "DynamicLibrary"
-		},
-		{
-			"Path": "$(EngineDir)/Plugins/Experimental/OpenImageDenoise/Binaries/Win64/UnrealEditor.modules",
 			"Type": "RequiredResource"
 		},
 		{
@@ -23268,10 +23252,6 @@
 			"Type": "NonUFS"
 		},
 		{
-			"Path": "$(EngineDir)/Binaries/Win64/OpenImageDenoise.dll",
-			"Type": "NonUFS"
-		},
-		{
 			"Path": "$(EngineDir)/Binaries/Win64/oo2tex_win64_2.9.10.dll",
 			"Type": "NonUFS"
 		},
@@ -23301,10 +23281,6 @@
 		},
 		{
 			"Path": "$(EngineDir)/Binaries/Win64/oo2tex_win64_2.9.9.dll",
-			"Type": "NonUFS"
-		},
-		{
-			"Path": "$(EngineDir)/Binaries/Win64/tbb12.dll",
 			"Type": "NonUFS"
 		},
 		{
@@ -26524,10 +26500,6 @@
 			"Type": "UFS"
 		},
 		{
-			"Path": "$(EngineDir)/Plugins/Experimental/OpenImageDenoise/OpenImageDenoise.uplugin",
-			"Type": "UFS"
-		},
-		{
 			"Path": "$(EngineDir)/Plugins/Experimental/PlanarCutPlugin/PlanarCut.uplugin",
 			"Type": "UFS"
 		},
@@ -27004,7 +26976,6 @@
 		"OnlineSubsystemSteam",
 		"OnlineSubsystemUtils",
 		"OodleNetwork",
-		"OpenImageDenoise",
 		"Paper2D",
 		"PerforceSourceControl",
 		"PixWinPlugin",

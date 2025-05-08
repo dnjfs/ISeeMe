@@ -127,11 +127,7 @@ void AISMLobbyGameMode::CountReadTutorial()
 	{
 		if (UISMGameInstance* GI = GetGameInstance<UISMGameInstance>())
 		{
-			FString ChapterName = FString::Printf(TEXT("Chapter%d"), GI->CurrChapterNo);
-			UWorld* World = GetWorld();
-			PCs[0]->MulticastControllerChangeUI(6);
-			PCs[1]->MulticastControllerChangeUI(6);
-			World->ServerTravel("/Game/ISeeMe/Maps/" + ChapterName + "?listen", true);
+			LoadingNextLevel();
 		}
 	}
 }
@@ -141,4 +137,16 @@ void AISMLobbyGameMode::ChangeTutorial()
 {
 	PCs[0]->CallTutorial();
 	PCs[1]->CallTutorial();
+}
+
+void AISMLobbyGameMode::LoadingNextLevel()
+{
+	if (UISMGameInstance* GI = GetGameInstance<UISMGameInstance>())
+	{
+		FString ChapterName = FString::Printf(TEXT("Chapter%d"), GI->CurrChapterNo);
+		UWorld* World = GetWorld();
+		PCs[0]->MulticastControllerChangeUI(6);
+		PCs[1]->MulticastControllerChangeUI(6);
+		World->ServerTravel("/Game/ISeeMe/Maps/" + ChapterName + "?listen", true);
+	}
 }
