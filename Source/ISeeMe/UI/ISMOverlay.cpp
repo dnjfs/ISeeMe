@@ -15,13 +15,12 @@ void UISMOverlay::NativeConstruct()
 
 	if (AISMGameState* GS = GetWorld()->GetGameState<AISMGameState>())
 	{
-		GS->OnSwapItemUpdated.BindLambda([this](bool bShowIcon)
+		GS->OnSwapItemUpdated.BindLambda([this](bool bHasItem) {
+			if (ItemWidgetSwitcher)
 			{
-				if (SwapItemPanel)
-				{
-					SwapItemPanel->SetVisibility(bShowIcon ? ESlateVisibility::Visible : ESlateVisibility::Hidden);
-				}
-			});
+				ItemWidgetSwitcher->SetActiveWidgetIndex(bHasItem ? 1 : 0);
+			}
+		});
 	}
 
 	UWorld* World = GetWorld();

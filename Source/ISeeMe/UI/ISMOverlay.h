@@ -26,6 +26,6 @@ protected:
 
 private:
 	UPROPERTY(meta = (BindWidget))
-	class UCanvasPanel* SwapItemPanel;
+	TObjectPtr<class UWidgetSwitcher> ItemWidgetSwitcher;
 
 };
