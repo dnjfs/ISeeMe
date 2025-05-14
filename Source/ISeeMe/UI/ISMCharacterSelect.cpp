@@ -51,6 +51,11 @@ void UISMCharacterSelect::BackSelect()
 
 void UISMCharacterSelect::MoveLevel()
 {
+	if (AISMLobbyGameMode* GM = Cast<AISMLobbyGameMode>(GetWorld()->GetAuthGameMode()))
+	{
+		GM->LoadingNextLevel();
+	}
+	/*
 	if (UISMGameInstance* GI = GetGameInstance<UISMGameInstance>())
 	{
 		FString ChapterName = FString::Printf(TEXT("Chapter%d"), GI->CurrChapterNo);
@@ -71,6 +76,7 @@ void UISMCharacterSelect::MoveLevel()
 			}
 		} // Go Next Server
 	}
+	*/
 }
 
 void UISMCharacterSelect::VisibleApply()
