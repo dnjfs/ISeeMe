@@ -28,6 +28,9 @@ public:
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastVisibleMesh(bool bVisible);
 
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastPlaySound();
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UStaticMeshComponent* ItemMesh;
 
@@ -36,7 +39,4 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Sound")
 	USoundBase* Sound;
-
-	UFUNCTION(NetMulticast, Reliable)
-	void MulticastPlaySound();
 };

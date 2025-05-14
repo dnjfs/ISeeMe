@@ -321,9 +321,27 @@ void AISeeMeCharacter::OnRep_IsCameraRestored()
 
 void AISeeMeCharacter::SwapCamera()
 {
+	if (HasAuthority())
+		MulticastStartSwapTimer(true);
+	else
+		ServerStartSwapTimer();
+
 	if (AISMPlayerController* PC = Cast<AISMPlayerController>(GetController()))
 	{
 		PC->ServerCallSwapCamera();
+	}
+}
+
+void AISeeMeCharacter::ServerStartSwapTimer_Implementation()
+{
+	MulticastStartSwapTimer(true);
+}
+
+void AISeeMeCharacter::MulticastStartSwapTimer_Implementation(bool bPlay)
+{
+	if (bPlay && SoundTimer)
+	{
+		TimerAudioComponent = UGameplayStatics::SpawnSound2D(this, SoundTimer);
 	}
 }
 
@@ -404,7 +422,13 @@ void AISeeMeCharacter::ServerCallGoCheckPoint_Implementation()
 
 void AISeeMeCharacter::MulticastPlaySound_Implementation()
 {
-	UGameplayStatics::PlaySound2D(this, CheckPointSound);
+	if (TimerAudioComponent)
+	{
+		TimerAudioComponent->Stop();
+	}
+
+	if(CheckPointSound)
+		UGameplayStatics::PlaySound2D(this, CheckPointSound);
 }
 
 void AISeeMeCharacter::OpenMenu()
