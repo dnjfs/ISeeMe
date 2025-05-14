@@ -46,9 +46,6 @@ public:
 	UFUNCTION(Server, Reliable)
 	void ServerCallGoCheckPoint();
 
-	UFUNCTION(Server, Reliable)
-	void ServerStartSwapTimer();
-
 	/** Called for swap camera */
 	void SwapCamera();
 
@@ -62,15 +59,6 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
 	UAudioComponent* AudioComponent;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Audio")
-	UAudioComponent* TimerAudioComponent;
-
-	UPROPERTY(EditAnywhere, Category = "Sound")
-	USoundBase* SoundTimer;
-
-	UFUNCTION(NetMulticast, Reliable)
-	void MulticastStartSwapTimer(bool bPlay);
 
 	void EnableAudio();
 	void DisableAudio();

@@ -96,8 +96,7 @@ void AISMPlayerController::ServerCallSwapCamera_Implementation()
 					}), GM->SwapTime, false);
 				GM->SwapCamera();
 
-				GS->UsedSwapViewItems.Add(GS->SwapViewItem);
-				GS->MulticastSetSwapViewItem(nullptr);
+				GS->OnItemUsed(GS->SwapViewItem);
 			}
 		}
 	}

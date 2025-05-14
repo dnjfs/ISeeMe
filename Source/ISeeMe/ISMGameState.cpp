@@ -4,6 +4,7 @@
 #include "ISMGameState.h"
 #include <Net/UnrealNetwork.h>
 #include <Kismet/GameplayStatics.h>
+#include "Components/AudioComponent.h"
 
 AISMGameState::AISMGameState()
 {
@@ -12,6 +13,12 @@ AISMGameState::AISMGameState()
 	SaveSwapViewItem = nullptr;
 	UsedSwapViewItems.Empty();
 	bAcqCheckPoint = false;
+
+	static ConstructorHelpers::FObjectFinder<USoundBase> ItemSoundRef(TEXT("/Script/Engine.SoundWave'/Game/ISeeMe/Sounds/SFX/SFX_ItemTimer.SFX_ItemTimer'"));
+	if (ItemSoundRef.Object)
+	{
+		ItemTimerSound = ItemSoundRef.Object;
+	}
 }
 
 void AISMGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -55,5 +62,30 @@ void AISMGameState::MulticastReturnSwapViewItem_Implementation()
 		SaveSwapViewItem->MulticastVisibleMesh(false);
 		MulticastSetSwapViewItem(SaveSwapViewItem);
 	}
+
+	MulticastPlayItemSound(false);
 }
 
+void AISMGameState::OnItemUsed(AISMSwapViewItem* InItem)
+{
+	// 서버에서만 실행되는 함수
+	if (GetNetMode() == ENetMode::NM_Client)
+		return;
+
+	UsedSwapViewItems.Add(InItem);
+	MulticastSetSwapViewItem(nullptr);
+	MulticastPlayItemSound(true);
+}
+
+void AISMGameState::MulticastPlayItemSound_Implementation(bool bIsPlay)
+{
+	if (bIsPlay)
+	{
+		TimerAudioComponent = UGameplayStatics::SpawnSound2D(this, ItemTimerSound);
+	}
+	else
+	{
+		if (TimerAudioComponent)
+			TimerAudioComponent->Stop();
+	}
+}

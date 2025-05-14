@@ -42,4 +42,16 @@ public:
 
 	bool bAcqCheckPoint; // Check Check Point
 
+	void OnItemUsed(AISMSwapViewItem* InItem);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastPlayItemSound(bool bIsPlay);
+
+public:
+	UPROPERTY()
+	TObjectPtr<USoundBase> ItemTimerSound;
+
+private:
+	UPROPERTY(Transient)
+	TObjectPtr<UAudioComponent> TimerAudioComponent;
 };

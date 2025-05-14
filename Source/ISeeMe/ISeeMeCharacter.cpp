@@ -321,27 +321,9 @@ void AISeeMeCharacter::OnRep_IsCameraRestored()
 
 void AISeeMeCharacter::SwapCamera()
 {
-	if (HasAuthority())
-		MulticastStartSwapTimer(true);
-	else
-		ServerStartSwapTimer();
-
 	if (AISMPlayerController* PC = Cast<AISMPlayerController>(GetController()))
 	{
 		PC->ServerCallSwapCamera();
-	}
-}
-
-void AISeeMeCharacter::ServerStartSwapTimer_Implementation()
-{
-	MulticastStartSwapTimer(true);
-}
-
-void AISeeMeCharacter::MulticastStartSwapTimer_Implementation(bool bPlay)
-{
-	if (bPlay && SoundTimer)
-	{
-		TimerAudioComponent = UGameplayStatics::SpawnSound2D(this, SoundTimer);
 	}
 }
 
@@ -391,11 +373,6 @@ void AISeeMeCharacter::ControlPitch(const FInputActionValue& Value)
 
 void AISeeMeCharacter::GoCheckPoint()
 {
-	if (AISMGameState* GS = Cast<AISMGameState>(UGameplayStatics::GetGameState(this)))
-	{
-		GS->MulticastReturnSwapViewItem();
-	}
-
 	// Return Swap Camera State
 	if (AISeeMeGameMode* GM = Cast<AISeeMeGameMode>(GetWorld()->GetAuthGameMode()))
 	{
@@ -413,6 +390,11 @@ void AISeeMeCharacter::GoCheckPoint()
 		if (AISMPlayerController* PC = Cast<AISMPlayerController>(Iterator->Get()))
 			PC->DeadCharacter();
 	}
+
+	if (AISMGameState* GS = Cast<AISMGameState>(UGameplayStatics::GetGameState(this)))
+	{
+		GS->MulticastReturnSwapViewItem();
+	}
 }
 
 void AISeeMeCharacter::ServerCallGoCheckPoint_Implementation()
@@ -422,11 +404,6 @@ void AISeeMeCharacter::ServerCallGoCheckPoint_Implementation()
 
 void AISeeMeCharacter::MulticastPlaySound_Implementation()
 {
-	if (TimerAudioComponent)
-	{
-		TimerAudioComponent->Stop();
-	}
-
 	if(CheckPointSound)
 		UGameplayStatics::PlaySound2D(this, CheckPointSound);
 }
