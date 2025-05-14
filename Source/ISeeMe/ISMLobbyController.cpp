@@ -300,6 +300,8 @@ void AISMLobbyController::FindSession()
 
 void AISMLobbyController::OnFindSessionComplete(bool bWasSuccessful)
 {
+	OnlineSessionInterface->ClearOnFindSessionsCompleteDelegates(this);
+
 	if (OnlineSessionInterface.IsValid() == false)
 	{
 		LOG_SCREEN("Session Interface is Invalid");
