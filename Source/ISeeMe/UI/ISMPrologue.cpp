@@ -24,6 +24,13 @@ void UISMPrologue::ShowPrologue()
 			}
 		}
 	}
+
+	if (AISMLobbyController* Controller = Cast<AISMLobbyController>(GetOwningPlayer()))
+	{
+		FInputModeGameAndUI Mode;
+		Mode.SetWidgetToFocus(this->GetCachedWidget());
+		Controller->SetInputMode(Mode);
+	}
 }
 
 void UISMPrologue::ReadPrologue()
