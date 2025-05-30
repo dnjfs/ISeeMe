@@ -27,7 +27,7 @@ void UISMPrologue::ShowPrologue()
 
 	if (AISMLobbyController* Controller = Cast<AISMLobbyController>(GetOwningPlayer()))
 	{
-		FInputModeGameAndUI Mode;
+		FInputModeUIOnly Mode;
 		Mode.SetWidgetToFocus(this->GetCachedWidget());
 		Controller->SetInputMode(Mode);
 	}
