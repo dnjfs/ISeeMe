@@ -3,7 +3,7 @@
 #include "ISeeMeGameMode.h"
 #include "ISeeMeCharacter.h"
 #include "UObject/ConstructorHelpers.h"
-
+#include "ISMTutorialController.h"
 #include "ISMPlayerController.h"
 #include "ISMCharacterState.h"
 #include "ISMGameInstance.h"
@@ -12,6 +12,7 @@
 #include "UI/ISMHUD.h"
 #include "ISeeMe/UI/ISMOverlay.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include <EnhancedInputSubsystems.h>
 
 AISeeMeGameMode::AISeeMeGameMode()
 {

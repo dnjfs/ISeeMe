@@ -22,6 +22,8 @@ public:
 protected:
 	virtual void BeginPlay() override;
 
+	UFUNCTION()
+	void InitWidgets();
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "UI")
 	TSubclassOf<UInGameMenu> InGameMenuClass;
@@ -34,7 +36,4 @@ private:
 
 	UPROPERTY()
 	UISMOverlay* ISMOverlay;
-
-	UFUNCTION()
-	void InitWidgets();
 };

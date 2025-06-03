@@ -147,6 +147,10 @@ void AISMLobbyGameMode::LoadingNextLevel()
 		UWorld* World = GetWorld();
 		PCs[0]->MulticastControllerChangeUI(6);
 		PCs[1]->MulticastControllerChangeUI(6);
+		
+		if (!GI->bTutorial)
+			ChapterName = "Tutorial";
+
 		World->ServerTravel("/Game/ISeeMe/Maps/" + ChapterName + "?listen", true);
 	}
 }

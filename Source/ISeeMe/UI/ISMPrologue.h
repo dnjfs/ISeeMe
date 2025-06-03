@@ -8,9 +8,6 @@
 #include <Components/TextBlock.h>
 #include "ISMPrologue.generated.h"
 
-#define	LOG_SCREEN(Format, ...) \
-	if (GEngine)\
-		GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT(Format), ##__VA_ARGS__))
 /**
  * 
  */

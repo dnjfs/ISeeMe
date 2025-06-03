@@ -1,0 +1,55 @@
+// Fill out your copyright notice in the Description page of Project Settings.
+
+#pragma once
+
+#include "CoreMinimal.h"
+#include "GameFramework/Actor.h"
+#include <Components/SphereComponent.h>
+#include "ISMTutorialStepDoneActor.generated.h"
+
+UCLASS()
+class ISEEME_API AISMTutorialStepDoneActor : public AActor
+{
+	GENERATED_BODY()
+	
+public:	
+	// Sets default values for this actor's properties
+	AISMTutorialStepDoneActor();
+
+protected:
+	// Called when the game starts or when spawned
+	virtual void BeginPlay() override;
+
+public:
+	UFUNCTION()
+	void OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	/**Check point Range**/
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	USphereComponent* TriggerVolume;
+
+	/*When no one detect, change material*/
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UMaterialInterface> BaseMaterial;
+
+	/*When one detect, change material*/
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UMaterialInterface> CheckMaterial;
+
+	/*When all detect, change material*/
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UMaterialInterface> AllCheckMaterial;
+
+	UPROPERTY(EditAnywhere)
+	int32 MaxDetectPlayer = 2;
+
+	UFUNCTION()
+	void InitStepDone();
+
+private:
+	int DetectPlayer = 0;
+
+};

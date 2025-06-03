@@ -7,8 +7,6 @@
 
 void UISMPrologue::ShowPrologue()
 {
-	LOG_SCREEN("Show Prologue");
-
 	if (UISMGameInstance* GI = GetGameInstance<UISMGameInstance>())
 	{
 		if (GI->SelectedPawnClass)

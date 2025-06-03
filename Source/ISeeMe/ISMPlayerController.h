@@ -16,9 +16,9 @@ class ISEEME_API AISMPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 
+protected:
 	AISMPlayerController();
 
-protected:
 	virtual void BeginPlay() override;
 	virtual void OnPossess(APawn* aPawn) override;
 	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
@@ -36,7 +36,7 @@ public:
 
 	/** Client call for Server swap camera*/
 	UFUNCTION(Server, Reliable)
-	void ServerCallSwapCamera();
+	virtual void ServerCallSwapCamera();
 
 	/** Swap aspect */
 	UFUNCTION()

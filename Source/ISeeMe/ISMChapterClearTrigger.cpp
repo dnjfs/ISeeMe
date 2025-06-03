@@ -46,10 +46,11 @@ void AISMChapterClearTrigger::Tick(float DeltaTime)
 void AISMChapterClearTrigger::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	MulticastDetectPlayer(true, OtherActor);
-
+	LOG_SCREEN("One");
 	// When all detect
 	if (DetectedPlayerCount == 2)
 	{
+		LOG_SCREEN("Two");
 		if (OnClearUpdated.IsBound())
 		{
 			OnClearUpdated.Execute(true);
