@@ -5,6 +5,7 @@
 #include "ISeeMe/ISMTutorialGameState.h"
 #include "Components/WidgetSwitcher.h" 
 #include "Components/TextBlock.h" 
+#include "Internationalization/StringTableRegistry.h"
 
 void UISMTutorialOverlay::NativeConstruct()
 {
@@ -18,42 +19,48 @@ void UISMTutorialOverlay::NativeConstruct()
 				if (bInformation)
 				{
 					TutorialtSwitcher->SetActiveWidgetIndex(0);
-					if (TutorialState <= TutorialInformationStrings.Num())
-					{
-						TutorialInformationText->SetText(FText::FromString(TutorialInformationStrings[TutorialState]));
-						MyFunction();
-					} // Change Information Canvas and Set Information Text
+					
+					MyFunction(TutorialState, 0);
 				}
 				else
 				{
 					TutorialtSwitcher->SetActiveWidgetIndex(1);
-					if (TutorialState <= TutorialPracticeStrings.Num())
-					{
-						TutorialPracticeText->SetText(FText::FromString(TutorialPracticeStrings[TutorialState]));
-					} // Change Practice Canvas and Set Practice Text
 				}
 			}
-			});
+		});
 	} 
 
-	MyFunction();
+	MyFunction(0, 0);
 }
 
-void UISMTutorialOverlay::MyFunction()
+void UISMTutorialOverlay::MyFunction(int TutorialStep, int InformationIdx)
 {
-	FTimerHandle AnyHandle;
-	FTimerDelegate AnyDelegate;
+	FTimerHandle InformationTimerHandle;
 
-	AnyDelegate = FTimerDelegate::CreateLambda([this]()
-		{
-			NextFunction();
-		});
+	FString Key = FString::Printf(TEXT("Information_%d_%d"), TutorialStep, InformationIdx);
+	FText Text = FText::FromStringTable(FName("/Game/ISeeMe/Strings/ST_Tutorial"), Key);
 
-	GetWorld()->GetTimerManager().SetTimer(AnyHandle, AnyDelegate, 3, false);
+	if (Text.ToString().Contains(TEXT("MISSING STRING TABLE ENTRY"))) // Current Information End
+	{
+		NextFunction(TutorialStep);
+	}
+	else
+	{
+		TutorialInformationText->SetText(Text);
+
+		GetWorld()->GetTimerManager().SetTimer(InformationTimerHandle, [this, TutorialStep, InformationIdx]()
+			{ MyFunction(TutorialStep, InformationIdx+1); }, 
+			3, false);
+	}
 }
 
-void UISMTutorialOverlay::NextFunction()
+void UISMTutorialOverlay::NextFunction(int TutorialStep)
 {
+	FString Key = FString::Printf(TEXT("Practice_%d"), TutorialStep);
+	FText Text = FText::FromStringTable(FName("/Game/ISeeMe/Strings/ST_Tutorial"), Key);
+
+	TutorialPracticeText->SetText(Text);
+
 	if (AISMTutorialGameState* GS = GetWorld()->GetGameState<AISMTutorialGameState>())
 	{
 		GS->Practice();

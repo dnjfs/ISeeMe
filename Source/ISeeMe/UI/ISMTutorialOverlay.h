@@ -16,12 +16,6 @@ class ISEEME_API UISMTutorialOverlay : public UUserWidget
 
 protected:
 	virtual void NativeConstruct() override;
-	
-	UPROPERTY(EditAnywhere, Category = "Tutorial")
-	TArray<FString> TutorialPracticeStrings;
-
-	UPROPERTY(EditAnywhere, Category = "Tutorial")
-	TArray<FString> TutorialInformationStrings;
 
 private:
 	UPROPERTY(meta = (BindWidget))
@@ -34,8 +28,8 @@ private:
 	TObjectPtr<class UWidgetSwitcher> TutorialtSwitcher;
 
 	/*Maybe Letter Implementation?*/
-	void MyFunction();
+	void MyFunction(int TutorialStep, int InformationIdx);
 
 	/*Turn Practice State*/
-	void NextFunction();
+	void NextFunction(int TutorialStep);
 };
