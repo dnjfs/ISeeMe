@@ -48,7 +48,10 @@ void AISMPlayerController::OnPossess(APawn* aPawn)
 	}
 
 	if (HasAuthority())
-		SwapCamera(false);
+	{
+		if (AISeeMeGameMode* GM = Cast<AISeeMeGameMode>(GetWorld()->GetAuthGameMode()))
+			GM->SwapCamera();
+	}
 }
 
 void AISMPlayerController::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
@@ -70,6 +73,11 @@ void AISMPlayerController::OnRep_SwapCamera()
 }
 
 void AISMPlayerController::ServerCallSwapCamera_Implementation()
+{
+	SwapCamera();
+}
+
+void AISMPlayerController::SwapCamera()
 {
 	if (AISMGameState* GS = Cast<AISMGameState>(UGameplayStatics::GetGameState(this)))
 	{
@@ -100,12 +108,6 @@ void AISMPlayerController::ServerCallSwapCamera_Implementation()
 			}
 		}
 	}
-}
-
-void AISMPlayerController::SwapCamera(bool bItem)
-{
-	if (AISeeMeGameMode* GM = Cast<AISeeMeGameMode>(GetWorld()->GetAuthGameMode()))
-		GM->SwapCamera();
 }
 
 void AISMPlayerController::SwapAspect()

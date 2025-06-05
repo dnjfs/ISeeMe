@@ -19,11 +19,5 @@ class ISEEME_API AISMTutorialController : public AISMPlayerController
 	GENERATED_BODY()
 
 public:
-	void ServerCallSwapCamera() override;
-
-protected:
-	virtual void BeginPlay();
-	
-private:
-	void UseItemPractice();
+	virtual void SwapCamera() override;
 };

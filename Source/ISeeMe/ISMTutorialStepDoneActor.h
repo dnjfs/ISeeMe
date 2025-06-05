@@ -49,6 +49,9 @@ public:
 	UFUNCTION()
 	void InitStepDone();
 
+	UPROPERTY(EditAnywhere, Category = "Step")
+	int32 TutorialStep = 2;
+
 private:
 	int DetectPlayer = 0;
 
