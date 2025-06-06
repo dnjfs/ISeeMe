@@ -13,6 +13,7 @@ void UISMGameInstance::SaveGame()
 		SaveGameInstance->MaxChapterNo = this->MaxChapterNo;
 		SaveGameInstance->CheckPointID = this->SavedCheckPointID;
 		SaveGameInstance->AcquiredRecollectionIDs = this->AcquiredRecollectionIDs;
+		SaveGameInstance->bIsFirstLaunch = this->bIsFirstLaunch;
 
 		UGameplayStatics::AsyncSaveGameToSlot(SaveGameInstance, TEXT("SaveSlot"), 0);
 	}
@@ -25,4 +26,5 @@ void UISMGameInstance::LoadGame(UISMSaveGame* LoadedGame)
 	MaxChapterNo = LoadedGame->MaxChapterNo;
 	SavedCheckPointID = LoadedGame->CheckPointID;
 	AcquiredRecollectionIDs = LoadedGame->AcquiredRecollectionIDs;
+	bIsFirstLaunch = LoadedGame->bIsFirstLaunch;
 }

@@ -35,4 +35,7 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	TArray<FName> AcquiredRecollectionIDs;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	bool bIsFirstLaunch;
 };

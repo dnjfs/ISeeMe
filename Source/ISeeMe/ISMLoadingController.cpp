@@ -8,6 +8,9 @@
 #include "Online/OnlineSessionNames.h"
 #include <Net/UnrealNetwork.h>
 #include <Kismet/GameplayStatics.h>
+#include "ISMSaveGame.h"
+#include "Kismet/KismetInternationalizationLibrary.h"
+#include "ISMGameInstance.h"
 
 AISMLoadingController::AISMLoadingController()
 	: CreateSessionCompleteDelegate(FOnCreateSessionCompleteDelegate::CreateUObject(this, &ThisClass::OnCreateSessionComplete)),
@@ -43,6 +46,31 @@ void AISMLoadingController::BeginPlay()
 	Mode.SetWidgetToFocus(UILoadingInstance->GetCachedWidget());
 	SetInputMode(Mode);
 	SetShowMouseCursor(true);
+
+	//현재 첫 실행이라면, 언어 설정
+	UE_LOG(LogTemp, Warning, TEXT("LANGUAGESET"));
+	if (UISMGameInstance* GI = GetGameInstance<UISMGameInstance>())
+	{
+		if (UISMSaveGame* LoadedGame = Cast<UISMSaveGame>(UGameplayStatics::LoadGameFromSlot("SaveSlot", 0)))
+			GI->LoadGame(LoadedGame);
+
+		if (GI->bIsFirstLaunch)
+		{
+			GI->bIsFirstLaunch = false;
+			GI->SaveGame();
+
+			FString DefaultLanguage = FGenericPlatformMisc::GetDefaultLanguage();
+			UE_LOG(LogTemp, Warning, TEXT("DL : %s"), *DefaultLanguage);
+			if (DefaultLanguage.Equals("ko"))
+			{
+				UKismetInternationalizationLibrary::SetCurrentCulture(DefaultLanguage, true);
+			}
+			else
+			{
+				UKismetInternationalizationLibrary::SetCurrentCulture(FString("en"), true);
+			}
+		}
+	}
 
 	CreateSession("EntryMap");
 }
