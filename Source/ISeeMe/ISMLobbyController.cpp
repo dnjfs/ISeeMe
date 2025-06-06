@@ -14,8 +14,7 @@
 #include "ISMLobbyGameMode.h"
 #include "ISMLobbyGameState.h"
 #include "ISMGameInstance.h"
-#include "ISMSaveGame.h"
-#include "Kismet/KismetInternationalizationLibrary.h"
+
 
 
 AISMLobbyController::AISMLobbyController()
@@ -50,28 +49,7 @@ void AISMLobbyController::BeginPlay()
 		UIWidgetInstance->ChangeLobbyUI(3);
 	} // Show Select Chpater UI after join client
 
-	 //현재 첫 실행이라면, 언어 설정
-	if (UISMGameInstance* GI = GetGameInstance<UISMGameInstance>())
-	{
-		if (UISMSaveGame* LoadedGame = Cast<UISMSaveGame>(UGameplayStatics::LoadGameFromSlot("SaveSlot", 0)))
-			GI->LoadGame(LoadedGame);
 
-		if (GI->bIsFirstLaunch)
-		{
-			GI->bIsFirstLaunch = false;
-			GI->SaveGame();
-
-			FString DefaultLanguage = FGenericPlatformMisc::GetDefaultLanguage();
-			if (DefaultLanguage.Equals("ko"))
-			{
-				UKismetInternationalizationLibrary::SetCurrentCulture(DefaultLanguage, true);
-			}
-			else
-			{
-				UKismetInternationalizationLibrary::SetCurrentCulture(FString("en"), true);
-			}
-		}
-	}
 }
 
 void AISMLobbyController::InitUI()
