@@ -32,4 +32,5 @@ private:
 
 	/*Turn Practice State*/
 	void NextFunction(int TutorialStep);
+
 };

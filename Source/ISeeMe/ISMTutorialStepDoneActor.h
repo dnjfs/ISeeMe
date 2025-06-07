@@ -4,7 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include <Components/SphereComponent.h>
+#include <Components/BoxComponent.h>
 #include "ISMTutorialStepDoneActor.generated.h"
 
 UCLASS()
@@ -28,20 +28,8 @@ public:
 	void OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	/**Check point Range**/
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
-	USphereComponent* TriggerVolume;
-
-	/*When no one detect, change material*/
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<UMaterialInterface> BaseMaterial;
-
-	/*When one detect, change material*/
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<UMaterialInterface> CheckMaterial;
-
-	/*When all detect, change material*/
-	UPROPERTY(EditAnywhere)
-	TObjectPtr<UMaterialInterface> AllCheckMaterial;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UBoxComponent* TriggerVolume;
 
 	UPROPERTY(EditAnywhere)
 	int32 MaxDetectPlayer = 2;
@@ -51,6 +39,9 @@ public:
 
 	UPROPERTY(EditAnywhere, Category = "Step")
 	int32 TutorialStep = 2;
+	
+	UFUNCTION()
+	void ChangeCollisionState();
 
 private:
 	int DetectPlayer = 0;

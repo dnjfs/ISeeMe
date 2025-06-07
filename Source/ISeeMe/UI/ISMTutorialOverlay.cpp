@@ -6,6 +6,8 @@
 #include "Components/WidgetSwitcher.h" 
 #include "Components/TextBlock.h" 
 #include "Internationalization/StringTableRegistry.h"
+#include <ISeeMe/ISMChapterClearTrigger.h>
+#include <Kismet/GameplayStatics.h>
 
 void UISMTutorialOverlay::NativeConstruct()
 {

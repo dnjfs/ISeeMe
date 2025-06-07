@@ -39,4 +39,8 @@ public:
 	/*When Information, Call Method*/
 	UFUNCTION(NetMulticast, Reliable,BlueprintCallable)
 	void MulticastInformation();
+
+private:
+	UFUNCTION()
+	void SendTutorialState();
 };

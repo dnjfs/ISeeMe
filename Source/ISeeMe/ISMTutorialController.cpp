@@ -8,11 +8,13 @@
 
 void AISMTutorialController::SwapCamera()
 {
-	Super::SwapCamera();
-
 	if (AISMTutorialGameState* GS = Cast<AISMTutorialGameState>(UGameplayStatics::GetGameState(this)))
 	{
-		GS->MulticastInformation();
+		if(!GS->bInformation && GS->TutorialStep==2)
+		{
+			Super::SwapCamera(); 
+			GS->MulticastInformation();
+		}
 	}
 }
 
