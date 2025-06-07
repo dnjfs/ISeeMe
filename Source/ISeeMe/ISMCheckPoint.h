@@ -9,6 +9,9 @@
 #include "Materials/MaterialInterface.h"
 #include "ISMCheckPoint.generated.h"
 
+class UGeometryCache;
+class UGeometryCacheComponent;
+
 UCLASS()
 class ISEEME_API AISMCheckPoint : public AActor
 {
@@ -68,9 +71,15 @@ public:
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UMaterialInterface> CheckMaterial;
 
-	/*When all detect, change material*/
+	/*When all detect, play GeometryCache*/
 	UPROPERTY(EditAnywhere)
-	TObjectPtr<UMaterialInterface> AllCheckMaterial;
+	TObjectPtr<UGeometryCache> PlagOutGeometry;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UGeometryCache> PlagFlutterGeometry;
+
+	UPROPERTY(EditAnywhere)
+	TObjectPtr<UGeometryCacheComponent> GeometryCacheComp;
 
 	UPROPERTY(EditAnywhere, Category = "Sound")
 	USoundBase* Sound;
