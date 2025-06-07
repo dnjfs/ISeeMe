@@ -32,11 +32,11 @@ public:
 
 	/** Swap camera for Game Mode */
 	UFUNCTION()
-	void SwapCamera(bool bItem);
+	virtual void SwapCamera();
 
 	/** Client call for Server swap camera*/
 	UFUNCTION(Server, Reliable)
-	virtual void ServerCallSwapCamera();
+	void ServerCallSwapCamera();
 
 	/** Swap aspect */
 	UFUNCTION()

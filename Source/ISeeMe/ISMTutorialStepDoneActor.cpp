@@ -15,13 +15,13 @@ AISMTutorialStepDoneActor::AISMTutorialStepDoneActor()
 	PrimaryActorTick.bCanEverTick = false;
 	bReplicates = true;
 
-	TriggerVolume = CreateDefaultSubobject<USphereComponent>(TEXT("TriggerVolume"));
+	TriggerVolume = CreateDefaultSubobject<UBoxComponent>(TEXT("TriggerVolume"));
 	if (TriggerVolume == nullptr)
 		return;
 
 	TriggerVolume->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	TriggerVolume->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
-	TriggerVolume->SetCollisionResponseToChannel(ECC_Pawn, HasAuthority() ? ECR_Overlap : ECR_Ignore);
+	TriggerVolume->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
 	TriggerVolume->SetGenerateOverlapEvents(true);
 
 	TriggerVolume->SetupAttachment(RootComponent);
@@ -40,10 +40,17 @@ void AISMTutorialStepDoneActor::BeginPlay()
 
 	DetectPlayer = 0;
 	InitStepDone();
+	ChangeCollisionState();
 }
 
 void AISMTutorialStepDoneActor::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
+	AISMTutorialGameState* GS = Cast<AISMTutorialGameState>(UGameplayStatics::GetGameState(this));
+	if (GS==nullptr)
+	{
+		return;
+	}
+
 	if (ACharacter* Character = Cast<ACharacter>(OtherActor))
 	{
 		if (AISMCharacterState* State = Cast<AISMCharacterState>(Character->GetPlayerState()))
@@ -65,10 +72,7 @@ void AISMTutorialStepDoneActor::OnOverlapBegin(UPrimitiveComponent* OverlappedCo
 			if (DetectPlayer == MaxDetectPlayer)
 			{
 				LOG_SCREEN("All Detect");
-				if (AISMTutorialGameState* GS = Cast<AISMTutorialGameState>(UGameplayStatics::GetGameState(this)))
-				{
-					GS->MulticastInformation();
-				}
+				GS->MulticastInformation();
 
 				DetectPlayer++;
 				InitStepDone();
@@ -111,6 +115,17 @@ void AISMTutorialStepDoneActor::InitStepDone()
 					State->bCheckPoint = false;
 				}
 			}
+		}
+	}
+}
+
+void AISMTutorialStepDoneActor::ChangeCollisionState()
+{
+	if (AISMTutorialGameState* GS = Cast<AISMTutorialGameState>(UGameplayStatics::GetGameState(this)))
+	{
+		if(!GS->bInformation && GS->TutorialStep == TutorialStep)
+		{
+			TriggerVolume->SetCollisionResponseToChannel(ECC_Pawn, HasAuthority() ? ECR_Overlap : ECR_Ignore);
 		}
 	}
 }

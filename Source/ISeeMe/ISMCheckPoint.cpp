@@ -4,12 +4,13 @@
 #include "ISMCheckPoint.h"
 #include <Components/BoxComponent.h>
 #include "GameFramework/Character.h"
+#include "GeometryCache.h"
+#include "GeometryCacheComponent.h"
 #include "ISMCharacterState.h"
 #include "ISMPlayerController.h"
 #include "ISMGameState.h"
 #include <Kismet/GameplayStatics.h>
 #include "ISMSaveGame.h"
-#include "ISMGameState.h"
 #include "ISMGameInstance.h"
 
 // Sets default values
@@ -45,6 +46,9 @@ AISMCheckPoint::AISMCheckPoint()
 	if (Spawn2PPlayer == nullptr)
 		return;
 	Spawn2PPlayer->SetupAttachment(CheckPointMesh);
+
+	GeometryCacheComp = CreateDefaultSubobject<UGeometryCacheComponent>(TEXT("GeometryCacheComponent"));
+	GeometryCacheComp->SetupAttachment(CheckPointMesh);
 }
 
 // Called when the game starts or when spawned
@@ -148,9 +152,20 @@ void AISMCheckPoint::MulticastChangeMaterial_Implementation(int CurDetect)
 		{
 			CheckPointMesh->SetMaterial(0, CheckMaterial);
 		}
-		else if (CurDetect == 2 && AllCheckMaterial)
+		else if (CurDetect == 2 && PlagOutGeometry)
 		{
-			CheckPointMesh->SetMaterial(0, AllCheckMaterial);
+			GeometryCacheComp->SetGeometryCache(PlagOutGeometry);
+			GeometryCacheComp->PlayFromStart();
+			
+			float PlagOutAnimDuration = GeometryCacheComp->GetDuration();
+			FTimerHandle TimerHandle;
+			GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]() {
+				if (PlagFlutterGeometry)
+				{
+					GeometryCacheComp->SetGeometryCache(PlagFlutterGeometry);
+					GeometryCacheComp->SetLooping(true);
+				}
+			}, PlagOutAnimDuration, false);
 		}
 	}
 	else

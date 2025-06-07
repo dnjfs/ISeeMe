@@ -6,10 +6,6 @@
 #include "ISMPlayerController.h"
 #include "ISMTutorialController.generated.h"
 
-#define	LOG_SCREEN(Format, ...) \
-	if (GEngine)\
-		GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, FString::Printf(TEXT(Format), ##__VA_ARGS__))
-
 /**
  * 
  */
@@ -19,11 +15,5 @@ class ISEEME_API AISMTutorialController : public AISMPlayerController
 	GENERATED_BODY()
 
 public:
-	void ServerCallSwapCamera() override;
-
-protected:
-	virtual void BeginPlay();
-	
-private:
-	void UseItemPractice();
+	virtual void SwapCamera() override;
 };
