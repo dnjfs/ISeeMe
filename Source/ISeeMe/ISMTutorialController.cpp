@@ -4,26 +4,17 @@
 #include "ISMTutorialController.h"
 #include "ISMTutorialGameState.h"
 #include <Kismet/GameplayStatics.h>
+#include "ISeeMeGameMode.h"
 
-void AISMTutorialController::ServerCallSwapCamera()
-{
-	Super::ServerCallSwapCamera();
-
-	if (AISMTutorialGameState* GS = Cast<AISMTutorialGameState>(UGameplayStatics::GetGameState(this)))
-	{
-		UseItemPractice();
-	}
-}
-
-void AISMTutorialController::BeginPlay()
-{
-	Super::BeginPlay();
-}
-
-void AISMTutorialController::UseItemPractice()
+void AISMTutorialController::SwapCamera()
 {
 	if (AISMTutorialGameState* GS = Cast<AISMTutorialGameState>(UGameplayStatics::GetGameState(this)))
 	{
-		GS->MulticastInformation();
+		if(!GS->bInformation && GS->TutorialStep==2)
+		{
+			Super::SwapCamera(); 
+			GS->MulticastInformation();
+		}
 	}
 }
+

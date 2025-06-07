@@ -24,6 +24,7 @@
 #include <Net/UnrealNetwork.h>
 #include "Components/AudioComponent.h"
 #include "ISMGameInstance.h"
+#include "ISMTutorialController.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 

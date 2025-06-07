@@ -42,6 +42,10 @@
 			"Type": "SymbolFile"
 		},
 		{
+			"Path": "$(EngineDir)/Binaries/Win64/EOSSDK-Win64-Shipping.dll",
+			"Type": "DynamicLibrary"
+		},
+		{
 			"Path": "$(EngineDir)/Binaries/Win64/OpenColorIO_2_3.dll",
 			"Type": "DynamicLibrary"
 		},
@@ -2838,6 +2842,18 @@
 			"Type": "RequiredResource"
 		},
 		{
+			"Path": "$(EngineDir)/Plugins/Fab/Binaries/Win64/UnrealEditor-Fab.dll",
+			"Type": "DynamicLibrary"
+		},
+		{
+			"Path": "$(EngineDir)/Plugins/Fab/Binaries/Win64/UnrealEditor-Fab.pdb",
+			"Type": "SymbolFile"
+		},
+		{
+			"Path": "$(EngineDir)/Plugins/Fab/Binaries/Win64/UnrealEditor.modules",
+			"Type": "RequiredResource"
+		},
+		{
 			"Path": "$(EngineDir)/Plugins/FastBuildController/Binaries/Win64/UnrealEditor-FastBuildController.dll",
 			"Type": "DynamicLibrary"
 		},
@@ -3086,6 +3102,14 @@
 			"Type": "RequiredResource"
 		},
 		{
+			"Path": "$(EngineDir)/Plugins/Online/EOSShared/Binaries/Win64/UnrealEditor-EOSShared.dll",
+			"Type": "DynamicLibrary"
+		},
+		{
+			"Path": "$(EngineDir)/Plugins/Online/EOSShared/Binaries/Win64/UnrealEditor.modules",
+			"Type": "RequiredResource"
+		},
+		{
 			"Path": "$(EngineDir)/Plugins/Online/OnlineBase/Binaries/Win64/UnrealEditor-OnlineBase.dll",
 			"Type": "DynamicLibrary"
 		},
@@ -3299,6 +3323,14 @@
 		},
 		{
 			"Path": "$(EngineDir)/Plugins/Runtime/GeometryProcessing/Binaries/Win64/UnrealEditor.modules",
+			"Type": "RequiredResource"
+		},
+		{
+			"Path": "$(EngineDir)/Plugins/Runtime/HDRIBackdrop/Binaries/Win64/UnrealEditor-HDRIBackdrop.dll",
+			"Type": "DynamicLibrary"
+		},
+		{
+			"Path": "$(EngineDir)/Plugins/Runtime/HDRIBackdrop/Binaries/Win64/UnrealEditor.modules",
 			"Type": "RequiredResource"
 		},
 		{
@@ -23084,6 +23116,10 @@
 			"Type": "DebugNonUFS"
 		},
 		{
+			"Path": "$(EngineDir)/Binaries/Win64/EOSSDK-Win64-Shipping.dll",
+			"Type": "NonUFS"
+		},
+		{
 			"Path": "$(EngineDir)/Binaries/Win64/EpicWebHelper.exe",
 			"Type": "NonUFS"
 		},
@@ -26372,6 +26408,10 @@
 			"Type": "UFS"
 		},
 		{
+			"Path": "$(EngineDir)/Plugins/Fab/Fab.uplugin",
+			"Type": "UFS"
+		},
+		{
 			"Path": "$(EngineDir)/Plugins/FastBuildController/FastBuildController.uplugin",
 			"Type": "UFS"
 		},
@@ -26437,6 +26477,10 @@
 		},
 		{
 			"Path": "$(EngineDir)/Plugins/MovieScene/TemplateSequence/TemplateSequence.uplugin",
+			"Type": "UFS"
+		},
+		{
+			"Path": "$(EngineDir)/Plugins/Online/EOSShared/EOSShared.uplugin",
 			"Type": "UFS"
 		},
 		{
@@ -26525,6 +26569,10 @@
 		},
 		{
 			"Path": "$(EngineDir)/Plugins/Runtime/GeometryProcessing/GeometryProcessing.uplugin",
+			"Type": "UFS"
+		},
+		{
+			"Path": "$(EngineDir)/Plugins/Runtime/HDRIBackdrop/HDRIBackdrop.uplugin",
 			"Type": "UFS"
 		},
 		{
@@ -26676,12 +26724,14 @@
 		"Dataflow",
 		"DatasmithContent",
 		"DumpGPUServices",
+		"EOSShared",
 		"EditorDebugTools",
 		"EditorScriptingUtilities",
 		"EngineAssetDefinitions",
 		"EnhancedInput",
 		"EnvironmentQueryEditor",
 		"ExampleDeviceProfileSelector",
+		"Fab",
 		"FacialAnimation",
 		"FastBuildController",
 		"Fracture",
@@ -26696,6 +26746,7 @@
 		"GeometryProcessing",
 		"GitSourceControl",
 		"GoogleCloudMessaging",
+		"HDRIBackdrop",
 		"IKRig",
 		"IOSDeviceProfileSelector",
 		"ImgMedia",
