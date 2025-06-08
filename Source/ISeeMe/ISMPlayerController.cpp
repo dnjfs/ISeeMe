@@ -79,6 +79,7 @@ void AISMPlayerController::ServerCallSwapCamera_Implementation()
 
 void AISMPlayerController::SwapCamera()
 {
+	LOG_SCREEN("You");
 	if (AISMGameState* GS = Cast<AISMGameState>(UGameplayStatics::GetGameState(this)))
 	{
 		if (GS->SwapViewItem == nullptr)
