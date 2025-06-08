@@ -16,5 +16,9 @@ void AISMTutorialController::SwapCamera()
 			GS->MulticastInformation();
 		}
 	}
+	else
+	{
+		Super::SwapCamera();
+	}
 }
 
