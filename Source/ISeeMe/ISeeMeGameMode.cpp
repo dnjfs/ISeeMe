@@ -80,7 +80,7 @@ void AISeeMeGameMode::SwapCamera()
 
 			if (AISeeMeCharacter* ISeeMeCharacter = PCs[i]->GetPawn<AISeeMeCharacter>())
 			{
-				ISeeMeCharacter->IsCameraRestored = true;
+				ISeeMeCharacter->MulticastSetCameraRestore(true);
 				/*if (PlayerNum == 2)
 				{
 					ISeeMeCharacter->EnableAudio();
@@ -99,7 +99,7 @@ void AISeeMeGameMode::SwapCamera()
 			
 			if (AISeeMeCharacter* ISeeMeCharacter = PCs[i]->GetPawn<AISeeMeCharacter>())
 			{
-				ISeeMeCharacter->IsCameraRestored = false;
+				ISeeMeCharacter->MulticastSetCameraRestore(false);
 				/*if (PlayerNum == 2)
 				{
 					ISeeMeCharacter->DisableAudio();

@@ -29,23 +29,12 @@ void AISMPlayerController::BeginPlay()
 
 	SetInputMode(FInputModeGameOnly());
 	SetShowMouseCursor(false);
+	SetControlRotation(FRotator(-20.f, 0.f, 0.f));
 }
 
 void AISMPlayerController::OnPossess(APawn* aPawn)
 {
 	Super::OnPossess(aPawn);
-
-	if (IsLocalController())
-	{
-		if (ACharacter* LocalCharacter = Cast<ACharacter>(GetPawn()))
-		{
-			USkeletalMeshComponent* LocalMesh = LocalCharacter->GetMesh();
-			if (LocalMesh)
-			{
-				LocalMesh->SetRenderCustomDepth(true);
-			}
-		}
-	}
 
 	if (HasAuthority())
 	{
