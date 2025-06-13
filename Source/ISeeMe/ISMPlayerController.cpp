@@ -60,9 +60,9 @@ void AISMPlayerController::SetPawn(APawn* InPawn)
 	}
 
 	// 내 캐릭터 강조를 위해 '커스텀 뎁스 패스 렌더(bRenderCustomDepth)' 켜기
-	if (ACharacter* MyCharacter = Cast<ACharacter>(InPawn))
+	if (GetCharacter())
 	{
-		if (USkeletalMeshComponent* LocalMesh = MyCharacter->GetMesh())
+		if (USkeletalMeshComponent* LocalMesh = GetCharacter()->GetMesh())
 		{
 			LocalMesh->SetRenderCustomDepth(true);
 		}
