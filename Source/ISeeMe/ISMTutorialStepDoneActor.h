@@ -43,6 +43,9 @@ public:
 	UFUNCTION()
 	void ChangeCollisionState();
 
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastSetTriggerOpacity(float InOpacity);
+
 private:
 	int DetectPlayer = 0;
 
