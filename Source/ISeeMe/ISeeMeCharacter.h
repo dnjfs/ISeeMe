@@ -39,9 +39,6 @@ public:
 	UPROPERTY(EditAnywhere)
 	float DeadHeight=1000;
 
-	UPROPERTY(ReplicatedUsing = OnRep_IsCameraRestored)
-	bool IsCameraRestored = true;
-
 	/** Call Go Check Point Function from client to the server **/
 	UFUNCTION(Server, Reliable)
 	void ServerCallGoCheckPoint();
@@ -63,9 +60,10 @@ public:
 	void EnableAudio();
 	void DisableAudio();
 
-protected:
-	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastSetCameraRestore(bool bInIsRestored);
 
+protected:
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
 
@@ -163,8 +161,5 @@ private:
 
 	UFUNCTION()
 	void PlayFocusTimeline(float Value);
-
-	UFUNCTION()
-	void OnRep_IsCameraRestored();
 };
 

@@ -60,6 +60,8 @@ AISeeMeCharacter::AISeeMeCharacter()
 	CameraBoom->SetupAttachment(RootComponent);
 	CameraBoom->TargetArmLength = 600.0f; // The camera follows at this distance behind the character	
 	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
+	CameraBoom->SetRelativeRotation(FRotator(-20.f, 0.f, 0.f));
+	CameraBoom->bInheritPitch = false;
 
 	// Create a follow camera
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
@@ -75,28 +77,17 @@ AISeeMeCharacter::AISeeMeCharacter()
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 }
 
-void AISeeMeCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
-{
-	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	DOREPLIFETIME(AISeeMeCharacter, IsCameraRestored);
-}
-
 void AISeeMeCharacter::BeginPlay()
 {
 	// Call the base class  
 	Super::BeginPlay();
 
 	// 내 캐릭터 강조를 위해 '커스텀 뎁스 패스 렌더(bRenderCustomDepth)' 켜기
-	if (AController* LocalController = GetWorld()->GetFirstPlayerController())
+	if (Controller && Controller->IsLocalPlayerController())
 	{
-		APawn* LocalPawn = LocalController->GetPawn();
-		if (ACharacter* LocalCharacter = Cast<ACharacter>(LocalPawn))
+		if (USkeletalMeshComponent* LocalMesh = GetMesh())
 		{
-			USkeletalMeshComponent* LocalMesh = LocalCharacter->GetMesh();
-			if (LocalMesh)
-			{
-				LocalMesh->SetRenderCustomDepth(true);
-			}
+			LocalMesh->SetRenderCustomDepth(true);
 		}
 	}
 
@@ -277,9 +268,10 @@ void AISeeMeCharacter::Look(const FInputActionValue& Value)
 	{
 		// add yaw and pitch input to controller
 		AddControllerYawInput(LookAxisVector.X);
-
-		if (IsCameraRestored)
+		if (CameraBoom->bInheritPitch)
+		{
 			AddControllerPitchInput(LookAxisVector.Y);
+		}
 	}
 }
 
@@ -305,18 +297,6 @@ void AISeeMeCharacter::PlayFocusTimeline(float Alpha)
 	{
 		MyController->SetControlRotation(
 			UKismetMathLibrary::RLerp(FocusStartRotator, FocusEndRotator, Alpha, true));
-	}
-}
-
-void AISeeMeCharacter::OnRep_IsCameraRestored()
-{
-	if (IsCameraRestored)
-	{
-		CameraBoom->bInheritPitch = true;
-	}
-	else
-	{
-		CameraBoom->bInheritPitch = false;
 	}
 }
 
@@ -352,22 +332,16 @@ void AISeeMeCharacter::CallGoCheckPoint()
 
 void AISeeMeCharacter::ControlPitch(const FInputActionValue& Value)
 {
-	if (IsCameraRestored)
+	if (CameraBoom->bInheritPitch)
 		return;
 
-	const float FloatValue = Value.Get<float>();
+	const float Axis = Value.Get<float>();
 
 	if (AISMPlayerController* ISMPlayerController = GetController<AISMPlayerController>())
 	{
 		if (AISeeMeCharacter* OtherCharacter = ISMPlayerController->GetOtherCharacter())
 		{
-			if (OtherCharacter->GetCameraBoom()->bInheritPitch == true)
-				OtherCharacter->GetCameraBoom()->bInheritPitch = false;
-
-			if (FloatValue > 0)
-				OtherCharacter->GetCameraBoom()->AddRelativeRotation(FRotator(1.f, 0.f, 0.f));
-			else
-				OtherCharacter->GetCameraBoom()->AddRelativeRotation(FRotator(-1.f, 0.f, 0.f));
+			OtherCharacter->GetCameraBoom()->AddRelativeRotation(FRotator(Axis, 0.f, 0.f));
 		}
 	}
 }
@@ -406,7 +380,7 @@ void AISeeMeCharacter::ServerCallGoCheckPoint_Implementation()
 void AISeeMeCharacter::MulticastPlaySound_Implementation()
 {
 	if(CheckPointSound)
-		UGameplayStatics::PlaySound2D(this, CheckPointSound);
+		UGameplayStatics::PlaySound2D(GetWorld(), CheckPointSound);
 }
 
 void AISeeMeCharacter::OpenMenu()
@@ -431,5 +405,15 @@ void AISeeMeCharacter::DisableAudio()
 	if (AudioComponent)
 	{
 		AudioComponent->FadeOut(0.5f, 0.0f); 
+	}
+}
+
+void AISeeMeCharacter::MulticastSetCameraRestore_Implementation(bool bInIsRestored)
+{
+	CameraBoom->bInheritPitch = bInIsRestored;
+
+	if (!bInIsRestored)
+	{
+		CameraBoom->SetRelativeRotation(FRotator(-20.f, 0.f, 0.f));
 	}
 }

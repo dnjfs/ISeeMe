@@ -211,5 +211,5 @@ void AISMCheckPoint::ServerInitCheckPoint_Implementation()
 
 void AISMCheckPoint::MulticastPlaySound_Implementation()
 {
-	UGameplayStatics::PlaySound2D(this, Sound);
+	UGameplayStatics::PlaySound2D(GetWorld(), Sound);
 }

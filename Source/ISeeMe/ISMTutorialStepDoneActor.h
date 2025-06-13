@@ -46,4 +46,5 @@ public:
 private:
 	int DetectPlayer = 0;
 
+	TObjectPtr<UMaterialInstanceDynamic> DynamicMaterial;
 };

@@ -6,6 +6,16 @@
 #include <Kismet/GameplayStatics.h>
 #include "ISeeMeGameMode.h"
 
+void AISMTutorialController::SetPawn(APawn* aPawn)
+{
+	Super::SetPawn(aPawn);
+
+	if (aPawn)
+	{
+		aPawn->DisableInput(this);
+	}
+}
+
 void AISMTutorialController::SwapCamera()
 {
 	if (AISMTutorialGameState* GS = Cast<AISMTutorialGameState>(UGameplayStatics::GetGameState(this)))
@@ -15,10 +25,6 @@ void AISMTutorialController::SwapCamera()
 			Super::SwapCamera(); 
 			GS->MulticastInformation();
 		}
-	}
-	else
-	{
-		Super::SwapCamera();
 	}
 }
 

@@ -41,6 +41,16 @@ void AISMTutorialStepDoneActor::BeginPlay()
 	DetectPlayer = 0;
 	InitStepDone();
 	ChangeCollisionState();
+
+	if (UStaticMeshComponent* Mesh = FindComponentByClass<UStaticMeshComponent>())
+	{
+		if (UMaterialInterface* BaseMaterial = Mesh->GetMaterial(0))
+		{
+			DynamicMaterial = UMaterialInstanceDynamic::Create(BaseMaterial, this);
+			Mesh->SetMaterial(0, DynamicMaterial);
+			DynamicMaterial->SetScalarParameterValue(TEXT("Opacity"), 0.f);
+		}
+	}
 }
 
 void AISMTutorialStepDoneActor::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -76,6 +86,8 @@ void AISMTutorialStepDoneActor::OnOverlapBegin(UPrimitiveComponent* OverlappedCo
 
 				DetectPlayer++;
 				InitStepDone();
+
+				Destroy();
 			}
 		}
 	}
@@ -126,6 +138,11 @@ void AISMTutorialStepDoneActor::ChangeCollisionState()
 		if(!GS->bInformation && GS->TutorialStep == TutorialStep)
 		{
 			TriggerVolume->SetCollisionResponseToChannel(ECC_Pawn, HasAuthority() ? ECR_Overlap : ECR_Ignore);
+
+			if (DynamicMaterial)
+			{
+				DynamicMaterial->SetScalarParameterValue(TEXT("Opacity"), 0.8f);
+			}
 		}
 	}
 }
