@@ -78,5 +78,5 @@ void AISMSwapViewItem::MulticastVisibleMesh_Implementation(bool bVisible)
 
 void AISMSwapViewItem::MulticastPlaySound_Implementation()
 {
-	UGameplayStatics::PlaySound2D(this, Sound);
+	UGameplayStatics::PlaySound2D(GetWorld(), Sound);
 }

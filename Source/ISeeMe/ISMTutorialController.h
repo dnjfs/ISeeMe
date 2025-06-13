@@ -14,6 +14,9 @@ class ISEEME_API AISMTutorialController : public AISMPlayerController
 {
 	GENERATED_BODY()
 
+protected:
+	virtual void SetPawn(APawn* aPawn) override;
+
 public:
 	virtual void SwapCamera() override;
 };

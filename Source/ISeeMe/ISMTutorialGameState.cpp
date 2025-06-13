@@ -24,7 +24,19 @@ AISMTutorialGameState::AISMTutorialGameState()
 
 void AISMTutorialGameState::Practice()
 {
-	// Enable Input (Plan)
+	// Enable Input
+	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	{
+		APlayerController* PC = Cast<APlayerController>(Iterator->Get());
+		if (PC == nullptr)
+			continue;
+
+		if (APawn* Pawn = PC->GetPawn())
+		{
+			Pawn->EnableInput(PC);
+		}
+	}
+
 	bInformation = false;
 	SendTutorialState();
 
@@ -34,7 +46,19 @@ void AISMTutorialGameState::Practice()
 
 void AISMTutorialGameState::MulticastInformation_Implementation()
 {
-	// Disable Input (Plan)
+	// Disable Input
+	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	{
+		APlayerController* PC = Cast<APlayerController>(Iterator->Get());
+		if (PC == nullptr)
+			continue;
+
+		if (APawn* Pawn = PC->GetPawn())
+		{
+			Pawn->DisableInput(PC);
+		}
+	}
+
 	bInformation = true;
 	TutorialStep++;
 	SendTutorialState();

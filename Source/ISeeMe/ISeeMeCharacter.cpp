@@ -380,7 +380,7 @@ void AISeeMeCharacter::ServerCallGoCheckPoint_Implementation()
 void AISeeMeCharacter::MulticastPlaySound_Implementation()
 {
 	if(CheckPointSound)
-		UGameplayStatics::PlaySound2D(this, CheckPointSound);
+		UGameplayStatics::PlaySound2D(GetWorld(), CheckPointSound);
 }
 
 void AISeeMeCharacter::OpenMenu()
