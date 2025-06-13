@@ -10,7 +10,7 @@ void AISMTutorialController::SetPawn(APawn* aPawn)
 {
 	Super::SetPawn(aPawn);
 
-	if (aPawn)
+	if (IsLocalController() && aPawn)
 	{
 		aPawn->DisableInput(this);
 	}
