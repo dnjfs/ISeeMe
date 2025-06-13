@@ -151,6 +151,34 @@ void AISeeMeCharacter::BeginPlay()
 	}
 }
 
+void AISeeMeCharacter::PossessedBy(AController* NewController)
+{
+	// Server Only
+	Super::PossessedBy(NewController);
+
+	if (AISMTutorialController* TutorialController = Cast<AISMTutorialController>(NewController))
+	{
+		if (TutorialController->IsLocalPlayerController())
+		{
+			DisableInput(TutorialController);
+		}
+	}
+}
+
+void AISeeMeCharacter::OnRep_Controller()
+{
+	// Client Only
+	Super::OnRep_Controller();
+
+	if (AISMTutorialController* TutorialController = GetController<AISMTutorialController>())
+	{
+		if (TutorialController->IsLocalPlayerController())
+		{
+			DisableInput(TutorialController);
+		}
+	}
+}
+
 
 //////////////////////////////////////////////////////////////////////////
 // Input
