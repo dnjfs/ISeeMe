@@ -86,8 +86,7 @@ void AISMTutorialStepDoneActor::OnOverlapBegin(UPrimitiveComponent* OverlappedCo
 
 				DetectPlayer++;
 				InitStepDone();
-
-				Destroy();
+				MulticastSetTriggerOpacity(0.f);
 			}
 		}
 	}
@@ -147,3 +146,10 @@ void AISMTutorialStepDoneActor::ChangeCollisionState()
 	}
 }
 
+void AISMTutorialStepDoneActor::MulticastSetTriggerOpacity_Implementation(float InOpacity)
+{
+	if (DynamicMaterial)
+	{
+		DynamicMaterial->SetScalarParameterValue(TEXT("Opacity"), InOpacity);
+	}
+}
