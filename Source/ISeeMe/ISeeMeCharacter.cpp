@@ -160,7 +160,7 @@ void AISeeMeCharacter::PossessedBy(AController* NewController)
 	{
 		if (TutorialController->IsLocalPlayerController())
 		{
-			DisableInput(TutorialController);
+			//DisableInput(TutorialController);
 		}
 	}
 }
@@ -174,7 +174,7 @@ void AISeeMeCharacter::OnRep_Controller()
 	{
 		if (TutorialController->IsLocalPlayerController())
 		{
-			DisableInput(TutorialController);
+			//DisableInput(TutorialController);
 		}
 	}
 }
