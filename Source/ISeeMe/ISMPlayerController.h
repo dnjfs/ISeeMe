@@ -22,6 +22,7 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void OnPossess(APawn* aPawn) override;
 	virtual void GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const override;
+	virtual void SetPawn(APawn* InPawn) override;
 
 public:
 	void SetOtherCharacter(AISeeMeCharacter* NewCharacter) { OtherCharacter = NewCharacter; }

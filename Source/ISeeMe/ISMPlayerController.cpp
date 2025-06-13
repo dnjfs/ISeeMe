@@ -50,6 +50,25 @@ void AISMPlayerController::GetLifetimeReplicatedProps(TArray< FLifetimeProperty 
 	DOREPLIFETIME(AISMPlayerController, OtherCharacter);
 }
 
+void AISMPlayerController::SetPawn(APawn* InPawn)
+{
+	Super::SetPawn(InPawn);
+
+	if (!IsLocalController())
+	{
+		return;
+	}
+
+	// 내 캐릭터 강조를 위해 '커스텀 뎁스 패스 렌더(bRenderCustomDepth)' 켜기
+	if (ACharacter* MyCharacter = Cast<ACharacter>(InPawn))
+	{
+		if (USkeletalMeshComponent* LocalMesh = MyCharacter->GetMesh())
+		{
+			LocalMesh->SetRenderCustomDepth(true);
+		}
+	}
+}
+
 void AISMPlayerController::OnRep_SwapCamera()
 {
 	if (OtherCharacter == nullptr)
