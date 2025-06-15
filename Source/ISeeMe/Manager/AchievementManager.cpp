@@ -95,7 +95,7 @@ void AAchievementManager::UpdateAchievementProgress(const FString& Id, float Per
 				AchievementsWriteObjectPtr = MakeShareable(new FOnlineAchievementsWrite());
 
 				//Sets the progress of the desired achievement - does nothing if the id is not valid
-				AchievementsWriteObjectPtr->SetFloatStat(*Id, Percent);
+				AchievementsWriteObjectPtr->SetFloatStat(Id, Percent);
 
 				//Write the achievements progress
 				FOnlineAchievementsWriteRef AchievementsWriteObjectRef = AchievementsWriteObjectPtr.ToSharedRef();
