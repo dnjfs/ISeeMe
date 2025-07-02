@@ -8,29 +8,15 @@
 #include "Engine/LocalPlayer.h"
 
 // Sets default values
-AAchievementManager::AAchievementManager()
+UAchievementManager::UAchievementManager()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
 
 }
 
-// Called when the game starts or when spawned
-void AAchievementManager::BeginPlay()
-{
-	Super::BeginPlay();
-	
-}
 
-// Called every frame
-void AAchievementManager::Tick(float DeltaTime)
+void UAchievementManager::QueryAchievements()
 {
-	Super::Tick(DeltaTime);
-
-}
-
-void AAchievementManager::QueryAchievements()
-{
+	GEngine->AddOnScreenDebugMessage(INDEX_NONE, 30.f, FColor::Cyan, TEXT("QueryAchievements"));
 	//Get the online sub system
 	IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
 
@@ -51,13 +37,13 @@ void AAchievementManager::QueryAchievements()
 			if (Achievements.IsValid())
 			{
 				//Cache all the game's achievements for future use and bind the OnQueryAchievementsComplete function to fire when we're finished caching
-				Achievements->QueryAchievements(*UserId.Get(), FOnQueryAchievementsCompleteDelegate::CreateUObject(this, &AAchievementManager::OnQueryAchievementsComplete));
+				Achievements->QueryAchievements(*UserId.Get(), FOnQueryAchievementsCompleteDelegate::CreateUObject(this, &UAchievementManager::OnQueryAchievementsComplete));
 			}
 		}
 	}
 }
 
-void AAchievementManager::OnQueryAchievementsComplete(const FUniqueNetId& PlayerId, const bool bWasSuccessful)
+void UAchievementManager::OnQueryAchievementsComplete(const FUniqueNetId& PlayerId, const bool bWasSuccessful)
 {
 	if (bWasSuccessful)
 	{
@@ -69,7 +55,7 @@ void AAchievementManager::OnQueryAchievementsComplete(const FUniqueNetId& Player
 	}
 }
 
-void AAchievementManager::UpdateAchievementProgress(const FString& Id, float Percent)
+void UAchievementManager::UpdateAchievementProgress(const FString& Id, float Percent)
 {
 	//Get the online sub system
 	IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();

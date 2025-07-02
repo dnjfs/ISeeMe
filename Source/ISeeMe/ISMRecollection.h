@@ -38,4 +38,6 @@ private:
 	UPROPERTY(EditDefaultsOnly)
 	class UBoxComponent* TriggerVolume;
 
+	UPROPERTY(EditInstanceOnly)
+	int32 RecollectionID; // 도전과제 번호로 사용
 };
