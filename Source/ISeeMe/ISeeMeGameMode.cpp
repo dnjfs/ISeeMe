@@ -164,10 +164,12 @@ void AISeeMeGameMode::CountReadEnding()
 
 	if (ReadEnding == 2)
 	{
+		// Logic After All Enter 
+
+		// Move Lobby Logic
 		for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
 		{
 			APlayerController* PCs = It->Get();
-			// 서버 자신의 PlayerController는 제외하고, 클라이언트의 PlayerController에만 RPC를 호출합니다.
 			if (PCs && !PCs->IsLocalController())
 			{
 				AISMPlayerController* PC = Cast<AISMPlayerController>(PCs);
@@ -178,7 +180,6 @@ void AISeeMeGameMode::CountReadEnding()
 			}
 		}
 
-		// 2. 세션 파괴 시작
 		IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
 		if (OnlineSub)
 		{
