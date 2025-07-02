@@ -6,6 +6,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "ISMGameInstance.h"
 #include "ISeeMeCharacter.h"
+#include "Manager/AchievementManager.h"
 
 // Sets default values
 AISMRecollection::AISMRecollection()
@@ -28,13 +29,14 @@ void AISMRecollection::BeginPlay()
 	
 	if (HasAuthority())
 	{
-		if (UISMGameInstance* GI = GetGameInstance<UISMGameInstance>())
-		{
-			if (GI->AcquiredRecollectionIDs.Contains(this->GetFName()))
-			{
-				MulticastDestroyRecollection();
-			}
-		}
+		// 이미 획득한 추억이라도 레벨에서 삭제하지 않도록 주석처리
+		//if (UISMGameInstance* GI = GetGameInstance<UISMGameInstance>())
+		//{
+		//	if (GI->AcquiredRecollectionIDs.Contains(this->GetFName()))
+		//	{
+		//		MulticastDestroyRecollection();
+		//	}
+		//}
 		TriggerVolume->OnComponentBeginOverlap.AddDynamic(this, &AISMRecollection::OnOverlap);
 	}
 }
@@ -62,6 +64,12 @@ void AISMRecollection::MulticastAcquireRecollection_Implementation()
 	{
 		GI->AcquiredRecollectionIDs.AddUnique(this->GetFName());
 		GI->SaveGame();
+
+		// 도전과제 달성
+		if (UAchievementManager* AM = GI->GetSubsystem<UAchievementManager>())
+		{
+			AM->UpdateAchievementProgress(FString::Printf(TEXT("Recollection_%d"), RecollectionID), 1.f);
+		}
 	}
 }
 
