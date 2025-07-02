@@ -8,6 +8,7 @@
 #include <ISeeMe/ISMChapterClearTrigger.h>
 #include <Kismet/GameplayStatics.h>
 #include <ISeeMe/ISMLobbyController.h>
+#include "ISeeMe/ISMChapterEndClearTrigger.h"
 
 void UISMOverlay::NativeConstruct()
 {
@@ -30,10 +31,19 @@ void UISMOverlay::NativeConstruct()
 		UGameplayStatics::GetActorOfClass(World, AISMChapterClearTrigger::StaticClass())
 	); // Find AISMChapterClearTrigger
 
+	AISMChapterEndClearTrigger* ChapterEndClearTrigger = Cast<AISMChapterEndClearTrigger>(
+		UGameplayStatics::GetActorOfClass(World, AISMChapterEndClearTrigger::StaticClass())
+	); // Find AISMChapterEndClearTrigger
+
 	if (ChapterClearTrigger)
 	{
 		ChapterClearTrigger->OnClearUpdated.BindUObject(this, &UISMOverlay::HandleClearUpdated);
-	} // Delegate Bind
+	} // OnClearUpdated Delegate Bind
+
+	if (ChapterEndClearTrigger)
+	{
+		ChapterEndClearTrigger->OnClearEndUpdated.BindUObject(this, &UISMOverlay::HandleEndClearUpdated);
+	} // OnClearEndUpdated Delegate Bind
 }
 
 void UISMOverlay::HandleClearUpdated(bool bLoading)
@@ -41,5 +51,20 @@ void UISMOverlay::HandleClearUpdated(bool bLoading)
 	if (LoadingSwitcher)
 	{
 		LoadingSwitcher->SetActiveWidgetIndex(bLoading ? 1 : 0);
+	}
+}
+
+void UISMOverlay::HandleEndClearUpdated(bool bEnding)
+{
+	if(GetOwningLocalPlayer() && LoadingSwitcher)
+	{
+		if (bEnding)
+		{
+			LoadingSwitcher->SetActiveWidgetIndex(2);
+			if (UISMPrologue* PrologueWidget = Cast<UISMPrologue>(LoadingSwitcher->GetActiveWidget()))
+			{
+				PrologueWidget->ShowPrologue();
+			}
+		}
 	}
 }

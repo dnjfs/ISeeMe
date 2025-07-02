@@ -47,7 +47,6 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastPlayItemSound(bool bIsPlay);
 
-public:
 	UPROPERTY()
 	TObjectPtr<USoundBase> ItemTimerSound;
 

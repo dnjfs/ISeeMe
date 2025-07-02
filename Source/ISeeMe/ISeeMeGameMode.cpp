@@ -13,6 +13,8 @@
 #include "ISeeMe/UI/ISMOverlay.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include <EnhancedInputSubsystems.h>
+#include "OnlineSubsystem.h"
+#include "Interfaces/OnlineSessionInterface.h"
 
 AISeeMeGameMode::AISeeMeGameMode()
 {
@@ -153,5 +155,52 @@ void AISeeMeGameMode::ChangePawn()
 				}
 			}
 		}
+	}
+}
+
+void AISeeMeGameMode::CountReadEnding()
+{
+	ReadEnding++;
+
+	if (ReadEnding == 2)
+	{
+		for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+		{
+			APlayerController* PCs = It->Get();
+			// 서버 자신의 PlayerController는 제외하고, 클라이언트의 PlayerController에만 RPC를 호출합니다.
+			if (PCs && !PCs->IsLocalController())
+			{
+				AISMPlayerController* PC = Cast<AISMPlayerController>(PCs);
+				if (PC)
+				{
+					PC->ClientGoToLevel();
+				}
+			}
+		}
+
+		// 2. 세션 파괴 시작
+		IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
+		if (OnlineSub)
+		{
+			IOnlineSessionPtr Sessions = OnlineSub->GetSessionInterface();
+			if (Sessions.IsValid() && Sessions->GetNamedSession(NAME_GameSession))
+			{
+				OnDestroySessionCompleteDelegate.BindUObject(this, &AISeeMeGameMode::OnDestroySessionComplete);
+				Sessions->AddOnDestroySessionCompleteDelegate_Handle(OnDestroySessionCompleteDelegate);
+				Sessions->DestroySession(NAME_GameSession);
+			}
+			else
+			{
+				OnDestroySessionComplete(NAME_None, true);
+			}
+		}
+	}
+}
+
+void AISeeMeGameMode::OnDestroySessionComplete(FName SessionName, bool bWasSuccessful)
+{
+	if (bWasSuccessful)
+	{
+		UGameplayStatics::OpenLevel(GetWorld(), FName("LoadingMap"), true);
 	}
 }

@@ -48,8 +48,6 @@ void AISMLobbyController::BeginPlay()
 		UIWidgetInstance->SetVisibility(ESlateVisibility::Visible);
 		UIWidgetInstance->ChangeLobbyUI(3);
 	} // Show Select Chpater UI after join client
-
-
 }
 
 void AISMLobbyController::InitUI()

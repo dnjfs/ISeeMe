@@ -130,6 +130,11 @@ void AISMPlayerController::CurrentAspect()
 	UpdateAspect(); 
 }
 
+void AISMPlayerController::ClientGoToLevel_Implementation()
+{
+	UGameplayStatics::OpenLevel(this, "LoadingMap");
+}
+
 void AISMPlayerController::UpdateAspect()
 {
 	if (bFirstAspect)
@@ -181,4 +186,33 @@ void AISMPlayerController::DeadCharacter()
 		MyCharacter->SetActorLocation(State->InitSpawnPointLocation);
 		MyCharacter->SetActorRotation(State->InitialSpawnPointRotator);
 	}
+}
+
+void AISMPlayerController::CallReadTutorial()
+{
+	if (!bDoneRead)
+	{
+		bDoneRead = true;
+		if (HasAuthority())
+		{
+			ReadTutorial();
+		}
+		else
+		{
+			ServerReadTutorial();
+		}
+	}
+}
+
+void AISMPlayerController::ReadTutorial()
+{
+	if (AISeeMeGameMode* GM = Cast<AISeeMeGameMode>(GetWorld()->GetAuthGameMode()))
+	{
+		GM->CountReadEnding();
+	}
+}
+
+void AISMPlayerController::ServerReadTutorial_Implementation()
+{
+	ReadTutorial();
 }

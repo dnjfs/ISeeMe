@@ -125,10 +125,7 @@ void AISMLobbyGameMode::CountReadTutorial()
 
 	if (ReadTutorial == 2)
 	{
-		if (UISMGameInstance* GI = GetGameInstance<UISMGameInstance>())
-		{
-			LoadingNextLevel();
-		}
+		LoadingNextLevel();
 	}
 }
 

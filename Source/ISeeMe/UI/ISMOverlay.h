@@ -21,6 +21,9 @@ public:
 	UFUNCTION()
 	void HandleClearUpdated(bool bLoading);
 
+	UFUNCTION()
+	void HandleEndClearUpdated(bool bEnding);
+
 protected:
 	virtual void NativeConstruct() override;
 

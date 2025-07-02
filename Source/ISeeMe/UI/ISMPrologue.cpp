@@ -4,6 +4,7 @@
 #include "ISMPrologue.h"
 #include <ISeeMe/ISMGameInstance.h>
 #include <ISeeMe/ISMLobbyController.h>
+#include <ISeeMe/ISMPlayerController.h>
 
 void UISMPrologue::ShowPrologue()
 {
@@ -23,8 +24,15 @@ void UISMPrologue::ShowPrologue()
 		}
 	}
 
-	if (AISMLobbyController* Controller = Cast<AISMLobbyController>(GetOwningPlayer()))
+	if (AISMLobbyController* LobbyController = Cast<AISMLobbyController>(GetOwningPlayer()))
 	{
+		FInputModeUIOnly Mode;
+		Mode.SetWidgetToFocus(this->GetCachedWidget());
+		LobbyController->SetInputMode(Mode);
+	}
+	else if (AISMPlayerController* Controller = Cast<AISMPlayerController>(GetOwningPlayer()))
+	{
+		SetKeyboardFocus();
 		FInputModeUIOnly Mode;
 		Mode.SetWidgetToFocus(this->GetCachedWidget());
 		Controller->SetInputMode(Mode);
@@ -34,7 +42,11 @@ void UISMPrologue::ShowPrologue()
 void UISMPrologue::ReadPrologue()
 {
 	SkipText->SetText(FText::FromString("Wait a minute"));
-	if (AISMLobbyController* Controller = Cast<AISMLobbyController>(GetOwningPlayer()))
+	if (AISMLobbyController* LobbyController = Cast<AISMLobbyController>(GetOwningPlayer()))
+	{
+		LobbyController->CallReadTutorial();
+	}
+	else if (AISMPlayerController* Controller = Cast<AISMPlayerController>(GetOwningPlayer()))
 	{
 		Controller->CallReadTutorial();
 	}

@@ -52,6 +52,20 @@ public:
 
 	void DeadCharacter();
 
+	UFUNCTION()
+	void CallReadTutorial();
+
+	UFUNCTION()
+	void ReadTutorial();
+
+	UFUNCTION(Server, Unreliable)
+	void ServerReadTutorial();
+
+	bool bDoneRead = false;
+
+	UFUNCTION(Client, Reliable)
+	void ClientGoToLevel();
+
 private:
 	bool bFirstAspect = false;
 

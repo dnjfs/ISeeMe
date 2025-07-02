@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include <Interfaces/OnlineSessionDelegates.h>
 #include "ISeeMeGameMode.generated.h"
 
 UCLASS(minimalapi)
@@ -33,6 +34,17 @@ public:
 	void ChangePawn();
 
 	int SelectNum = 0;
+
+	int ReadEnding = 0;
+
+	UFUNCTION()
+	void CountReadEnding();
+
+	UFUNCTION()
+	virtual void OnDestroySessionComplete(FName SessionName, bool bWasSuccessful);
+
+private:
+	FOnDestroySessionCompleteDelegate OnDestroySessionCompleteDelegate;
 };
 
 

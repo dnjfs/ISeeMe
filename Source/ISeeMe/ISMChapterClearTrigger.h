@@ -32,7 +32,7 @@ protected:
 	void OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
 	UFUNCTION()
-	void CompleteChapter();
+	virtual void CompleteChapter();
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastSaveChapterNo();
