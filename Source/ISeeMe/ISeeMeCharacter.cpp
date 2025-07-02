@@ -25,6 +25,7 @@
 #include "Components/AudioComponent.h"
 #include "ISMGameInstance.h"
 #include "ISMTutorialController.h"
+#include "Manager/AchievementManager.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -148,6 +149,15 @@ void AISeeMeCharacter::BeginPlay()
 		FocusTimeline->AddInterpFloat(FocusCurve, OnTimelineFloat, TEXT("Alpha"));
 		FocusTimeline->SetLooping(false);
 		FocusTimeline->SetIgnoreTimeDilation(true);
+	}
+
+	if (UISMGameInstance* GI = GetGameInstance<UISMGameInstance>())
+	{
+		// 도전과제 달성
+		if (UAchievementManager* AM = GI->GetSubsystem<UAchievementManager>())
+		{
+			AM->QueryAchievements();
+		}
 	}
 }
 
