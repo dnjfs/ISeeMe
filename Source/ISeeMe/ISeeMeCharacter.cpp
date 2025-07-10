@@ -76,6 +76,12 @@ AISeeMeCharacter::AISeeMeCharacter()
 
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
+
+	// 캐릭터가 회전하는 바닥 위에서 바닥과 함께 회전하지 않도록 함
+	if (UCharacterMovementComponent* MovementComponent = GetCharacterMovement())
+	{
+		MovementComponent->bIgnoreBaseRotation = true;
+	}
 }
 
 void AISeeMeCharacter::BeginPlay()
