@@ -13,16 +13,7 @@ void AISMCharacterState::BeginPlay()
 {
 	if (UISMGameInstance* GameInstance = Cast<UISMGameInstance>(GetGameInstance()))
 	{
-		TSubclassOf<APawn> Pawn;
-		if (AISeeMeGameMode* GM = Cast<AISeeMeGameMode>(GetWorld()->GetAuthGameMode()))
-		{
-			Pawn = GM->DefaultPawnClass;
-		}
-		if (GameInstance->SelectedPawnClass != nullptr)
-		{
-			Pawn = GameInstance->SelectedPawnClass;
-			CallSelectPawn(GameInstance->SelectedPawnClass);
-		}
+		CallSelectPawn(GameInstance->SelectedPawnClass);
 	}
 }
 
@@ -43,7 +34,6 @@ void AISMCharacterState::CallSelectPawn(TSubclassOf<APawn> NewPawn)
 {
 	if (HasAuthority())
 	{
-		LOG_SCREEN("Server Select");
 		SelectPawn(NewPawn, 0);
 	}
 	else 
@@ -69,8 +59,9 @@ void AISMCharacterState::SelectPawn(TSubclassOf<APawn> NewPawn, int num)
 {
 	if (AISeeMeGameMode* GM = Cast<AISeeMeGameMode>(GetWorld()->GetAuthGameMode()))
 	{
-		GM->SelectNum++;
-		GM->SelectedPawnClasses[num] = NewPawn;
+		if(NewPawn!=nullptr)
+			GM->SelectedPawnClasses[num] = NewPawn;
+
 		GM->ChangePawn();
 	}
 }

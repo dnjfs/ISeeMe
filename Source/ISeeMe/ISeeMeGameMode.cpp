@@ -15,6 +15,7 @@
 #include <EnhancedInputSubsystems.h>
 #include "OnlineSubsystem.h"
 #include "Interfaces/OnlineSessionInterface.h"
+#include "ISMGameState.h"
 
 AISeeMeGameMode::AISeeMeGameMode()
 {
@@ -42,6 +43,65 @@ void AISeeMeGameMode::PostLogin(APlayerController* NewPlayer)
 
 	UISMGameInstance* GI = Cast<UISMGameInstance>(GetGameInstance());
 	AISMPlayerController* PC = Cast<AISMPlayerController>(NewPlayer);
+
+	if (GetNumPlayers() == 2)
+	{
+		if (!bFirst)
+		{
+			for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+			{
+				// Enable Input
+				if (PC == nullptr)
+					continue;
+
+				ACharacter* BaseCharacter = PC->GetCharacter();
+				if (BaseCharacter)
+				{
+					//BaseCharacter->EnableInput(PC);
+					BaseCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+				}
+
+				// Go Check Point
+				if (GI->SavedCheckPointID != FName("None"))
+				{
+					TArray<AActor*> CheckPoints;
+					UGameplayStatics::GetAllActorsOfClass(GetWorld(), AISMCheckPoint::StaticClass(), CheckPoints);
+					for (AActor* ACheckPoint : CheckPoints)
+					{
+						if (GI->SavedCheckPointID == ACheckPoint->GetFName()) // 체크포인트 찾음
+						{
+							AISMCheckPoint* ISMCheckPoint = Cast<AISMCheckPoint>(ACheckPoint);
+
+							if (AISMGameState* GS = Cast<AISMGameState>(UGameplayStatics::GetGameState(this)))
+							{
+								if (GS->SwapViewItem != nullptr)
+								{
+									GS->bAcqCheckPoint = true;
+									GS->SaveSwapViewItem = GS->SwapViewItem;
+								}
+								GS->UsedSwapViewItems.Empty();
+
+								ISMCheckPoint->MulticastChangeMaterial(2);
+								ISMCheckPoint->InitCheckPoint();
+
+								PC->DeadCharacter();
+							}
+							break;
+						}
+						else
+						{
+							continue;
+						}
+					}
+				}
+			}
+		}
+		else
+		{
+			bFirst = false;
+		}
+	}
+
 }
 
 void AISeeMeGameMode::SwapCamera()
@@ -203,5 +263,24 @@ void AISeeMeGameMode::OnDestroySessionComplete(FName SessionName, bool bWasSucce
 	if (bWasSuccessful)
 	{
 		UGameplayStatics::OpenLevel(GetWorld(), FName("LoadingMap"), true);
+	}
+}
+
+void AISeeMeGameMode::Logout(AController* Exiting)
+{
+	Super::Logout(Exiting);
+
+	// Disable Input
+	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	{
+		AISMPlayerController* PC = Cast<AISMPlayerController>(Iterator->Get());
+		if (PC == nullptr)
+			continue;
+
+		ACharacter* BaseCharacter = PC->GetCharacter();
+		if (BaseCharacter)
+		{
+			BaseCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+		}
 	}
 }
