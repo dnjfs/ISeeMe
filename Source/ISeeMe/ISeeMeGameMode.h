@@ -37,6 +37,8 @@ public:
 
 	int ReadEnding = 0;
 
+	virtual void Logout(AController* Exiting) override;
+
 	UFUNCTION()
 	void CountReadEnding();
 
@@ -45,6 +47,8 @@ public:
 
 private:
 	FOnDestroySessionCompleteDelegate OnDestroySessionCompleteDelegate;
+
+	bool bFirst = true;
 };
 
 
