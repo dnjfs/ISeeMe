@@ -118,8 +118,11 @@ void AISMCrackGround::MulticastSetCracking_Implementation(bool bInCracking)
 		GeometryCacheComp->SetGeometryCache(bInCracking ? FirstCrack : nullptr);
 	}
 
-	if (AudioComponent)
+	if (bInCracking && AudioComponent)
+	{
+		AudioComponent->SetSound(CrackingSound);
 		AudioComponent->Play();
+	}
 }
 
 void AISMCrackGround::MulticastChangeCrack_Implementation(UGeometryCache* ChangeGeometry)
