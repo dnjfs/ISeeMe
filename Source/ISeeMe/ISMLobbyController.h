@@ -69,6 +69,8 @@ public:
 	UFUNCTION(Server, Unreliable)
 	void ServerReadTutorial();
 
+	void ClearLobbyWidget();
+
 	/// ///////////////////////////////////////////////////
 
 	UPROPERTY()

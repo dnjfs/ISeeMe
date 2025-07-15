@@ -11,6 +11,7 @@ void AISMHUD::BeginPlay()
 {
 	Super::BeginPlay();
     
+	UE_LOG(LogTemp, Warning, TEXT("HUD BeginPlay"));
 	InitWidgets();
 }
 
@@ -18,22 +19,28 @@ void AISMHUD::InitWidgets()
 {
 	if (UWorld* World = GetWorld())
 	{
-		APlayerController* PlayerController = World->GetFirstPlayerController();
-		if (PlayerController && InGameMenuClass)
+		APlayerController* PlayerController = GetOwningPlayerController();
+		if (PlayerController->IsLocalController())
 		{
-			InGameMenu = CreateWidget<UInGameMenu>(PlayerController, InGameMenuClass);
-			InGameMenu->AddToViewport(1);
-		}
-		if (PlayerController && ISMOverlayClass)
-		{
-			ISMOverlay = CreateWidget<UISMOverlay>(PlayerController, ISMOverlayClass);
-			ISMOverlay->AddToViewport(0);
+			if (PlayerController && InGameMenuClass)
+			{
+				InGameMenu = CreateWidget<UInGameMenu>(PlayerController, InGameMenuClass);
+				InGameMenu->AddToViewport(1);
+			}
+			if (PlayerController && ISMOverlayClass)
+			{
+				ISMOverlay = CreateWidget<UISMOverlay>(PlayerController, ISMOverlayClass);
+				ISMOverlay->AddToViewport(0);
+			}
 		}
 	}
 }
 
 void AISMHUD::ToggleInGameMenu(APlayerController* PlayerController)
 {
-	InGameMenu->ToggleWidget(PlayerController);
+	if (PlayerController->IsLocalController())
+	{
+		InGameMenu->ToggleWidget(PlayerController);
+	}
 }
 

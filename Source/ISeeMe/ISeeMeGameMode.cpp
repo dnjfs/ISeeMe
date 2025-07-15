@@ -106,6 +106,7 @@ void AISeeMeGameMode::PostLogin(APlayerController* NewPlayer)
 
 void AISeeMeGameMode::SwapCamera()
 {
+	UE_LOG(LogTemp, Warning, TEXT("Swap Camera"));
 	int32 CurrentPlayers = GetNumPlayers();
 
 	TArray<AISMPlayerController*> PCs;
@@ -175,6 +176,8 @@ void AISeeMeGameMode::SwapCamera()
 
 void AISeeMeGameMode::ChangePawn()
 {
+	UE_LOG(LogTemp, Warning, TEXT("Swap Pawn"));
+
 	TArray<AISeeMeCharacter*> LocalCharacters;
 	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 	{
@@ -264,6 +267,13 @@ void AISeeMeGameMode::OnDestroySessionComplete(FName SessionName, bool bWasSucce
 	{
 		UGameplayStatics::OpenLevel(GetWorld(), FName("LoadingMap"), true);
 	}
+}
+
+void AISeeMeGameMode::SwapPlayerControllers(APlayerController* OldPC, APlayerController* NewPC)
+{
+	Super::SwapPlayerControllers(OldPC, NewPC);
+
+	UE_LOG(LogTemp, Warning, TEXT("Swap Controllers %s -> %s"), *OldPC->GetName(), *NewPC->GetName());
 }
 
 void AISeeMeGameMode::Logout(AController* Exiting)

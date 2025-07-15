@@ -11,6 +11,11 @@
 
 void AISMCharacterState::BeginPlay()
 {
+	if (HasActorBegunPlay())
+	{
+		return;
+	}
+
 	if (UISMGameInstance* GameInstance = Cast<UISMGameInstance>(GetGameInstance()))
 	{
 		CallSelectPawn(GameInstance->SelectedPawnClass);

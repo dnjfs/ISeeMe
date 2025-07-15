@@ -30,6 +30,24 @@ void AISMPlayerController::BeginPlay()
 	SetInputMode(FInputModeGameOnly());
 	SetShowMouseCursor(false);
 	SetControlRotation(FRotator(-20.f, 0.f, 0.f));
+
+	/*if (IsLocalController())
+	{
+		AHUD* HUD = GetHUD();
+		if (AISMHUD* PCHUD = Cast<AISMHUD>(HUD))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("GET HUD"));
+			PCHUD->InitWidgets();
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("NO HUD"));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("NOT LocalController"));
+	}*/
 }
 
 void AISMPlayerController::OnPossess(APawn* aPawn)
@@ -41,6 +59,26 @@ void AISMPlayerController::OnPossess(APawn* aPawn)
 		if (AISeeMeGameMode* GM = Cast<AISeeMeGameMode>(GetWorld()->GetAuthGameMode()))
 			GM->SwapCamera();
 	}
+
+	UE_LOG(LogTemp, Warning, TEXT("OnPossess Called. IsLocalController: %s"), *FString(IsLocalController() ? "true" : "false"));
+	
+	/*if (IsLocalController())
+	{
+		AHUD* HUD = GetHUD();
+		if (AISMHUD* PCHUD = Cast<AISMHUD>(HUD))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("GET HUD"));
+			PCHUD->InitWidgets();
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("NO HUD"));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("NOT LocalController"));
+	}*/
 }
 
 void AISMPlayerController::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const

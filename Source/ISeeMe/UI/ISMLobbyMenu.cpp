@@ -6,13 +6,16 @@
 
 void UISMLobbyMenu::ChangeLobbyUI(int32 Index)
 {
-	LobbySwitcher->SetActiveWidget(LobbySwitcher->GetWidgetAtIndex(Index)); 
-
-    if (Index == 5)
+    if (LobbySwitcher != nullptr)
     {
-        if (UISMPrologue* PrologueWidget = Cast<UISMPrologue>(LobbySwitcher->GetActiveWidget()))
+        LobbySwitcher->SetActiveWidget(LobbySwitcher->GetWidgetAtIndex(Index));
+
+        if (Index == 5)
         {
-            PrologueWidget->ShowPrologue();
+            if (UISMPrologue* PrologueWidget = Cast<UISMPrologue>(LobbySwitcher->GetActiveWidget()))
+            {
+                PrologueWidget->ShowPrologue();
+            }
         }
     }
 }
