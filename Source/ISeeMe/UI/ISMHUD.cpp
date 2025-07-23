@@ -36,6 +36,24 @@ void AISMHUD::InitWidgets()
 	}
 }
 
+void AISMHUD::RemoveWidgets()
+{
+	APlayerController* PlayerController = GetOwningPlayerController();
+	if (PlayerController->IsLocalController())
+	{
+		if (InGameMenu)
+		{
+			InGameMenu->RemoveFromParent();
+			InGameMenu = nullptr;
+		}
+		if (ISMOverlay)
+		{
+			ISMOverlay->RemoveFromParent();
+			ISMOverlay = nullptr;
+		}
+	}
+}
+
 void AISMHUD::ToggleInGameMenu(APlayerController* PlayerController)
 {
 	if (PlayerController->IsLocalController())

@@ -22,6 +22,10 @@ public:
 
 	UFUNCTION()
 	void InitWidgets();
+
+	UFUNCTION()
+	void RemoveWidgets();
+
 protected:
 	virtual void BeginPlay() override;
 

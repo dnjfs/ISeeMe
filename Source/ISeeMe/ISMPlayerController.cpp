@@ -125,7 +125,6 @@ void AISMPlayerController::ServerCallSwapCamera_Implementation()
 
 void AISMPlayerController::SwapCamera()
 {
-	LOG_SCREEN("You");
 	if (AISMGameState* GS = Cast<AISMGameState>(UGameplayStatics::GetGameState(this)))
 	{
 		if (GS->SwapViewItem == nullptr)
@@ -155,6 +154,29 @@ void AISMPlayerController::SwapCamera()
 			}
 		}
 	}
+}
+
+void AISMPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	if (IsLocalController())
+	{
+		AHUD* HUD = GetHUD();
+		if (AISMHUD* PCHUD = Cast<AISMHUD>(HUD))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("GET HUD"));
+			PCHUD->RemoveWidgets();
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("NO HUD"));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("NOT LocalController"));
+	}
+
+	Super::EndPlay(EndPlayReason);
 }
 
 void AISMPlayerController::SwapAspect()

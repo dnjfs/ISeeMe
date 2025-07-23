@@ -20,6 +20,8 @@ void AISMCharacterState::BeginPlay()
 	{
 		CallSelectPawn(GameInstance->SelectedPawnClass);
 	}
+
+	Super::BeginPlay();
 }
 
 UStaticMeshComponent* AISMCharacterState::GetRespawnPoint(int InCustomPlayerId)
