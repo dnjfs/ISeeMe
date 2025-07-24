@@ -26,7 +26,7 @@ void AISMCharacterState::BeginPlay()
 
 UStaticMeshComponent* AISMCharacterState::GetRespawnPoint(int InCustomPlayerId)
 {
-	if (CurCheckPoint == nullptr)
+	if (!CurCheckPoint.IsValid())
 		return nullptr;
 
 	if (InCustomPlayerId == 1)
@@ -35,6 +35,12 @@ UStaticMeshComponent* AISMCharacterState::GetRespawnPoint(int InCustomPlayerId)
 		return CurCheckPoint->Spawn2PPlayer;
 
 	return nullptr;
+}
+
+void AISMCharacterState::SetCurCheckPoint(AISMCheckPoint* InCheckPoint)
+{
+	bCheckPoint = false;
+	CurCheckPoint = InCheckPoint;
 }
 
 void AISMCharacterState::CallSelectPawn(TSubclassOf<APawn> NewPawn)

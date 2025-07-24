@@ -184,8 +184,7 @@ void AISMCheckPoint::InitCheckPoint()
 			{
 				if (AISMCharacterState* State = Cast<AISMCharacterState>(Character->GetPlayerState()))
 				{
-					State->bCheckPoint = false;
-					State->CurCheckPoint = this;
+					State->SetCurCheckPoint(this);
 				}
 			}
 		}
