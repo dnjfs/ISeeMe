@@ -160,7 +160,7 @@ void AISMCheckPoint::MulticastChangeMaterial_Implementation(int CurDetect)
 			float PlagOutAnimDuration = GeometryCacheComp->GetDuration();
 			FTimerHandle TimerHandle;
 			GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]() {
-				if (PlagFlutterGeometry)
+				if (PlagFlutterGeometry && GeometryCacheComp)
 				{
 					GeometryCacheComp->SetGeometryCache(PlagFlutterGeometry);
 					GeometryCacheComp->SetLooping(true);
