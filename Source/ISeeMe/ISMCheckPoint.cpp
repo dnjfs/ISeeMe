@@ -139,6 +139,19 @@ void AISMCheckPoint::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* O
 	}
 }
 
+void AISMCheckPoint::OnPlagOutAnimationFinished()
+{
+	if (PlagFlutterGeometry && GeometryCacheComp)
+	{
+		GeometryCacheComp->SetGeometryCache(PlagFlutterGeometry);
+		GeometryCacheComp->SetLooping(true);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("PlagFlutterGeometry is not set!"));
+	}
+}
+
 void AISMCheckPoint::MulticastChangeMaterial_Implementation(int CurDetect)
 {
 	// According to the perception of a person
@@ -159,13 +172,14 @@ void AISMCheckPoint::MulticastChangeMaterial_Implementation(int CurDetect)
 			
 			float PlagOutAnimDuration = GeometryCacheComp->GetDuration();
 			FTimerHandle TimerHandle;
-			GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]() {
+			GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AISMCheckPoint::OnPlagOutAnimationFinished, PlagOutAnimDuration, false);
+			/*GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]() {
 				if (PlagFlutterGeometry && GeometryCacheComp)
 				{
 					GeometryCacheComp->SetGeometryCache(PlagFlutterGeometry);
 					GeometryCacheComp->SetLooping(true);
 				}
-			}, PlagOutAnimDuration, false);
+			}, PlagOutAnimDuration, false);*/
 		}
 	}
 	else
