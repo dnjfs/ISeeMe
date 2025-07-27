@@ -32,7 +32,6 @@ AISMCheckPoint::AISMCheckPoint()
 
 	TriggerVolume->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	TriggerVolume->SetCollisionObjectType(ECollisionChannel::ECC_WorldDynamic);
-	TriggerVolume->SetCollisionResponseToChannel(ECC_Pawn, HasAuthority() ? ECR_Overlap : ECR_Ignore);
 	TriggerVolume->SetGenerateOverlapEvents(true);
 
 	TriggerVolume->SetupAttachment(CheckPointMesh);
@@ -58,6 +57,8 @@ void AISMCheckPoint::BeginPlay()
 
 	if (TriggerVolume)
 	{
+		TriggerVolume->SetCollisionResponseToChannel(ECC_Pawn, HasAuthority() ? ECR_Overlap : ECR_Ignore);
+
 		TriggerVolume->OnComponentBeginOverlap.AddDynamic(this, &AISMCheckPoint::OnOverlapBegin);
 		TriggerVolume->OnComponentEndOverlap.AddDynamic(this, &AISMCheckPoint::OnOverlapEnd);
 	}
@@ -172,14 +173,17 @@ void AISMCheckPoint::MulticastChangeMaterial_Implementation(int CurDetect)
 			
 			float PlagOutAnimDuration = GeometryCacheComp->GetDuration();
 			FTimerHandle TimerHandle;
-			GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AISMCheckPoint::OnPlagOutAnimationFinished, PlagOutAnimDuration, false);
-			/*GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]() {
+			//GetWorld()->GetTimerManager().SetTimer(TimerHandle, this, &AISMCheckPoint::OnPlagOutAnimationFinished, PlagOutAnimDuration, false);
+			FTimerDelegate TimerDelegate;
+			TimerDelegate.BindWeakLambda(this, [this]() {
 				if (PlagFlutterGeometry && GeometryCacheComp)
 				{
 					GeometryCacheComp->SetGeometryCache(PlagFlutterGeometry);
 					GeometryCacheComp->SetLooping(true);
 				}
-			}, PlagOutAnimDuration, false);*/
+				});
+
+			GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, PlagOutAnimDuration, false);
 		}
 	}
 	else
@@ -192,15 +196,29 @@ void AISMCheckPoint::InitCheckPoint()
 {
 	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Player"));
 		if (AISMPlayerController* PC = Cast<AISMPlayerController>(Iterator->Get()))
 		{
 			if (ACharacter* Character = PC->GetCharacter())
 			{
 				if (AISMCharacterState* State = Cast<AISMCharacterState>(Character->GetPlayerState()))
 				{
+					UE_LOG(LogTemp, Warning, TEXT("Set CheckPoint"));
 					State->SetCurCheckPoint(this);
 				}
+				else 
+				{
+					UE_LOG(LogTemp, Warning, TEXT("No Player State"));
+				}
 			}
+			else
+			{
+				UE_LOG(LogTemp, Warning, TEXT("No Character"));
+			}
+		}
+		else 
+		{
+			UE_LOG(LogTemp, Warning, TEXT("No PC"));
 		}
 	}
 }
