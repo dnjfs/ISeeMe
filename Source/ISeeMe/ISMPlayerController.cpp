@@ -143,10 +143,14 @@ void AISMPlayerController::SwapCamera()
 					return;
 				}
 
-				GetWorldTimerManager().SetTimer(GM->SwapTimerHandle, FTimerDelegate::CreateWeakLambda(this, [GM]()
+				TWeakObjectPtr<AISeeMeGameMode> WeakGameMode(GM);
+				GetWorldTimerManager().SetTimer(GM->SwapTimerHandle, FTimerDelegate::CreateWeakLambda(this, [WeakGameMode]()
 					{
-						GM->SwapCamera();
-						GM->SwapTimerHandle.Invalidate();
+						if (TStrongObjectPtr<AISeeMeGameMode> StrongGameMode = WeakGameMode.Pin(false))
+						{
+							StrongGameMode->SwapCamera();
+							StrongGameMode->SwapTimerHandle.Invalidate();
+						}
 					}), GM->SwapTime, false);
 				GM->SwapCamera();
 

@@ -59,9 +59,12 @@ void AISMFlickerGround::Tick(float DeltaTime)
 	{
 		MulticastAwake(false);
 
-		//FTimerHandle TimerHandle;
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]() {
-			this->ResetTimer();
+		TWeakObjectPtr<AISMFlickerGround> WeakThis(this);
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, [WeakThis]() {
+			if (TStrongObjectPtr<AISMFlickerGround> StrongThis = WeakThis.Pin(false))
+			{
+				StrongThis->ResetTimer();
+			}
 		}, DormantTime, false);
 	}
 }

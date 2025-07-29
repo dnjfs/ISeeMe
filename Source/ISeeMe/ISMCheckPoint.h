@@ -87,9 +87,6 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastPlaySound();
 
-	UFUNCTION()
-	void OnPlagOutAnimationFinished();
-
 private:
 	int DetectPlayer = 0;
 };
