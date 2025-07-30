@@ -11,6 +11,7 @@ void AISMHUD::BeginPlay()
 {
 	Super::BeginPlay();
     
+	UE_LOG(LogTemp, Warning, TEXT("HUD BeginPlay"));
 	InitWidgets();
 }
 
@@ -18,22 +19,46 @@ void AISMHUD::InitWidgets()
 {
 	if (UWorld* World = GetWorld())
 	{
-		APlayerController* PlayerController = World->GetFirstPlayerController();
-		if (PlayerController && InGameMenuClass)
+		APlayerController* PlayerController = GetOwningPlayerController();
+		if (PlayerController->IsLocalController())
 		{
-			InGameMenu = CreateWidget<UInGameMenu>(PlayerController, InGameMenuClass);
-			InGameMenu->AddToViewport(1);
+			if (PlayerController && InGameMenuClass)
+			{
+				InGameMenu = CreateWidget<UInGameMenu>(PlayerController, InGameMenuClass);
+				InGameMenu->AddToViewport(1);
+			}
+			if (PlayerController && ISMOverlayClass)
+			{
+				ISMOverlay = CreateWidget<UISMOverlay>(PlayerController, ISMOverlayClass);
+				ISMOverlay->AddToViewport(0);
+			}
 		}
-		if (PlayerController && ISMOverlayClass)
+	}
+}
+
+void AISMHUD::RemoveWidgets()
+{
+	APlayerController* PlayerController = GetOwningPlayerController();
+	if (PlayerController->IsLocalController())
+	{
+		if (InGameMenu)
 		{
-			ISMOverlay = CreateWidget<UISMOverlay>(PlayerController, ISMOverlayClass);
-			ISMOverlay->AddToViewport(0);
+			InGameMenu->RemoveFromParent();
+			InGameMenu = nullptr;
+		}
+		if (ISMOverlay)
+		{
+			ISMOverlay->RemoveFromParent();
+			ISMOverlay = nullptr;
 		}
 	}
 }
 
 void AISMHUD::ToggleInGameMenu(APlayerController* PlayerController)
 {
-	InGameMenu->ToggleWidget(PlayerController);
+	if (PlayerController->IsLocalController())
+	{
+		InGameMenu->ToggleWidget(PlayerController);
+	}
 }
 

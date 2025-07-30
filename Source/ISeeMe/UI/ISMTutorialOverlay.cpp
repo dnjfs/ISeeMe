@@ -50,9 +50,14 @@ void UISMTutorialOverlay::MyFunction(int TutorialStep, int InformationIdx)
 	{
 		TutorialInformationText->SetText(Text);
 
-		GetWorld()->GetTimerManager().SetTimer(InformationTimerHandle, [this, TutorialStep, InformationIdx]()
-			{ MyFunction(TutorialStep, InformationIdx+1); }, 
-			3, false);
+		TWeakObjectPtr<UISMTutorialOverlay> WeakThis(this);
+		GetWorld()->GetTimerManager().SetTimer(InformationTimerHandle, [WeakThis, TutorialStep, InformationIdx]() {
+			// this가 파괴되었거나 PendingKill 상태라면 nullptr 반환
+			if (TStrongObjectPtr<UISMTutorialOverlay> StrongThis = WeakThis.Pin(false))
+			{
+				StrongThis->MyFunction(TutorialStep, InformationIdx+1);
+			}
+		}, 3, false);
 	}
 }
 

@@ -242,6 +242,15 @@ void AISMLobbyController::ReadTutorial()
 	}
 }
 
+void AISMLobbyController::ClearLobbyWidget()
+{
+	if (UIWidgetInstance)
+	{
+		UIWidgetInstance->RemoveFromParent();
+		UIWidgetInstance = nullptr;
+	}
+}
+
 void AISMLobbyController::ServerReadTutorial_Implementation()
 {
 	ReadTutorial();

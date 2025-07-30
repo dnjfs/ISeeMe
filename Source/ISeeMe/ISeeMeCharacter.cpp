@@ -113,9 +113,22 @@ void AISeeMeCharacter::BeginPlay()
 						UGameplayStatics::GetAllActorsOfClass(GetWorld(), AISMCheckPoint::StaticClass(), CheckPoints);
 						for (AActor* ACheckPoint : CheckPoints)
 						{
+							// GetAllActorsOfClass()는 nullptr을 반환할 수 있음 (EGetWorldErrorMode::LogAndReturnNull)
+							if (!ACheckPoint)
+							{
+								continue;
+							}
+
 							if (GI->SavedCheckPointID == ACheckPoint->GetFName()) // 체크포인트 찾음
 							{
 								AISMCheckPoint* ISMCheckPoint = Cast<AISMCheckPoint>(ACheckPoint);
+
+								// IsValid(): nullptr + Pending Kill 검사
+								// IsValidLowLevel: Dangling Pointer 검사
+								if (!IsValid(ISMCheckPoint) || ISMCheckPoint->IsValidLowLevel())
+								{
+									continue;
+								}
 
 								if (AISMGameState* GS = Cast<AISMGameState>(UGameplayStatics::GetGameState(this)))
 								{
