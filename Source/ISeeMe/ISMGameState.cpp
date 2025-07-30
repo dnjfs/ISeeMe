@@ -12,7 +12,6 @@ AISMGameState::AISMGameState()
 	SwapViewItem = nullptr;
 	SaveSwapViewItem = nullptr;
 	UsedSwapViewItems.Empty();
-	bAcqCheckPoint = false;
 
 	static ConstructorHelpers::FObjectFinder<USoundBase> ItemSoundRef(TEXT("/Script/Engine.SoundWave'/Game/ISeeMe/Sounds/SFX/SFX_ItemTimer.SFX_ItemTimer'"));
 	if (ItemSoundRef.Object)
@@ -57,7 +56,7 @@ void AISMGameState::MulticastReturnSwapViewItem_Implementation()
 	}
 
 	// Return Check point state
-	if (bAcqCheckPoint && SaveSwapViewItem != nullptr)
+	if (SaveSwapViewItem != nullptr)
 	{
 		SaveSwapViewItem->MulticastVisibleMesh(false);
 		MulticastSetSwapViewItem(SaveSwapViewItem);

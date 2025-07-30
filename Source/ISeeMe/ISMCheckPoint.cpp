@@ -94,7 +94,6 @@ void AISMCheckPoint::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor*
 			{
 				if (AISMGameState* GS = Cast<AISMGameState>(UGameplayStatics::GetGameState(this)))
 				{
-					GS->bAcqCheckPoint = true;
 					GS->SaveSwapViewItem = GS->SwapViewItem;
 					GS->UsedSwapViewItems.Empty();
 				}

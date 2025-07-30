@@ -40,8 +40,6 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastReturnSwapViewItem();
 
-	bool bAcqCheckPoint; // Check Check Point
-
 	void OnItemUsed(AISMSwapViewItem* InItem);
 
 	UFUNCTION(NetMulticast, Reliable)
