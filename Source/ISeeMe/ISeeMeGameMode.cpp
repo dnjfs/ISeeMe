@@ -191,31 +191,35 @@ void AISeeMeGameMode::ChangePawn()
 	for (int i = 0; i < LocalCharacters.Num(); i++)
 	{
 		AISeeMeCharacter* MyCharacter = LocalCharacters[i];
-		if (SelectedPawnClasses[i])
+		if (!IsValid(MyCharacter))
+			continue;
+
+		AISMPlayerController* Controller = Cast<AISMPlayerController>(MyCharacter->GetController());
+		if (!Controller)
+			continue;
+
+		if (AISMCharacterState* State = Controller->GetPlayerState<AISMCharacterState>())
 		{
-			APawn* ExistingPawn = MyCharacter->GetController()->GetPawn();
-			AISMPlayerController* Controller = Cast<AISMPlayerController>(MyCharacter->GetController());
-			if (ExistingPawn)
-			{
-				UE_LOG(LogTemp, Warning, TEXT("Destroying existing pawn for player %d: %s"), i, *ExistingPawn->GetName());
-				ExistingPawn->Destroy();
-			}
+			State->CustomPlayerID = i + 1;
+		}
 
-			FVector MySpawnLocation = MyCharacter->GetActorLocation();
-			FRotator MySpawnRotation = MyCharacter->GetActorRotation();
-			if (!MySpawnLocation.ContainsNaN() && !MySpawnRotation.ContainsNaN())
-			{
-				APawn* NewPawn = GetWorld()->SpawnActor<APawn>(SelectedPawnClasses[i], MySpawnLocation, MySpawnRotation);
+		if (!SelectedPawnClasses[i])
+			continue;
 
-				if (NewPawn)
-				{
-					Controller->Possess(NewPawn);
-				}
-			}
+		if (APawn* ExistingPawn = Controller->GetPawn(); IsValid(ExistingPawn))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Destroying existing pawn for player %d: %s"), i, *ExistingPawn->GetName());
+			ExistingPawn->Destroy();
+		}
 
-			if (AISMCharacterState* State = Controller->GetPlayerState<AISMCharacterState>())
+		FVector MySpawnLocation = MyCharacter->GetActorLocation();
+		FRotator MySpawnRotation = MyCharacter->GetActorRotation();
+		if (!MySpawnLocation.ContainsNaN() && !MySpawnRotation.ContainsNaN())
+		{
+			APawn* NewPawn = GetWorld()->SpawnActor<APawn>(SelectedPawnClasses[i], MySpawnLocation, MySpawnRotation);
+			if (NewPawn)
 			{
-				State->CustomPlayerID = i + 1;
+				Controller->Possess(NewPawn);
 			}
 		}
 	}
