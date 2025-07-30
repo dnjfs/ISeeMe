@@ -119,7 +119,10 @@ void AISMCrackGround::MulticastSetCracking_Implementation(bool bInCracking)
 	if (GeometryCacheComp)
 	{
 		GeometryCacheComp->SetVisibility(bInCracking);
+		GeometryCacheComp->Stop();
+		GeometryCacheComp->SetLooping(true);
 		GeometryCacheComp->SetGeometryCache(bInCracking ? FirstCrack : nullptr);
+		GeometryCacheComp->PlayFromStart();
 	}
 
 	if (bInCracking && AudioComponent)
@@ -132,13 +135,20 @@ void AISMCrackGround::MulticastSetCracking_Implementation(bool bInCracking)
 void AISMCrackGround::MulticastChangeCrack_Implementation(UGeometryCache* ChangeGeometry)
 {
 	if (GeometryCacheComp)
+	{
+		GeometryCacheComp->Stop();
+		GeometryCacheComp->SetLooping(true);
 		GeometryCacheComp->SetGeometryCache(ChangeGeometry);
+		GeometryCacheComp->PlayFromStart();
+	}
 }
 
 void AISMCrackGround::MulticastSpawnCrackPart_Implementation()
 {
 	if (GeometryCacheComp)
 	{
+		GeometryCacheComp->Stop();
+		GeometryCacheComp->SetLooping(false);
 		GeometryCacheComp->SetGeometryCache(FallingGeometry);
 		GeometryCacheComp->PlayFromStart();
 	}
