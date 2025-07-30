@@ -45,6 +45,8 @@ public:
 	UFUNCTION()
 	virtual void OnDestroySessionComplete(FName SessionName, bool bWasSuccessful);
 
+	virtual void SwapPlayerControllers(APlayerController* OldPC, APlayerController* NewPC) override;
+
 private:
 	FOnDestroySessionCompleteDelegate OnDestroySessionCompleteDelegate;
 

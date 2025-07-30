@@ -30,6 +30,24 @@ void AISMPlayerController::BeginPlay()
 	SetInputMode(FInputModeGameOnly());
 	SetShowMouseCursor(false);
 	SetControlRotation(FRotator(-20.f, 0.f, 0.f));
+
+	/*if (IsLocalController())
+	{
+		AHUD* HUD = GetHUD();
+		if (AISMHUD* PCHUD = Cast<AISMHUD>(HUD))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("GET HUD"));
+			PCHUD->InitWidgets();
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("NO HUD"));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("NOT LocalController"));
+	}*/
 }
 
 void AISMPlayerController::OnPossess(APawn* aPawn)
@@ -41,6 +59,26 @@ void AISMPlayerController::OnPossess(APawn* aPawn)
 		if (AISeeMeGameMode* GM = Cast<AISeeMeGameMode>(GetWorld()->GetAuthGameMode()))
 			GM->SwapCamera();
 	}
+
+	UE_LOG(LogTemp, Warning, TEXT("OnPossess Called. IsLocalController: %s"), *FString(IsLocalController() ? "true" : "false"));
+	
+	/*if (IsLocalController())
+	{
+		AHUD* HUD = GetHUD();
+		if (AISMHUD* PCHUD = Cast<AISMHUD>(HUD))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("GET HUD"));
+			PCHUD->InitWidgets();
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("NO HUD"));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("NOT LocalController"));
+	}*/
 }
 
 void AISMPlayerController::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
@@ -87,7 +125,6 @@ void AISMPlayerController::ServerCallSwapCamera_Implementation()
 
 void AISMPlayerController::SwapCamera()
 {
-	LOG_SCREEN("You");
 	if (AISMGameState* GS = Cast<AISMGameState>(UGameplayStatics::GetGameState(this)))
 	{
 		if (GS->SwapViewItem == nullptr)
@@ -106,10 +143,14 @@ void AISMPlayerController::SwapCamera()
 					return;
 				}
 
-				GetWorldTimerManager().SetTimer(GM->SwapTimerHandle, FTimerDelegate::CreateWeakLambda(this, [GM]()
+				TWeakObjectPtr<AISeeMeGameMode> WeakGameMode(GM);
+				GetWorldTimerManager().SetTimer(GM->SwapTimerHandle, FTimerDelegate::CreateWeakLambda(this, [WeakGameMode]()
 					{
-						GM->SwapCamera();
-						GM->SwapTimerHandle.Invalidate();
+						if (TStrongObjectPtr<AISeeMeGameMode> StrongGameMode = WeakGameMode.Pin(false))
+						{
+							StrongGameMode->SwapCamera();
+							StrongGameMode->SwapTimerHandle.Invalidate();
+						}
 					}), GM->SwapTime, false);
 				GM->SwapCamera();
 
@@ -117,6 +158,29 @@ void AISMPlayerController::SwapCamera()
 			}
 		}
 	}
+}
+
+void AISMPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
+{
+	if (IsLocalController())
+	{
+		AHUD* HUD = GetHUD();
+		if (AISMHUD* PCHUD = Cast<AISMHUD>(HUD))
+		{
+			UE_LOG(LogTemp, Warning, TEXT("GET HUD"));
+			PCHUD->RemoveWidgets();
+		}
+		else
+		{
+			UE_LOG(LogTemp, Warning, TEXT("NO HUD"));
+		}
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning, TEXT("NOT LocalController"));
+	}
+
+	Super::EndPlay(EndPlayReason);
 }
 
 void AISMPlayerController::SwapAspect()

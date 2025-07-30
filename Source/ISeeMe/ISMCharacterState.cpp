@@ -11,16 +11,26 @@
 
 void AISMCharacterState::BeginPlay()
 {
+	if (HasActorBegunPlay())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Has Actor BegunPlay"));
+		return;
+	}
+
 	if (UISMGameInstance* GameInstance = Cast<UISMGameInstance>(GetGameInstance()))
 	{
 		CallSelectPawn(GameInstance->SelectedPawnClass);
 	}
+
+	Super::BeginPlay();
 }
 
 UStaticMeshComponent* AISMCharacterState::GetRespawnPoint(int InCustomPlayerId)
 {
-	if (CurCheckPoint == nullptr)
+	if (!CurCheckPoint.IsValid())
 		return nullptr;
+	
+	UE_LOG(LogTemp, Warning, TEXT("%d"), InCustomPlayerId);
 
 	if (InCustomPlayerId == 1)
 		return CurCheckPoint->Spawn1PPlayer;
@@ -28,6 +38,12 @@ UStaticMeshComponent* AISMCharacterState::GetRespawnPoint(int InCustomPlayerId)
 		return CurCheckPoint->Spawn2PPlayer;
 
 	return nullptr;
+}
+
+void AISMCharacterState::SetCurCheckPoint(AISMCheckPoint* InCheckPoint)
+{
+	bCheckPoint = false;
+	CurCheckPoint = InCheckPoint;
 }
 
 void AISMCharacterState::CallSelectPawn(TSubclassOf<APawn> NewPawn)

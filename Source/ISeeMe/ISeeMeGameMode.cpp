@@ -16,6 +16,7 @@
 #include "OnlineSubsystem.h"
 #include "Interfaces/OnlineSessionInterface.h"
 #include "ISMGameState.h"
+#include "GameFramework/PlayerState.h"
 
 AISeeMeGameMode::AISeeMeGameMode()
 {
@@ -34,12 +35,6 @@ AISeeMeGameMode::AISeeMeGameMode()
 void AISeeMeGameMode::PostLogin(APlayerController* NewPlayer)
 {
 	Super::PostLogin(NewPlayer);
-
-	if (AISMCharacterState* State = NewPlayer->GetPlayerState<AISMCharacterState>())
-	{
-		int32 CurrentPlayerCount = GetNumPlayers();
-		State->CustomPlayerID = CurrentPlayerCount;
-	}
 
 	UISMGameInstance* GI = Cast<UISMGameInstance>(GetGameInstance());
 	AISMPlayerController* PC = Cast<AISMPlayerController>(NewPlayer);
@@ -106,6 +101,7 @@ void AISeeMeGameMode::PostLogin(APlayerController* NewPlayer)
 
 void AISeeMeGameMode::SwapCamera()
 {
+	UE_LOG(LogTemp, Warning, TEXT("Swap Camera"));
 	int32 CurrentPlayers = GetNumPlayers();
 
 	TArray<AISMPlayerController*> PCs;
@@ -175,6 +171,8 @@ void AISeeMeGameMode::SwapCamera()
 
 void AISeeMeGameMode::ChangePawn()
 {
+	UE_LOG(LogTemp, Warning, TEXT("Swap Pawn"));
+
 	TArray<AISeeMeCharacter*> LocalCharacters;
 	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 	{
@@ -213,6 +211,11 @@ void AISeeMeGameMode::ChangePawn()
 				{
 					Controller->Possess(NewPawn);
 				}
+			}
+
+			if (AISMCharacterState* State = Controller->GetPlayerState<AISMCharacterState>())
+			{
+				State->CustomPlayerID = i + 1;
 			}
 		}
 	}
@@ -264,6 +267,23 @@ void AISeeMeGameMode::OnDestroySessionComplete(FName SessionName, bool bWasSucce
 	{
 		UGameplayStatics::OpenLevel(GetWorld(), FName("LoadingMap"), true);
 	}
+}
+
+void AISeeMeGameMode::SwapPlayerControllers(APlayerController* OldPC, APlayerController* NewPC)
+{
+	Super::SwapPlayerControllers(OldPC, NewPC);
+
+	/*if (NewPC)
+	{
+		if (AISMCharacterState* State = NewPC->GetPlayerState<AISMCharacterState>())
+		{
+			int32 CurrentPlayerCount = State->PlayerId;
+			UE_LOG(LogTemp, Warning, TEXT("SwapPlayerControllers: Player count is %d"), CurrentPlayerCount);
+			State->CustomPlayerID = CurrentPlayerCount;
+		}
+	}*/
+
+	UE_LOG(LogTemp, Warning, TEXT("Swap Controllers %s -> %s"), *OldPC->GetName(), *NewPC->GetName());
 }
 
 void AISeeMeGameMode::Logout(AController* Exiting)

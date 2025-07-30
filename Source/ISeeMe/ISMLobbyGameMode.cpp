@@ -142,8 +142,18 @@ void AISMLobbyGameMode::LoadingNextLevel()
 	{
 		FString ChapterName = FString::Printf(TEXT("Chapter%d"), GI->CurrChapterNo);
 		UWorld* World = GetWorld();
-		PCs[0]->MulticastControllerChangeUI(6);
-		PCs[1]->MulticastControllerChangeUI(6);
+
+		for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+		{
+			AISMLobbyController* PC = Cast<AISMLobbyController>(It->Get());
+			if (PC && PC->IsLocalPlayerController()) 
+			{
+				PC->ClearLobbyWidget();
+			}
+		}
+
+		//PCs[0]->MulticastControllerChangeUI(6);
+		//PCs[1]->MulticastControllerChangeUI(6);
 		
 		if (!GI->bTutorial)
 			ChapterName = "Tutorial";

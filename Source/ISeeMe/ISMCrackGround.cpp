@@ -74,10 +74,14 @@ void AISMCrackGround::OnCracked()
 {
 	MulticastSpawnCrackPart();
 
+	FTimerDelegate TimerDelegate;
+	TimerDelegate.BindWeakLambda(this, [this]() {
+		if (IsValid(this))
+			this->ResetTimer();
+	});
+
 	FTimerHandle TimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, [this]() {
-		this->ResetTimer();
-	}, DormantTime, false);
+	GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, DormantTime, false);
 
 	MulticastAwake(false);
 }

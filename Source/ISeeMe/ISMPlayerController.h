@@ -35,6 +35,8 @@ public:
 	UFUNCTION()
 	virtual void SwapCamera();
 
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
 	/** Client call for Server swap camera*/
 	UFUNCTION(Server, Reliable)
 	void ServerCallSwapCamera();

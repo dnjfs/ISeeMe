@@ -18,6 +18,8 @@ class ISEEME_API AISMCharacterState : public APlayerState
 public:
 	UStaticMeshComponent* GetRespawnPoint(int InCustomPlayerId);
 
+	void SetCurCheckPoint(AISMCheckPoint* InCheckPoint);
+
 public:
 	/*First Check Point Location*/
 	UPROPERTY(BlueprintReadOnly, VisibleAnywhere, Category = "Spawn")
@@ -28,7 +30,8 @@ public:
 	FRotator InitialSpawnPointRotator;
 
 	/*Current Check Point*/
-	AISMCheckPoint* CurCheckPoint;
+	UPROPERTY(Transient)
+	TWeakObjectPtr<AISMCheckPoint> CurCheckPoint;
 
 	/*Current Check Point State*/
 	bool bCheckPoint = false;
