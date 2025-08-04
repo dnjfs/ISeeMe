@@ -15,9 +15,6 @@ public:
 	// Sets default values for this actor's properties
 	AISMRecollection();
 
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -33,10 +30,10 @@ private:
 	void MulticastDestroyRecollection();
 
 	UPROPERTY(EditDefaultsOnly)
-	class UStaticMeshComponent* Mesh;
+	TObjectPtr<class UGeometryCacheComponent> Body;
 
 	UPROPERTY(EditDefaultsOnly)
-	class UBoxComponent* TriggerVolume;
+	TObjectPtr<class UBoxComponent> TriggerVolume;
 
 	UPROPERTY(EditInstanceOnly)
 	int32 RecollectionID; // 도전과제 번호로 사용

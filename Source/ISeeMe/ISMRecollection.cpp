@@ -3,7 +3,8 @@
 
 #include "ISMRecollection.h"
 #include "Components/BoxComponent.h"
-#include "Components/StaticMeshComponent.h"
+#include "GeometryCache.h"
+#include "GeometryCacheComponent.h"
 #include "ISMGameInstance.h"
 #include "ISeeMeCharacter.h"
 #include "Manager/AchievementManager.h"
@@ -15,11 +16,11 @@ AISMRecollection::AISMRecollection()
 	PrimaryActorTick.bCanEverTick = false;
 	bReplicates = true;
 
-	Mesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
-	SetRootComponent(Mesh);
+	Body = CreateDefaultSubobject<UGeometryCacheComponent>(TEXT("Body"));
+	SetRootComponent(Body);
 
 	TriggerVolume = CreateDefaultSubobject<UBoxComponent>(TEXT("Trigger Volume"));
-	TriggerVolume->SetupAttachment(Mesh);
+	TriggerVolume->SetupAttachment(Body);
 }
 
 // Called when the game starts or when spawned
@@ -29,14 +30,6 @@ void AISMRecollection::BeginPlay()
 	
 	if (HasAuthority())
 	{
-		// 이미 획득한 추억이라도 레벨에서 삭제하지 않도록 주석처리
-		//if (UISMGameInstance* GI = GetGameInstance<UISMGameInstance>())
-		//{
-		//	if (GI->AcquiredRecollectionIDs.Contains(this->GetFName()))
-		//	{
-		//		MulticastDestroyRecollection();
-		//	}
-		//}
 		TriggerVolume->OnComponentBeginOverlap.AddDynamic(this, &AISMRecollection::OnOverlap);
 	}
 }
@@ -48,13 +41,6 @@ void AISMRecollection::OnOverlap(UPrimitiveComponent* OverlappedComp, AActor* Ot
 		MulticastAcquireRecollection();
 		MulticastDestroyRecollection();
 	}
-}
-
-// Called every frame
-void AISMRecollection::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
 }
 
 void AISMRecollection::MulticastAcquireRecollection_Implementation()
