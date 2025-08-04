@@ -14,9 +14,9 @@ UAchievementManager::UAchievementManager()
 }
 
 
-void UAchievementManager::QueryAchievements()
+void UAchievementManager::Initialize(FSubsystemCollectionBase& Collection)
 {
-	GEngine->AddOnScreenDebugMessage(INDEX_NONE, 30.f, FColor::Cyan, TEXT("QueryAchievements"));
+	GEngine->AddOnScreenDebugMessage(INDEX_NONE, 30.f, FColor::Cyan, TEXT("UAchievementManager::Initialize()"));
 	//Get the online sub system
 	IOnlineSubsystem* OnlineSub = IOnlineSubsystem::Get();
 

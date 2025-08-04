@@ -165,15 +165,6 @@ void AISeeMeCharacter::BeginPlay()
 		FocusTimeline->SetLooping(false);
 		FocusTimeline->SetIgnoreTimeDilation(true);
 	}
-
-	if (UISMGameInstance* GI = GetGameInstance<UISMGameInstance>())
-	{
-		// 도전과제 달성
-		if (UAchievementManager* AM = GI->GetSubsystem<UAchievementManager>())
-		{
-			AM->QueryAchievements();
-		}
-	}
 }
 
 void AISeeMeCharacter::PossessedBy(AController* NewController)

@@ -15,16 +15,11 @@ class ISEEME_API UAchievementManager : public UGameInstanceSubsystem
 public:	
 	// Sets default values for this actor's properties
 	UAchievementManager();
-	
+
 protected:
-	// Called when the game starts or when spawned
-	//virtual void BeginPlay() override;
+	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 
-public:	
-	// Called every frame
-	//virtual void Tick(float DeltaTime) override;
-
-	void QueryAchievements();
+public:
 	void OnQueryAchievementsComplete(const FUniqueNetId& PlayerId, const bool bWasSuccessful);
 	void UpdateAchievementProgress(const FString& Id, float Percent);
 
