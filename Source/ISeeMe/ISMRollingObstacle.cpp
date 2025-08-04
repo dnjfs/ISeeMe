@@ -86,10 +86,14 @@ void AISMRollingObstacle::PushCharacter(UPrimitiveComponent* OverlappedComponent
 	if (!HasAuthority())
 		return;
 
+	if (!OverlappedComponent)
+		return;
+
 	if (ACharacter* Character = Cast<ACharacter>(OtherActor))
 	{
-		FVector PushingDirection = ObjectNewLoc - ObjectOldLoc;
-		PushingDirection.Normalize();
+		FVector StartLocation = OverlappedComponent->GetComponentLocation();
+		FVector EndLocation = Character->GetActorLocation();
+		FVector PushingDirection = (EndLocation - StartLocation).GetSafeNormal();
 
 		Character->LaunchCharacter(PushingDirection * PushingPower, true, true);
 	}
