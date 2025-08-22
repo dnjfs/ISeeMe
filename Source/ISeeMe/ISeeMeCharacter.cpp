@@ -125,7 +125,7 @@ void AISeeMeCharacter::BeginPlay()
 
 								// IsValid(): nullptr + Pending Kill 검사
 								// IsValidLowLevel: Dangling Pointer 검사
-								if (!IsValid(ISMCheckPoint) || ISMCheckPoint->IsValidLowLevel())
+								if (!IsValid(ISMCheckPoint) || !ISMCheckPoint->IsValidLowLevel())
 								{
 									continue;
 								}
