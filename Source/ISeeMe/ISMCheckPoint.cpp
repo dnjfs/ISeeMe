@@ -151,6 +151,7 @@ void AISMCheckPoint::MulticastChangeMaterial_Implementation(int CurDetect)
 		}
 		else if (CurDetect == 2 && PlagOutGeometry)
 		{
+			CheckPointMesh->SetMaterial(0, CheckMaterial);
 			GeometryCacheComp->SetGeometryCache(PlagOutGeometry);
 			GeometryCacheComp->PlayFromStart();
 			
