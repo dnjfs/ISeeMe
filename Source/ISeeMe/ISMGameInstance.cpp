@@ -28,3 +28,19 @@ void UISMGameInstance::LoadGame(UISMSaveGame* LoadedGame)
 	AcquiredRecollectionIDs = LoadedGame->AcquiredRecollectionIDs;
 	bIsFirstLaunch = LoadedGame->bIsFirstLaunch;
 }
+
+void UISMGameInstance::SetSelectedPawnClass(TSubclassOf<ACharacter> ServerCharacter, TSubclassOf<ACharacter> ClientCharacter)
+{
+	UWorld* World = GetWorld();
+	if (!IsValid(World))
+	{
+		return;
+	}
+
+	// 서버에서만 실행
+	if (World->GetNetMode() < ENetMode::NM_Client)
+	{
+		SelectedPawnClass = ServerCharacter;
+		ClientPawnClass = ClientCharacter;
+	}
+}

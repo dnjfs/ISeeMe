@@ -54,8 +54,6 @@ void UISMCharacterSelect::MoveLevel()
 	if (UISMGameInstance* GI = GetGameInstance<UISMGameInstance>())
 	{
 		FString ChapterName = FString::Printf(TEXT("Chapter%d"), GI->CurrChapterNo);
-		UWorld* World = GetWorld();
-
 		if (!GI->bTutorial)
 		{
 			if (AISMLobbyGameMode* GM = Cast<AISMLobbyGameMode>(GetWorld()->GetAuthGameMode()))

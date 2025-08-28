@@ -26,9 +26,6 @@ AISeeMeGameMode::AISeeMeGameMode()
 	{
 		DefaultPawnClass = PlayerPawnBPClass.Class;
 	}
-
-	SelectedPawnClasses.Add(nullptr);
-	SelectedPawnClasses.Add(nullptr);
 }
 
 
@@ -162,59 +159,31 @@ void AISeeMeGameMode::RestoreCamera()
 	bSwapCamera = false;
 }
 
-void AISeeMeGameMode::ChangePawn()
+void AISeeMeGameMode::ChangePawn(APlayerController* Controller, TSubclassOf<APawn> SelectedPawnClass)
 {
-	UE_LOG(LogTemp, Warning, TEXT("Swap Pawn"));
-
-	TArray<AISeeMeCharacter*> LocalCharacters;
-	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	if (!IsValid(Controller))
 	{
-		AISMPlayerController* PC = Cast<AISMPlayerController>(Iterator->Get());
-		if (PC == nullptr)
-			continue;
-
-		ACharacter* BaseCharacter = PC->GetCharacter();
-		if (BaseCharacter && BaseCharacter->IsA(AISeeMeCharacter::StaticClass()))
-		{
-			AISeeMeCharacter* LocalCharacter = Cast<AISeeMeCharacter>(BaseCharacter);
-			LocalCharacters.Add(LocalCharacter);
-		}
+		return;
 	}
 
-	for (int i = 0; i < LocalCharacters.Num(); i++)
+	if (!SelectedPawnClass)
 	{
-		AISeeMeCharacter* MyCharacter = LocalCharacters[i];
-		if (!IsValid(MyCharacter))
-			continue;
+		return;
+	}
 
-		AISMPlayerController* Controller = Cast<AISMPlayerController>(MyCharacter->GetController());
-		if (!Controller)
-			continue;
+	APawn* ExistingPawn = Controller->GetPawn();
+	if (!IsValid(ExistingPawn))
+	{
+		return;
+	}
 
-		if (AISMCharacterState* State = Controller->GetPlayerState<AISMCharacterState>())
-		{
-			State->CustomPlayerID = i + 1;
-		}
+	FVector MySpawnLocation = ExistingPawn->GetActorLocation();
+	FRotator MySpawnRotation = ExistingPawn->GetActorRotation();
 
-		if (!SelectedPawnClasses[i])
-			continue;
-
-		if (APawn* ExistingPawn = Controller->GetPawn(); IsValid(ExistingPawn))
-		{
-			UE_LOG(LogTemp, Warning, TEXT("Destroying existing pawn for player %d: %s"), i, *ExistingPawn->GetName());
-			ExistingPawn->Destroy();
-		}
-
-		FVector MySpawnLocation = MyCharacter->GetActorLocation();
-		FRotator MySpawnRotation = MyCharacter->GetActorRotation();
-		if (!MySpawnLocation.ContainsNaN() && !MySpawnRotation.ContainsNaN())
-		{
-			APawn* NewPawn = GetWorld()->SpawnActor<APawn>(SelectedPawnClasses[i], MySpawnLocation, MySpawnRotation);
-			if (NewPawn)
-			{
-				Controller->Possess(NewPawn);
-			}
-		}
+	if (APawn* NewPawn = GetWorld()->SpawnActor<APawn>(SelectedPawnClass, MySpawnLocation, MySpawnRotation))
+	{
+		ExistingPawn->Destroy();
+		Controller->Possess(NewPawn);
 	}
 }
 
@@ -264,23 +233,6 @@ void AISeeMeGameMode::OnDestroySessionComplete(FName SessionName, bool bWasSucce
 	{
 		UGameplayStatics::OpenLevel(GetWorld(), FName("LoadingMap"), true);
 	}
-}
-
-void AISeeMeGameMode::SwapPlayerControllers(APlayerController* OldPC, APlayerController* NewPC)
-{
-	Super::SwapPlayerControllers(OldPC, NewPC);
-
-	/*if (NewPC)
-	{
-		if (AISMCharacterState* State = NewPC->GetPlayerState<AISMCharacterState>())
-		{
-			int32 CurrentPlayerCount = State->PlayerId;
-			UE_LOG(LogTemp, Warning, TEXT("SwapPlayerControllers: Player count is %d"), CurrentPlayerCount);
-			State->CustomPlayerID = CurrentPlayerCount;
-		}
-	}*/
-
-	UE_LOG(LogTemp, Warning, TEXT("Swap Controllers %s -> %s"), *OldPC->GetName(), *NewPC->GetName());
 }
 
 void AISeeMeGameMode::Logout(AController* Exiting)

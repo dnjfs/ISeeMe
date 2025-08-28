@@ -20,18 +20,21 @@ public:
     // 로컬 SaveGame에 저장된 데이터를 GI로 불러오기
     void LoadGame(UISMSaveGame* LoadedGame);
 
-    UPROPERTY(BlueprintReadWrite)
+    UFUNCTION(BlueprintCallable)
+    void SetSelectedPawnClass(TSubclassOf<ACharacter> ServerCharacter, TSubclassOf<ACharacter> ClientCharacter);
+
+    UPROPERTY(Transient)
     TSubclassOf<APawn> SelectedPawnClass;
 
-    UPROPERTY(BlueprintReadWrite)
+    UPROPERTY(Transient)
+    TSubclassOf<APawn> ClientPawnClass;
+
     int CurrChapterNo;
 
     // 클리어한 최대 챕터
-    UPROPERTY(BlueprintReadWrite)
     int MaxChapterNo;
 
     // Have been Tutorial?
-    UPROPERTY(BlueprintReadWrite)
     bool bTutorial = false;
 
     FName SavedCheckPointID;

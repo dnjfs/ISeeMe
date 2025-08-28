@@ -29,10 +29,7 @@ public:
 
 	FTimerHandle SwapTimerHandle;
 
-	UPROPERTY()
-	TArray<TSubclassOf<APawn>> SelectedPawnClasses;
-
-	void ChangePawn();
+	void ChangePawn(APlayerController* Controller, TSubclassOf<APawn> SelectedPawnClass);
 
 	int SelectNum = 0;
 
@@ -45,8 +42,6 @@ public:
 
 	UFUNCTION()
 	virtual void OnDestroySessionComplete(FName SessionName, bool bWasSuccessful);
-
-	virtual void SwapPlayerControllers(APlayerController* OldPC, APlayerController* NewPC) override;
 
 private:
 	FOnDestroySessionCompleteDelegate OnDestroySessionCompleteDelegate;

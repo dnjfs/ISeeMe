@@ -42,5 +42,6 @@ protected:
 	virtual void PostLogin(APlayerController* NewPlayer) override;
 
 private:
+	UPROPERTY(Transient)
 	TArray<AISMLobbyController*> PCs = {nullptr, nullptr};
 };

@@ -30,55 +30,41 @@ void AISMPlayerController::BeginPlay()
 	SetInputMode(FInputModeGameOnly());
 	SetShowMouseCursor(false);
 	SetControlRotation(FRotator(-20.f, 0.f, 0.f));
-
-	/*if (IsLocalController())
-	{
-		AHUD* HUD = GetHUD();
-		if (AISMHUD* PCHUD = Cast<AISMHUD>(HUD))
-		{
-			UE_LOG(LogTemp, Warning, TEXT("GET HUD"));
-			PCHUD->InitWidgets();
-		}
-		else
-		{
-			UE_LOG(LogTemp, Warning, TEXT("NO HUD"));
-		}
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("NOT LocalController"));
-	}*/
 }
 
 void AISMPlayerController::OnPossess(APawn* aPawn)
 {
 	Super::OnPossess(aPawn);
 
-	if (HasAuthority())
+	check(GetWorld());
+
+	AISeeMeGameMode* GM = Cast<AISeeMeGameMode>(GetWorld()->GetAuthGameMode());
+	if (!IsValid(GM))
 	{
-		if (AISeeMeGameMode* GM = Cast<AISeeMeGameMode>(GetWorld()->GetAuthGameMode()))
-			GM->SwapCamera();
+		return;
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("OnPossess Called. IsLocalController: %s"), *FString(IsLocalController() ? "true" : "false"));
-	
-	/*if (IsLocalController())
+	TSubclassOf<AISeeMeCharacter> DesiredClass;
+	if (UISMGameInstance* GameInstance = GetGameInstance<UISMGameInstance>())
 	{
-		AHUD* HUD = GetHUD();
-		if (AISMHUD* PCHUD = Cast<AISMHUD>(HUD))
+		if (IsLocalController())
 		{
-			UE_LOG(LogTemp, Warning, TEXT("GET HUD"));
-			PCHUD->InitWidgets();
+			DesiredClass = GameInstance->SelectedPawnClass;
 		}
 		else
 		{
-			UE_LOG(LogTemp, Warning, TEXT("NO HUD"));
+			DesiredClass = GameInstance->ClientPawnClass;
 		}
 	}
-	else
+	
+	// if statement with initializer (C++17)
+	if (UClass* PossessedClass = aPawn->GetClass(); DesiredClass && PossessedClass != DesiredClass)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("NOT LocalController"));
-	}*/
+		GM->ChangePawn(this, DesiredClass);
+		return;
+	}
+
+	GM->SwapCamera();
 }
 
 void AISMPlayerController::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
@@ -240,7 +226,8 @@ void AISMPlayerController::DeadCharacter()
 	if (MyCharacter == nullptr)
 		return;
 
-	if (USceneComponent* RespawnPoint = State->GetRespawnPoint(State->CustomPlayerID)) // When get check point
+	int RespawnIndex = IsLocalController() ? 1 : 2;
+	if (USceneComponent* RespawnPoint = State->GetRespawnPoint(RespawnIndex)) // When get check point
 	{
 		MyCharacter->SetActorLocation(RespawnPoint->GetComponentLocation());
 		MyCharacter->SetActorRotation(RespawnPoint->GetComponentRotation());
