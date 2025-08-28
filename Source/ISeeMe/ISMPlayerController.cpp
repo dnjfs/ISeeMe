@@ -152,7 +152,7 @@ void AISMPlayerController::SwapCamera()
 							StrongGameMode->SwapTimerHandle.Invalidate();
 						}
 					}), GM->SwapTime, false);
-				GM->SwapCamera();
+				GM->RestoreCamera();
 
 				GS->OnItemUsed(GS->SwapViewItem);
 			}

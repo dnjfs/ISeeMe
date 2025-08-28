@@ -97,7 +97,6 @@ void AISeeMeGameMode::PostLogin(APlayerController* NewPlayer)
 
 void AISeeMeGameMode::SwapCamera()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Swap Camera"));
 	int32 CurrentPlayers = GetNumPlayers();
 
 	TArray<AISMPlayerController*> PCs;
@@ -109,60 +108,58 @@ void AISeeMeGameMode::SwapCamera()
 		if (PC == nullptr)
 			continue;
 
-		ACharacter* BaseCharacter = PC->GetCharacter();
-
-		if (BaseCharacter == nullptr)
+		AISeeMeCharacter* Character = Cast<AISeeMeCharacter>(PC->GetCharacter());
+		if (Character == nullptr)
 			continue;
 
-		if (BaseCharacter && BaseCharacter->IsA(AISeeMeCharacter::StaticClass()))
-		{
-			AISeeMeCharacter* Character = Cast<AISeeMeCharacter>(BaseCharacter);
-			PCs.Add(PC);
-			Characters.Add(Character);
-		}
+		PCs.Add(PC);
+		Characters.Add(Character);
 	}
 
 	// 카메라 스왑
 	int PlayerNum = PCs.Num();
-	if (bSwapCamera)
+	for (int i = 0; i < PlayerNum; i++)
 	{
-		for (int i = 0; i < PlayerNum; i++)
-		{
-			PCs[i]->SetViewTarget(Characters[i]);
-			PCs[i]->SetOtherCharacter(Characters[i]);
-			PCs[i]->CurrentAspect();
+		int TargetIndex = (i+1 < PlayerNum) ? i+1 : 0;
+		AISeeMeCharacter* Character = Characters[TargetIndex];
+		check(Character); // nullptr이 아닐거라 가정
 
-			if (AISeeMeCharacter* ISeeMeCharacter = PCs[i]->GetPawn<AISeeMeCharacter>())
-			{
-				ISeeMeCharacter->MulticastSetCameraRestore(true);
-				/*if (PlayerNum == 2)
-				{
-					ISeeMeCharacter->EnableAudio();
-					Characters[(i + 1 < PlayerNum) ? i + 1 : 0]->DisableAudio();
-				}*/
-			}
-		}
+		PCs[i]->SetViewTarget(Character);
+		PCs[i]->SetOtherCharacter(Character);
+		PCs[i]->CurrentAspect();
+
+		Character->MulticastSetCameraRestore(false);
 	}
-	else
+
+	bSwapCamera = true;
+}
+
+void AISeeMeGameMode::RestoreCamera()
+{
+	int32 CurrentPlayers = GetNumPlayers();
+
+	TArray<AISMPlayerController*> PCs;
+	TArray<AISeeMeCharacter*> Characters;
+
+	// 카메라 복구
+	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 	{
-		for (int i = 0; i < PlayerNum; i++)
-		{
-			PCs[i]->SetViewTarget(Characters[(i + 1 < PlayerNum) ? i + 1 : 0]);
-			PCs[i]->SetOtherCharacter(Characters[(i + 1 < PlayerNum) ? i + 1 : 0]);
-			PCs[i]->CurrentAspect();
-			
-			if (AISeeMeCharacter* ISeeMeCharacter = PCs[i]->GetPawn<AISeeMeCharacter>())
-			{
-				ISeeMeCharacter->MulticastSetCameraRestore(false);
-				/*if (PlayerNum == 2)
-				{
-					ISeeMeCharacter->DisableAudio();
-					Characters[(i + 1 < PlayerNum) ? i + 1 : 0]->EnableAudio();
-				}*/
-			}
-		}
+		AISMPlayerController* PC = Cast<AISMPlayerController>(Iterator->Get());
+		if (PC == nullptr)
+			continue;
+
+		AISeeMeCharacter* Character = Cast<AISeeMeCharacter>(PC->GetCharacter());
+		if (Character == nullptr)
+			continue;
+
+		PC->SetViewTarget(Character);
+		PC->SetOtherCharacter(Character);
+		PC->CurrentAspect();
+
+		Character->MulticastSetCameraRestore(true);
 	}
-	bSwapCamera = !bSwapCamera;
+
+	bSwapCamera = false;
 }
 
 void AISeeMeGameMode::ChangePawn()

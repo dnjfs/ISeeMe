@@ -20,6 +20,7 @@ public:
 
 	/*For swap camera*/
 	void SwapCamera();
+	void RestoreCamera();
 
 	bool bSwapCamera = true;
 
