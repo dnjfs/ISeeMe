@@ -151,6 +151,20 @@ void AISMCrackGround::MulticastSpawnCrackPart_Implementation()
 		GeometryCacheComp->SetLooping(false);
 		GeometryCacheComp->SetGeometryCache(FallingGeometry);
 		GeometryCacheComp->PlayFromStart();
+
+		// 애니메이션 길이보다 대기시간이 더 길면 애니메이션 종료 시 제거
+		float AnimDuration = FallingGeometry->CalculateDuration();
+		if (AnimDuration < DormantTime)
+		{
+			FTimerHandle TimerHandle;
+			TWeakObjectPtr<UGeometryCacheComponent> WeakGeometryCacheComp(GeometryCacheComp);
+			GetWorld()->GetTimerManager().SetTimer(TimerHandle, [WeakGeometryCacheComp]() {
+				if (TStrongObjectPtr<UGeometryCacheComponent> StrongGeometryCacheComp = WeakGeometryCacheComp.Pin(false))
+				{
+					StrongGeometryCacheComp->SetGeometryCache(nullptr);
+				}
+			}, AnimDuration, false);
+		}
 	}
 
 	if (AudioComponent)
