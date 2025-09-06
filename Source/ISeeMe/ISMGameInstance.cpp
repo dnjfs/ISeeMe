@@ -3,7 +3,7 @@
 #include "ISMGameInstance.h"
 #include "ISeeMe/ISMSaveGame.h"
 #include "Kismet/GameplayStatics.h"
-
+#include "GameFramework/Character.h"
 
 void UISMGameInstance::SaveGame()
 {
@@ -43,4 +43,9 @@ void UISMGameInstance::SetSelectedPawnClass(TSubclassOf<ACharacter> ServerCharac
 		SelectedPawnClass = ServerCharacter;
 		ClientPawnClass = ClientCharacter;
 	}
+}
+
+void UISMGameInstance::SoundPlay(USoundBase* Sound)
+{
+	UGameplayStatics::SpawnSound2D(GetWorld(), Sound, 1, 1, 0, nullptr, true, true);
 }

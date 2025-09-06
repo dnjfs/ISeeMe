@@ -21,6 +21,13 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 	FOnClearUpdated OnClearUpdated;
+
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundBase* ClearSound;
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastPlaySound();
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

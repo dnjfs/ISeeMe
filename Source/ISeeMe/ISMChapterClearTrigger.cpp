@@ -58,6 +58,17 @@ void AISMChapterClearTrigger::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, 
 	MulticastDetectPlayer(false,OtherActor);
 }
 
+void AISMChapterClearTrigger::MulticastDetectPlayer_Implementation(bool bAdd, AActor* OtherActor)
+{
+	if (ACharacter* Character = Cast<ACharacter>(OtherActor))
+	{
+		if (bAdd)
+			DetectedPlayerCount++;
+		else
+			DetectedPlayerCount--;
+	}
+}
+
 void AISMChapterClearTrigger::CompleteChapter()
 {
 	if (OnClearUpdated.IsBound())
@@ -65,10 +76,29 @@ void AISMChapterClearTrigger::CompleteChapter()
 		OnClearUpdated.Execute(true);
 	} // Delegate Execute (Loading UI)
 
+	MulticastPlaySound();
 	MoveToNextChapter();
 	if (GEngine)
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, TEXT("Chapter Clear"));
 	MulticastSaveChapterNo();
+}
+
+void AISMChapterClearTrigger::MulticastPlaySound_Implementation()
+{
+	if (UISMGameInstance* GI = GetGameInstance<UISMGameInstance>())
+	{
+		GI->SoundPlay(ClearSound);
+	}
+}
+
+void AISMChapterClearTrigger::MoveToNextChapter()
+{
+	UWorld* World = GetWorld(); 
+
+	if (HasAuthority())
+	{
+		World->ServerTravel("/Game/ISeeMe/Maps/" + NextChapter + "?listen", true);
+	}
 }
 
 void AISMChapterClearTrigger::MulticastSaveChapterNo_Implementation()
@@ -83,24 +113,4 @@ void AISMChapterClearTrigger::MulticastSaveChapterNo_Implementation()
 	}
 }
 
-void AISMChapterClearTrigger::MoveToNextChapter()
-{
-	UWorld* World = GetWorld(); 
-
-	if (HasAuthority())
-	{
-		World->ServerTravel("/Game/ISeeMe/Maps/" + NextChapter + "?listen", true);
-	}
-}
-
-void AISMChapterClearTrigger::MulticastDetectPlayer_Implementation(bool bAdd, AActor* OtherActor)
-{
-	if (ACharacter* Character = Cast<ACharacter>(OtherActor))
-	{
-		if(bAdd)
-			DetectedPlayerCount++;
-		else
-			DetectedPlayerCount--;
-	}
-}
 

@@ -10,4 +10,5 @@ void AISMChapterEndClearTrigger::CompleteChapter()
 		OnClearEndUpdated.Execute(true);
 	}
 	MulticastSaveChapterNo();
+	MulticastPlaySound();
 }
