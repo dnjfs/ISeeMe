@@ -7,6 +7,7 @@
 #include "GameFramework/RotatingMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "ISeeMeCharacter.h"
+#include "ISMPlayerController.h"
 
 // Sets default values
 AISMRollingObstacle::AISMRollingObstacle()
@@ -96,6 +97,17 @@ void AISMRollingObstacle::PushCharacter(UPrimitiveComponent* OverlappedComponent
 		FVector PushingDirection = (EndLocation - StartLocation).GetSafeNormal();
 
 		Character->LaunchCharacter(PushingDirection * PushingPower, true, true);
+	}
+
+	if (AISeeMeCharacter* OverlappingCharacter = Cast<AISeeMeCharacter>(OtherActor))
+	{
+		if (HasAuthority())
+		{
+			if (AISMPlayerController* PC = Cast<AISMPlayerController>(OverlappingCharacter->GetController()))
+			{
+				PC->ClientPlayLocalSound(BumpSound, true);
+			}
+		}
 	}
 }
 

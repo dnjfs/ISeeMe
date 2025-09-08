@@ -68,6 +68,9 @@ public:
 	UFUNCTION(Client, Reliable)
 	void ClientGoToLevel();
 
+	UFUNCTION(Client, Reliable)
+	void ClientPlayLocalSound(USoundBase* SoundToPlay, bool bPlay);
+
 private:
 	bool bFirstAspect = false;
 

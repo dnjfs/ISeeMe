@@ -12,6 +12,7 @@
 #include "Components/AudioComponent.h"
 #include <Kismet/GameplayStatics.h>
 #include "ISeeMeCharacter.h"
+#include "ISMPlayerController.h"
 
 // Sets default values
 AISMWindArea::AISMWindArea()
@@ -64,10 +65,15 @@ void AISMWindArea::Tick(float DeltaTime)
 
 void AISMWindArea::OnEnter(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	AISeeMeCharacter* OverlappingCharacter = Cast<AISeeMeCharacter>(OtherActor);
-	if (AudioComponent && OverlappingCharacter)
+	if (AISeeMeCharacter* OverlappingCharacter = Cast<AISeeMeCharacter>(OtherActor))
 	{
-		MulticastWindSound(true);
+		if (HasAuthority())
+		{
+			if (AISMPlayerController* PC = Cast<AISMPlayerController>(OverlappingCharacter->GetController()))
+			{
+				PC->ClientPlayLocalSound(WindSound, true);
+			}
+		}
 	}
 
 	if (!HasAuthority())
@@ -78,28 +84,22 @@ void AISMWindArea::OnEnter(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 
 void AISMWindArea::OnExit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	AISeeMeCharacter* OverlappingCharacter = Cast<AISeeMeCharacter>(OtherActor);
-	if (AudioComponent && OverlappingCharacter)
+	if (AISeeMeCharacter* OverlappingCharacter = Cast<AISeeMeCharacter>(OtherActor))
 	{
-		MulticastWindSound(false);
+		if (HasAuthority())
+		{
+			if (AISMPlayerController* PC = Cast<AISMPlayerController>(OverlappingCharacter->GetController()))
+			{
+				PC->ClientPlayLocalSound(WindSound, false);
+			}
+		}
+		//OverlappingCharacter->AudioComponent->FadeOut(1.0f, 0.0f);
 	}
 
 	if (!HasAuthority())
 		return;
 
 	MulticastRemoveTarget(OverlappedComponent, OtherActor, OtherComp, OtherBodyIndex);
-}
-
-void AISMWindArea::MulticastWindSound_Implementation(bool bEnter)
-{
-	if (bEnter)
-	{
-		AudioComponent->Play();
-	}
-	else
-	{
-		AudioComponent->FadeOut(1.0f, 0.0f);
-	}
 }
 
 void AISMWindArea::MulticastApplyWindForce_Implementation(float DeltaTime)

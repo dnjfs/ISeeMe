@@ -2,7 +2,7 @@
 
 
 #include "ISMPlayerController.h"
-
+#include "Components/AudioComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
@@ -16,6 +16,7 @@
 #include "ISMLobbyController.h"
 #include "ISMGameInstance.h"
 #include "TimerManager.h"
+#include "Kismet/GameplayStatics.h"
 
 AISMPlayerController::AISMPlayerController()
 {
@@ -183,6 +184,31 @@ void AISMPlayerController::CurrentAspect()
 void AISMPlayerController::ClientGoToLevel_Implementation()
 {
 	UGameplayStatics::OpenLevel(this, "LoadingMap");
+}
+
+void AISMPlayerController::ClientPlayLocalSound_Implementation(USoundBase* SoundToPlay, bool bPlay)
+{
+	if (bPlay)
+	{
+		if (AISeeMeCharacter* PlayerCharacter = Cast<AISeeMeCharacter>(GetCharacter()))
+		{
+			if (SoundToPlay && PlayerCharacter->GimmickAudioComponent)
+			{
+				PlayerCharacter->GimmickAudioComponent->SetSound(SoundToPlay);
+				PlayerCharacter->GimmickAudioComponent->Play();
+			}
+		}
+	}
+	else
+	{
+		if (AISeeMeCharacter* PlayerCharacter = Cast<AISeeMeCharacter>(GetCharacter()))
+		{
+			if (SoundToPlay && PlayerCharacter->GimmickAudioComponent && PlayerCharacter->GimmickAudioComponent->IsPlaying())
+			{
+				PlayerCharacter->GimmickAudioComponent->FadeOut(1.0f, 0.0f);
+			}
+		}
+	}
 }
 
 void AISMPlayerController::UpdateAspect()

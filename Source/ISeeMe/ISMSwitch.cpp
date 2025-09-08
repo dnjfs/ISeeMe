@@ -5,6 +5,8 @@
 #include "GameFramework/Character.h"
 #include "Components/BoxComponent.h"
 #include "Components/ArrowComponent.h"
+#include "ISeeMeCharacter.h"
+#include "ISMPlayerController.h"
 
 // Sets default values
 AISMSwitch::AISMSwitch()
@@ -96,6 +98,14 @@ void AISMSwitch::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* Oth
 			return;
 		}
 
+		if (AISeeMeCharacter* OverlappingCharacter = Cast<AISeeMeCharacter>(Character))
+		{
+			if (AISMPlayerController* PC = Cast<AISMPlayerController>(OverlappingCharacter->GetController()))
+			{
+				PC->ClientPlayLocalSound(SwitchOnSound, true);
+			}
+		}
+
 		CurDetectPlayer++;
 		if (CurDetectPlayer == 1)
 		{
@@ -112,6 +122,14 @@ void AISMSwitch::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* Other
 		if (!HasAuthority())
 		{
 			return;
+		}
+
+		if (AISeeMeCharacter* OverlappingCharacter = Cast<AISeeMeCharacter>(Character))
+		{
+			if (AISMPlayerController* PC = Cast<AISMPlayerController>(OverlappingCharacter->GetController()))
+			{
+				PC->ClientPlayLocalSound(SwitchOffSound, true);
+			}
 		}
 
 		CurDetectPlayer--;
@@ -139,4 +157,21 @@ void AISMSwitch::MulticastChangeMaterial_Implementation(bool bCheck)
 	}
 }
 
+// 부딪힐 때 사운드 + 따로 함수 만들어서 on/off 소리 다르게 하기
+	/*AISeeMeCharacter* OverlappingCharacter = Cast<AISeeMeCharacter>(OtherActor);
+	if (AudioComponent && OverlappingCharacter)
+	{
+		if (OverlappingCharacter->AudioComponent == nullptr)
+			return;
+
+		if (HasAuthority())
+		{
+			APlayerController* PC = Cast<APlayerController>(OverlappingCharacter->GetController());
+			if (AISMPlayerController* MyPC = Cast<AISMPlayerController>(PC)) // 우리가 만든 컨트롤러 클래스로 캐스팅
+			{
+				// 3. 그 특정 플레이어 컨트롤러에게만 소리를 재생하라고 RPC 명령을 내립니다.
+				MyPC->ClientPlayLocalSound(AudioComponent->Sound); // SoundToPlay는 재생할 사운드 애셋
+			}
+		}
+	}*/
 

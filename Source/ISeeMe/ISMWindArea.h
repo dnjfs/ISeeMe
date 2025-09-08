@@ -26,6 +26,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Sound")
 	UAudioComponent* AudioComponent;
 
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundBase* WindSound;
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -59,10 +61,4 @@ private:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UNiagaraSystem* WindEffect;
-
-	UPROPERTY(EditAnywhere, Category = "Sound")
-	USoundBase* CheckPointSound;
-
-	UFUNCTION(NetMulticast, Unreliable)
-	void MulticastWindSound(bool bEnter);
 };

@@ -16,6 +16,12 @@ public:
 	// Sets default values for this actor's properties
 	AISMSwitch();
 
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundBase* SwitchOnSound;
+
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundBase* SwitchOffSound;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;

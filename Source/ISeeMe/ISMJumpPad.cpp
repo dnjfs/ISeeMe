@@ -5,6 +5,8 @@
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/Character.h"
 #include "Components/TimelineComponent.h"
+#include "ISeeMeCharacter.h"
+#include "ISMPlayerController.h"
 
 // Sets default values
 AISMJumpPad::AISMJumpPad()
@@ -31,7 +33,7 @@ void AISMJumpPad::BeginPlay()
 	
 	if (HasAuthority())
 	{
-		OnActorBeginOverlap.AddDynamic(this, &AISMJumpPad::MulticastLaunchCharacter);
+		OnActorBeginOverlap.AddDynamic(this, &AISMJumpPad::LaunchJumpPad);
 	}
 
 	if (ShakeCurve)
@@ -50,6 +52,21 @@ void AISMJumpPad::PlayShakeTimeline(float Value)
 	FVector NextLocation = FVector(OriginalLocation.X, OriginalLocation.Y, OriginalLocation.Z + Value * ShakeScale);
 
 	JumpPad->SetRelativeLocation(NextLocation);
+}
+
+void AISMJumpPad::LaunchJumpPad(AActor* OverlappedActor, AActor* OtherActor)
+{
+	MulticastLaunchCharacter(OverlappedActor, OtherActor);
+	if (AISeeMeCharacter* OverlappingCharacter = Cast<AISeeMeCharacter>(OtherActor))
+	{
+		if (HasAuthority())
+		{
+			if (AISMPlayerController* PC = Cast<AISMPlayerController>(OverlappingCharacter->GetController()))
+			{
+				PC->ClientPlayLocalSound(JumpPadSound, true);
+			}
+		}
+	}
 }
 
 void AISMJumpPad::MulticastLaunchCharacter_Implementation(AActor* OverlappedActor, AActor* OtherActor)

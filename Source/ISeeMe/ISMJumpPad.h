@@ -15,6 +15,9 @@ public:
 	// Sets default values for this actor's properties
 	AISMJumpPad();
 
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundBase* JumpPadSound;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -39,6 +42,9 @@ private:
 
 	UFUNCTION()
 	void PlayShakeTimeline(float Value);
+
+	UFUNCTION()
+	void LaunchJumpPad(AActor* OverlappedActor, AActor* OtherActor);
 
 	float ShakeScale = 50.f;
 };

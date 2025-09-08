@@ -20,6 +20,9 @@ public:
 
 	virtual bool ShouldTickIfViewportsOnly() const override { return true; }
 
+	UPROPERTY(EditAnywhere, Category = "Sound")
+	USoundBase* BumpSound;
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
