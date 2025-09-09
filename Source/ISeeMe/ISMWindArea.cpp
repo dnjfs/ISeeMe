@@ -12,7 +12,6 @@
 #include "Components/AudioComponent.h"
 #include <Kismet/GameplayStatics.h>
 #include "ISeeMeCharacter.h"
-#include "ISMPlayerController.h"
 
 // Sets default values
 AISMWindArea::AISMWindArea()
@@ -65,13 +64,17 @@ void AISMWindArea::Tick(float DeltaTime)
 
 void AISMWindArea::OnEnter(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	if (AISeeMeCharacter* OverlappingCharacter = Cast<AISeeMeCharacter>(OtherActor))
+	if (ACharacter* OverlappingCharacter = Cast<ACharacter>(OtherActor))
 	{
-		if (HasAuthority())
+		if (APlayerController* PC = Cast<APlayerController>(OverlappingCharacter->GetController()))
 		{
-			if (AISMPlayerController* PC = Cast<AISMPlayerController>(OverlappingCharacter->GetController()))
+			if (PC->IsLocalController())
 			{
-				PC->ClientPlayLocalSound(WindSound, true);
+				if (AudioComponent)
+				{
+					AudioComponent->SetSound(WindSound);
+					AudioComponent->FadeIn(1.f);
+				}
 			}
 		}
 	}
@@ -84,16 +87,18 @@ void AISMWindArea::OnEnter(UPrimitiveComponent* OverlappedComponent, AActor* Oth
 
 void AISMWindArea::OnExit(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	if (AISeeMeCharacter* OverlappingCharacter = Cast<AISeeMeCharacter>(OtherActor))
+	if (ACharacter* OverlappingCharacter = Cast<ACharacter>(OtherActor))
 	{
-		if (HasAuthority())
+		if (APlayerController* PC = Cast<APlayerController>(OverlappingCharacter->GetController()))
 		{
-			if (AISMPlayerController* PC = Cast<AISMPlayerController>(OverlappingCharacter->GetController()))
+			if (PC->IsLocalController())
 			{
-				PC->ClientPlayLocalSound(WindSound, false);
+				if (AudioComponent)
+				{
+					AudioComponent->FadeOut(1.f, 0.f);
+				}
 			}
 		}
-		//OverlappingCharacter->AudioComponent->FadeOut(1.0f, 0.0f);
 	}
 
 	if (!HasAuthority())
