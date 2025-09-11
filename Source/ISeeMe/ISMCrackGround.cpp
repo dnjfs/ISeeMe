@@ -66,6 +66,12 @@ void AISMCrackGround::OnStep(UPrimitiveComponent* HitComp, AActor* OtherActor, U
 	if (!OtherActor->IsA<AISeeMeCharacter>())
 		return;
 
+	if (IsActorTickEnabled())
+	{
+		// 한 번 밟히고 나면 이미 틱이 활성화 된 상태임
+		return;
+	}
+
 	SetActorTickEnabled(true);
 	MulticastSetCracking(true);
 }
