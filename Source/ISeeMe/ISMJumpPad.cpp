@@ -56,9 +56,10 @@ void AISMJumpPad::PlayShakeTimeline(float Value)
 
 void AISMJumpPad::LaunchJumpPad(AActor* OverlappedActor, AActor* OtherActor)
 {
-	MulticastLaunchCharacter(OverlappedActor, OtherActor);
 	if (AISeeMeCharacter* OverlappingCharacter = Cast<AISeeMeCharacter>(OtherActor))
 	{
+		MulticastLaunchCharacter(OverlappedActor, OtherActor);
+
 		if (HasAuthority())
 		{
 			if (AISMPlayerController* PC = Cast<AISMPlayerController>(OverlappingCharacter->GetController()))
