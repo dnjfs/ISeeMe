@@ -26,8 +26,8 @@ void UISMChapterSelect::NativeConstruct()
 		else // 세이브 파일 없음
 		{
 			ContinueButton->SetIsEnabled(false);
-			GI->CurrChapterNo = 1;
-			GI->MaxChapterNo = 1;
+			GI->CurrChapterNo = 0;
+			GI->MaxChapterNo = 0;
 			GI->SavedCheckPointID = FName("None");
 		}
 
@@ -44,7 +44,7 @@ void UISMChapterSelect::NewGame()
 	if (UISMGameInstance* GI = GetGameInstance<UISMGameInstance>())
 	{
 		// 현재 챕터, 체크포인트 정보 초기화 후 저장
-		GI->CurrChapterNo = 1;
+		GI->CurrChapterNo = 0;
 		GI->SavedCheckPointID = FName("None");
 
 		GI->SaveGame();
@@ -61,7 +61,7 @@ void UISMChapterSelect::NewGame()
 void UISMChapterSelect::Continue()
 {
 	if (UISMGameInstance* GI = GetGameInstance<UISMGameInstance>())
-	{
+	{ 
 		FString ChapterName = FString::Printf(TEXT("Chapter%d"), GI->CurrChapterNo);
 		GI->bTutorial = true;
 		if (AISMLobbyGameMode* GM = Cast<AISMLobbyGameMode>(GetWorld()->GetAuthGameMode()))
