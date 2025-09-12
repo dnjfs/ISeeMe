@@ -34,24 +34,29 @@ void AISeeMeGameMode::PostLogin(APlayerController* NewPlayer)
 	Super::PostLogin(NewPlayer);
 
 	UISMGameInstance* GI = Cast<UISMGameInstance>(GetGameInstance());
-	AISMPlayerController* PC = Cast<AISMPlayerController>(NewPlayer);
 
 	if (GetNumPlayers() == 2)
 	{
+		for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+		{
+			AISMPlayerController* PC = Cast<AISMPlayerController>(Iterator->Get());
+
+			// Enable Input
+			if (PC == nullptr)
+				continue;
+
+			ACharacter* BaseCharacter = PC->GetCharacter();
+			if (BaseCharacter)
+			{
+				BaseCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
+			}
+		}
+
 		if (!bFirst)
 		{
 			for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 			{
-				// Enable Input
-				if (PC == nullptr)
-					continue;
-
-				ACharacter* BaseCharacter = PC->GetCharacter();
-				if (BaseCharacter)
-				{
-					//BaseCharacter->EnableInput(PC);
-					BaseCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_Walking);
-				}
+				AISMPlayerController* PC = Cast<AISMPlayerController>(Iterator->Get());
 
 				// Go Check Point
 				if (GI->SavedCheckPointID != FName("None"))
@@ -246,10 +251,13 @@ void AISeeMeGameMode::Logout(AController* Exiting)
 		if (PC == nullptr)
 			continue;
 
-		ACharacter* BaseCharacter = PC->GetCharacter();
-		if (BaseCharacter)
+		if (PC->IsLocalController())
 		{
-			BaseCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+			ACharacter* BaseCharacter = PC->GetCharacter();
+			if (BaseCharacter)
+			{
+				BaseCharacter->GetCharacterMovement()->SetMovementMode(EMovementMode::MOVE_None);
+			}
 		}
 	}
 }
