@@ -29,7 +29,7 @@ public:
 
 	FTimerHandle SwapTimerHandle;
 
-	void ChangePawn(APlayerController* Controller, TSubclassOf<APawn> SelectedPawnClass);
+	bool ChangePawn(APlayerController* Controller, TSubclassOf<APawn> SelectedPawnClass);
 
 	int SelectNum = 0;
 

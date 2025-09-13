@@ -107,11 +107,11 @@ void AISeeMeGameMode::SwapCamera()
 	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 	{
 		AISMPlayerController* PC = Cast<AISMPlayerController>(Iterator->Get());
-		if (PC == nullptr)
+		if (!IsValid(PC))
 			continue;
 
 		AISeeMeCharacter* Character = Cast<AISeeMeCharacter>(PC->GetCharacter());
-		if (Character == nullptr)
+		if (!IsValid(Character))
 			continue;
 
 		PCs.Add(PC);
@@ -164,32 +164,37 @@ void AISeeMeGameMode::RestoreCamera()
 	bSwapCamera = false;
 }
 
-void AISeeMeGameMode::ChangePawn(APlayerController* Controller, TSubclassOf<APawn> SelectedPawnClass)
+bool AISeeMeGameMode::ChangePawn(APlayerController* Controller, TSubclassOf<APawn> SelectedPawnClass)
 {
 	if (!IsValid(Controller))
 	{
-		return;
+		return false;
 	}
 
 	if (!SelectedPawnClass)
 	{
-		return;
+		return false;
 	}
 
 	APawn* ExistingPawn = Controller->GetPawn();
 	if (!IsValid(ExistingPawn))
 	{
-		return;
+		return false;
 	}
 
 	FVector MySpawnLocation = ExistingPawn->GetActorLocation();
 	FRotator MySpawnRotation = ExistingPawn->GetActorRotation();
 
-	if (APawn* NewPawn = GetWorld()->SpawnActor<APawn>(SelectedPawnClass, MySpawnLocation, MySpawnRotation))
+	APawn* NewPawn = GetWorld()->SpawnActor<APawn>(SelectedPawnClass, MySpawnLocation, MySpawnRotation);
+	if (!NewPawn)
 	{
-		ExistingPawn->Destroy();
-		Controller->Possess(NewPawn);
+		return false;
 	}
+
+	ExistingPawn->Destroy();
+	Controller->Possess(NewPawn);
+
+	return true;
 }
 
 void AISeeMeGameMode::CountReadEnding()

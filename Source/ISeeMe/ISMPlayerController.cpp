@@ -61,11 +61,24 @@ void AISMPlayerController::OnPossess(APawn* aPawn)
 	// if statement with initializer (C++17)
 	if (UClass* PossessedClass = aPawn->GetClass(); DesiredClass && PossessedClass != DesiredClass)
 	{
-		GM->ChangePawn(this, DesiredClass);
-		return;
+		if (GM->ChangePawn(this, DesiredClass))
+		{
+			// 정상적으로 새로운 캐릭터를 스폰한 경우 OnPossess()가 한 번 더 호출됨
+			return;
+		}
 	}
 
-	GM->SwapCamera();
+	// [NOTE] 레이스 컨디션 완화를 위해 1프레임 딜레이 발생
+	// ChangePawn() 함수 내에서 스폰된 캐릭터의 정보가 클라이언트에 아직 반영되지 않은 상태에서
+	// SwapCamera() 함수 내에서 SetViewTarget()의 인자로 사용되면 리플리케이션 시 nullptr로 받을 수 있음
+	TWeakObjectPtr<AISeeMeGameMode> WeakWorld(GM);
+	FTimerHandle TimerHandle;
+	GetWorld()->GetTimerManager().SetTimerForNextTick([WeakWorld]() {
+		if (TStrongObjectPtr<AISeeMeGameMode> StrongWorld = WeakWorld.Pin(false))
+		{
+			StrongWorld->SwapCamera();
+		}
+	});
 }
 
 void AISMPlayerController::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
