@@ -14,6 +14,8 @@ class ISEEME_API UISMGameInstance : public UGameInstance
 	GENERATED_BODY()
 	
 public:
+    virtual void Init() override;
+
     // GI에 저장된 데이터를 로컬 SaveGame으로 저장
     void SaveGame();
 
@@ -45,4 +47,11 @@ public:
     bool bIsFirstLaunch = false;
 
     void SoundPlay(USoundBase* Sound);
+
+private:
+    UPROPERTY(Transient)
+    TSubclassOf<ACharacter> PreloadedCharacterClass1;
+
+    UPROPERTY(Transient)
+    TSubclassOf<ACharacter> PreloadedCharacterClass2;
 };
