@@ -35,6 +35,6 @@ private:
 	UPROPERTY(EditDefaultsOnly)
 	TObjectPtr<class UBoxComponent> TriggerVolume;
 
-	UPROPERTY(EditInstanceOnly)
+	UPROPERTY(EditAnywhere)
 	int32 RecollectionID; // 도전과제 번호로 사용
 };
