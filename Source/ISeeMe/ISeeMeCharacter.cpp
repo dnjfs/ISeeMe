@@ -26,6 +26,7 @@
 #include "ISMGameInstance.h"
 #include "ISMTutorialController.h"
 #include "Manager/AchievementManager.h"
+#include "ISMCharacterMovementComponent.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -36,7 +37,8 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 //////////////////////////////////////////////////////////////////////////
 // AISeeMeCharacter
 
-AISeeMeCharacter::AISeeMeCharacter()
+AISeeMeCharacter::AISeeMeCharacter(const FObjectInitializer & ObjectInitializer)
+	:Super(ObjectInitializer.SetDefaultSubobjectClass<UISMCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -63,6 +65,10 @@ AISeeMeCharacter::AISeeMeCharacter()
 	CameraBoom->bUsePawnControlRotation = true; // Rotate the arm based on the controller
 	CameraBoom->SetRelativeRotation(FRotator(-20.f, 0.f, 0.f));
 	CameraBoom->bInheritPitch = false;
+
+	// 카메라 부드럽게 움직이도록
+	CameraBoom->bEnableCameraLag = true;
+	CameraBoom->bEnableCameraRotationLag = true;
 
 	// Create a follow camera
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
@@ -182,6 +188,9 @@ void AISeeMeCharacter::PossessedBy(AController* NewController)
 			//DisableInput(TutorialController);
 		}
 	}
+
+	// 애니메이션 업데이트가 네트워크 업데이트에 의해서가 아닌, 메쉬 tick에 의해 이루어지도록 함
+	GetMesh()->bOnlyAllowAutonomousTickPose = false;
 }
 
 void AISeeMeCharacter::OnRep_Controller()

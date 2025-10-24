@@ -23,7 +23,7 @@ class AISeeMeCharacter : public ACharacter
 	GENERATED_BODY()
 
 public:
-	AISeeMeCharacter();
+	AISeeMeCharacter(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
 
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
