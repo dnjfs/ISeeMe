@@ -26,7 +26,6 @@
 #include "ISMGameInstance.h"
 #include "ISMTutorialController.h"
 #include "Manager/AchievementManager.h"
-#include "ISMCharacterMovementComponent.h"
 
 DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
@@ -37,8 +36,7 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 //////////////////////////////////////////////////////////////////////////
 // AISeeMeCharacter
 
-AISeeMeCharacter::AISeeMeCharacter(const FObjectInitializer & ObjectInitializer)
-	:Super(ObjectInitializer.SetDefaultSubobjectClass<UISMCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
+AISeeMeCharacter::AISeeMeCharacter()
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -46,7 +44,7 @@ AISeeMeCharacter::AISeeMeCharacter(const FObjectInitializer & ObjectInitializer)
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 
 	// Configure character movement
-	GetCharacterMovement()->bOrientRotationToMovement = true; // Character moves in the direction of input...	
+	GetCharacterMovement()->bOrientRotationToMovement = false; // 캐릭터의 방향은 항상 시점 방향으로 고정이므로, false
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 500.0f, 0.0f); // ...at this rotation rate
 
 	// Note: For faster iteration times these variables, and many more, can be tweaked in the Character Blueprint
@@ -57,6 +55,10 @@ AISeeMeCharacter::AISeeMeCharacter(const FObjectInitializer & ObjectInitializer)
 	GetCharacterMovement()->MinAnalogWalkSpeed = 20.f;
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 	GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
+
+	// 네트워크 보간처리 시간
+	GetCharacterMovement()->NetworkSimulatedSmoothLocationTime = 0.1f;
+	GetCharacterMovement()->ListenServerNetworkSimulatedSmoothLocationTime = 0.04f;
 
 	// Create a camera boom (pulls in towards the player if there is a collision)
 	CameraBoom = CreateDefaultSubobject<USpringArmComponent>(TEXT("CameraBoom"));
@@ -174,6 +176,10 @@ void AISeeMeCharacter::BeginPlay()
 		FocusTimeline->SetLooping(false);
 		FocusTimeline->SetIgnoreTimeDilation(true);
 	}
+
+	// 서버에서 네트워크 품질 검사
+	if (HasAuthority() && !IsLocallyControlled())
+		GetWorldTimerManager().SetTimerForNextTick(this, &AISeeMeCharacter::CheckNetworkQuality);
 }
 
 void AISeeMeCharacter::PossessedBy(AController* NewController)
@@ -281,6 +287,33 @@ void AISeeMeCharacter::Tick(float DeltaTime)
 		bIsFalling = false;
 	}
 	*/
+}
+
+void AISeeMeCharacter::CheckNetworkQuality()
+{
+	if (!HasAuthority())
+		return;
+
+	if (APlayerState* PS = GetPlayerState())
+	{
+		float Ping = PS->GetPingInMilliseconds();
+		LOG_SCREEN("Ping : %f", Ping);
+
+		if (Ping >= 150.f) // 네트워크 상황이 안좋을 경우 보간 시간 늘림
+		{
+			LOG_SCREEN("Server: Bad network. Increasing smoothing time");
+			MulticastIncreaseSmoothingTime();
+		}
+	}
+}
+
+void AISeeMeCharacter::MulticastIncreaseSmoothingTime_Implementation()
+{
+	if (UCharacterMovementComponent* MV = GetCharacterMovement())
+	{
+		MV->NetworkSimulatedSmoothLocationTime = 0.4f;
+		MV->ListenServerNetworkSimulatedSmoothLocationTime = 0.3f;
+	}
 }
 
 void AISeeMeCharacter::Move(const FInputActionValue& Value)

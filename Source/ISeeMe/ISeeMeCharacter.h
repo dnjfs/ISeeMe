@@ -23,7 +23,7 @@ class AISeeMeCharacter : public ACharacter
 	GENERATED_BODY()
 
 public:
-	AISeeMeCharacter(const FObjectInitializer& ObjectInitializer = FObjectInitializer::Get());
+	AISeeMeCharacter();
 
 	/** Returns CameraBoom subobject **/
 	FORCEINLINE class USpringArmComponent* GetCameraBoom() const { return CameraBoom; }
@@ -67,6 +67,13 @@ public:
 	void MulticastSetCameraRestore(bool bInIsRestored);
 
 protected:
+	UFUNCTION()
+	// 네트워크 품질 확인, 필요 시 렉 최적화 작업
+	void CheckNetworkQuality();
+
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastIncreaseSmoothingTime();
+
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
 
@@ -166,5 +173,7 @@ private:
 
 	UFUNCTION()
 	void PlayFocusTimeline(float Value);
+
+	FTimerHandle NetworkCheckTimerHandle;
 };
 
