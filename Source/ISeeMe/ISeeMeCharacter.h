@@ -66,14 +66,10 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastSetCameraRestore(bool bInIsRestored);
 
+	// **항상 상대방 캐릭터에 대해 적용되어야 함
+	void SetSmoothCharacterMovement(bool bEnable);
+
 protected:
-	UFUNCTION()
-	// 네트워크 품질 확인, 필요 시 렉 최적화 작업
-	void CheckNetworkQuality();
-
-	UFUNCTION(NetMulticast, Reliable)
-	void MulticastIncreaseSmoothingTime();
-
 	/** Called for movement input */
 	void Move(const FInputActionValue& Value);
 

@@ -48,6 +48,8 @@ public:
 
     void SoundPlay(USoundBase* Sound);
 
+    bool bEnableSmoothCharacterMovement = false;
+
 private:
     UPROPERTY(Transient)
     TSubclassOf<ACharacter> PreloadedCharacterClass1;

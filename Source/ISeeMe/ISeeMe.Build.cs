@@ -13,6 +13,7 @@ public class ISeeMe : ModuleRules
 		PublicDependencyModuleNames.AddRange(new string[] {
 			"Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput", "UMG", "OnlineSubsystem", 
 			"OnlineSubsystemSteam","OnlineSubsystemUtils", "Niagara", "GeometryCache", "NetCore","EngineSettings",
+            "Slate", "SlateCore",
         });
 	}
 }

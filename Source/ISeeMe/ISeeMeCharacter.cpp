@@ -70,7 +70,6 @@ AISeeMeCharacter::AISeeMeCharacter()
 
 	// 카메라 부드럽게 움직이도록
 	CameraBoom->bEnableCameraLag = true;
-	CameraBoom->bEnableCameraRotationLag = true;
 
 	// Create a follow camera
 	FollowCamera = CreateDefaultSubobject<UCameraComponent>(TEXT("FollowCamera"));
@@ -177,9 +176,13 @@ void AISeeMeCharacter::BeginPlay()
 		FocusTimeline->SetIgnoreTimeDilation(true);
 	}
 
-	// 서버에서 네트워크 품질 검사
-	if (HasAuthority() && !IsLocallyControlled())
-		GetWorldTimerManager().SetTimerForNextTick(this, &AISeeMeCharacter::CheckNetworkQuality);
+	if (UISMGameInstance* GI = GetGameInstance<UISMGameInstance>())
+	{
+		if (!IsLocallyControlled())
+		{
+			SetSmoothCharacterMovement(GI->bEnableSmoothCharacterMovement);
+		}
+	}
 }
 
 void AISeeMeCharacter::PossessedBy(AController* NewController)
@@ -289,30 +292,31 @@ void AISeeMeCharacter::Tick(float DeltaTime)
 	*/
 }
 
-void AISeeMeCharacter::CheckNetworkQuality()
+void AISeeMeCharacter::SetSmoothCharacterMovement(bool bEnable)
 {
-	if (!HasAuthority())
-		return;
-
-	if (APlayerState* PS = GetPlayerState())
+	if (GetNetMode() == NM_ListenServer) // server 
 	{
-		float Ping = PS->GetPingInMilliseconds();
-		LOG_SCREEN("Ping : %f", Ping);
-
-		if (Ping >= 150.f) // 네트워크 상황이 안좋을 경우 보간 시간 늘림
+		if (bEnable)
 		{
-			LOG_SCREEN("Server: Bad network. Increasing smoothing time");
-			MulticastIncreaseSmoothingTime();
+			GetCharacterMovement()->ListenServerNetworkSimulatedSmoothLocationTime = 0.3f;
 		}
+		else
+		{
+			GetCharacterMovement()->ListenServerNetworkSimulatedSmoothLocationTime = 0.04f;
+		}
+		GetCharacterMovement()->ResetPredictionData_Client();
 	}
-}
-
-void AISeeMeCharacter::MulticastIncreaseSmoothingTime_Implementation()
-{
-	if (UCharacterMovementComponent* MV = GetCharacterMovement())
+	else // client
 	{
-		MV->NetworkSimulatedSmoothLocationTime = 0.4f;
-		MV->ListenServerNetworkSimulatedSmoothLocationTime = 0.3f;
+		if (bEnable)
+		{
+			GetCharacterMovement()->NetworkSimulatedSmoothLocationTime = 0.4f;
+		}
+		else
+		{
+			GetCharacterMovement()->NetworkSimulatedSmoothLocationTime = 0.1f;
+		}
+		GetCharacterMovement()->ResetPredictionData_Client();
 	}
 }
 

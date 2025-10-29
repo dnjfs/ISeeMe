@@ -6,7 +6,12 @@
 #include "Components/Slider.h"
 #include "Components/TextBlock.h"
 #include "Components/WidgetSwitcher.h"
+#include "ISeeMe/ISMGameInstance.h"
+#include "ISeeMe/ISeeMeCharacter.h"
 #include <ISeeMe/ISMSettingsSave.h>
+#include "Components/Button.h"
+#include "Styling/SlateBrush.h"
+#include "ISeeMe/ISMPlayerController.h"
 
 
 void UISMOptionPanel::ResetPageSwitcher()
@@ -40,6 +45,39 @@ void UISMOptionPanel::InitSoundSetting(TSubclassOf<USaveGame> SaveGameClass, USo
 	} // Set Sound Settings
 }
 
+void UISMOptionPanel::SetNetworkSettingUI()
+{
+	FButtonStyle OnButtonStyle = SmoothingOnButton->GetStyle();
+	FButtonStyle OffButtonStyle = SmoothingOffButton->GetStyle();
+
+	if (UISMGameInstance* GI = GetGameInstance<UISMGameInstance>())
+	{
+		if (GI->bEnableSmoothCharacterMovement && RedButtonTexture && GreenButtonTexture) // Smoothing On
+		{
+			OnButtonStyle.Normal.SetResourceObject(RedButtonTexture);
+			OnButtonStyle.Hovered.SetResourceObject(RedButtonTexture);
+			OnButtonStyle.Pressed.SetResourceObject(RedButtonTexture);
+
+			OffButtonStyle.Normal.SetResourceObject(GreenButtonTexture);
+			OffButtonStyle.Hovered.SetResourceObject(GreenButtonTexture);
+			OffButtonStyle.Pressed.SetResourceObject(GreenButtonTexture);
+		}
+		else // Smoothing Off
+		{
+			OnButtonStyle.Normal.SetResourceObject(GreenButtonTexture);
+			OnButtonStyle.Hovered.SetResourceObject(GreenButtonTexture);
+			OnButtonStyle.Pressed.SetResourceObject(GreenButtonTexture);
+			
+			OffButtonStyle.Normal.SetResourceObject(RedButtonTexture);
+			OffButtonStyle.Hovered.SetResourceObject(RedButtonTexture);
+			OffButtonStyle.Pressed.SetResourceObject(RedButtonTexture);
+		}
+
+		SmoothingOnButton->SetStyle(OnButtonStyle);
+		SmoothingOffButton->SetStyle(OffButtonStyle);
+	}
+}
+
 void UISMOptionPanel::ChangeSound(USoundMix* InSoundMix, USoundClass* InSoundClass, float Volume, FString Mode)
 {
 	if (UISMSettingsSave* SaveGameInstance = Cast<UISMSettingsSave>(UGameplayStatics::LoadGameFromSlot("SoundSettings", 0)))
@@ -59,5 +97,26 @@ void UISMOptionPanel::ChangeSound(USoundMix* InSoundMix, USoundClass* InSoundCla
 		{
 			UGameplayStatics::SetSoundMixClassOverride(GetWorld(), InSoundMix, InSoundClass, Volume, 1, 0);
 		} // Save Sound Settings
+	}
+}
+
+void UISMOptionPanel::SetSmoothCharacterMovement(bool bEnable)
+{
+	if (UISMGameInstance* GI = GetGameInstance<UISMGameInstance>())
+	{
+		GI->bEnableSmoothCharacterMovement = bEnable;
+
+		SetNetworkSettingUI();
+
+		if (APlayerController* PlayerController = GI->GetFirstLocalPlayerController())
+		{
+			if (AISMPlayerController* ISMPlayerController = Cast<AISMPlayerController>(PlayerController))
+			{
+				if (AISeeMeCharacter* OtherCharacter = ISMPlayerController->GetOtherCharacter())
+				{
+					OtherCharacter->SetSmoothCharacterMovement(bEnable);
+				}
+			}
+		}
 	}
 }
