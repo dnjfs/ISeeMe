@@ -38,4 +38,7 @@ public:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	bool bIsFirstLaunch;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
+	bool bEnableSmoothCharacterMovement;
 };

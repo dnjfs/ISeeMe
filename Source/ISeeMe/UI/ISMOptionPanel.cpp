@@ -52,11 +52,11 @@ void UISMOptionPanel::SetNetworkSettingUI()
 
 	if (UISMGameInstance* GI = GetGameInstance<UISMGameInstance>())
 	{
-		if (GI->bEnableSmoothCharacterMovement && RedButtonTexture && GreenButtonTexture) // Smoothing On
+		if (GI->bEnableSmoothCharacterMovement && BlueButtonTexture && GreenButtonTexture) // Smoothing On
 		{
-			OnButtonStyle.Normal.SetResourceObject(RedButtonTexture);
-			OnButtonStyle.Hovered.SetResourceObject(RedButtonTexture);
-			OnButtonStyle.Pressed.SetResourceObject(RedButtonTexture);
+			OnButtonStyle.Normal.SetResourceObject(BlueButtonTexture);
+			OnButtonStyle.Hovered.SetResourceObject(BlueButtonTexture);
+			OnButtonStyle.Pressed.SetResourceObject(BlueButtonTexture);
 
 			OffButtonStyle.Normal.SetResourceObject(GreenButtonTexture);
 			OffButtonStyle.Hovered.SetResourceObject(GreenButtonTexture);
@@ -68,9 +68,9 @@ void UISMOptionPanel::SetNetworkSettingUI()
 			OnButtonStyle.Hovered.SetResourceObject(GreenButtonTexture);
 			OnButtonStyle.Pressed.SetResourceObject(GreenButtonTexture);
 			
-			OffButtonStyle.Normal.SetResourceObject(RedButtonTexture);
-			OffButtonStyle.Hovered.SetResourceObject(RedButtonTexture);
-			OffButtonStyle.Pressed.SetResourceObject(RedButtonTexture);
+			OffButtonStyle.Normal.SetResourceObject(BlueButtonTexture);
+			OffButtonStyle.Hovered.SetResourceObject(BlueButtonTexture);
+			OffButtonStyle.Pressed.SetResourceObject(BlueButtonTexture);
 		}
 
 		SmoothingOnButton->SetStyle(OnButtonStyle);
@@ -105,6 +105,7 @@ void UISMOptionPanel::SetSmoothCharacterMovement(bool bEnable)
 	if (UISMGameInstance* GI = GetGameInstance<UISMGameInstance>())
 	{
 		GI->bEnableSmoothCharacterMovement = bEnable;
+		GI->SaveGame();
 
 		SetNetworkSettingUI();
 

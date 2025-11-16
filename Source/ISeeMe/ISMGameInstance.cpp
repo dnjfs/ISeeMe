@@ -33,6 +33,7 @@ void UISMGameInstance::SaveGame()
 		SaveGameInstance->CheckPointID = this->SavedCheckPointID;
 		SaveGameInstance->AcquiredRecollectionIDs = this->AcquiredRecollectionIDs;
 		SaveGameInstance->bIsFirstLaunch = this->bIsFirstLaunch;
+		SaveGameInstance->bEnableSmoothCharacterMovement = this->bEnableSmoothCharacterMovement;
 
 		UGameplayStatics::AsyncSaveGameToSlot(SaveGameInstance, TEXT("SaveSlot"), 0);
 	}
@@ -46,6 +47,7 @@ void UISMGameInstance::LoadGame(UISMSaveGame* LoadedGame)
 	SavedCheckPointID = LoadedGame->CheckPointID;
 	AcquiredRecollectionIDs = LoadedGame->AcquiredRecollectionIDs;
 	bIsFirstLaunch = LoadedGame->bIsFirstLaunch;
+	bEnableSmoothCharacterMovement = LoadedGame->bEnableSmoothCharacterMovement;
 }
 
 void UISMGameInstance::SetSelectedPawnClass(TSubclassOf<ACharacter> ServerCharacter, TSubclassOf<ACharacter> ClientCharacter)

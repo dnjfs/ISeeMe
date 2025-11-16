@@ -55,7 +55,7 @@ protected:
 	class UButton* SmoothingOffButton;
 
 	UPROPERTY(EditDefaultsOnly)
-	UTexture2D* RedButtonTexture;
+	UTexture2D* BlueButtonTexture;
 
 	UPROPERTY(EditDefaultsOnly)
 	UTexture2D* GreenButtonTexture;
