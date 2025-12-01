@@ -65,6 +65,10 @@ void AISMLoadingController::BeginPlay()
 			{
 				UKismetInternationalizationLibrary::SetCurrentCulture(DefaultLanguage, true);
 			}
+			if (DefaultLanguage.Equals("ja"))
+			{
+				UKismetInternationalizationLibrary::SetCurrentCulture(FString("ja"), true);
+			}
 			else
 			{
 				UKismetInternationalizationLibrary::SetCurrentCulture(FString("en"), true);
