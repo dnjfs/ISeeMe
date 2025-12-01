@@ -9,15 +9,15 @@ void UISMGameInstance::Init()
 {
 	Super::Init();
 
-	// [NOTE] 서버에서 스폰한 액터가 클라이언트에 복제되지 않는 문제에 대한 해결 코드
-	// 1. 서버는 스폰할 액터의 원형(Archetype) 정보를 NetGUID를 통해 클라이언트로 전송한다.
-	// 2. 클라이언트는 전송받은 NetGUID를 이용해 자신의 메모리에 로드된 UClass(Archetype)를 찾는다.
-	// 3. 만약 SeamlessTravel 중 GC에 의해 해당 UClass에 대한 하드 레퍼런스가 모두 사라지면,
-	//    UClass가 메모리에서 언로드되어 Archetype을 찾지 못하고 액터 스폰에 실패하게 된다.
-	// 4. 이를 방지하기 위해, GameInstance에서 해당 클래스들을 직접 로드하여 하드 레퍼런스를 유지시킨다.
-	//    이를 통해 GC가 UClass를 제거하는 것을 막고, 네트워크를 통한 캐릭터 스폰이 항상 가능하도록 보장한다.
+	// [NOTE] サーバーでスポーンしたアクターがクライアントにレプリケートされない問題への対処コード
+	// 1. サーバーはスポーンするアクターのアーキタイプ情報を NetGUID を通じてクライアントに送信する。
+	// 2. クライアントは受け取った NetGUID を使って、自身のメモリにロードされている UClass (アーキタイプ) を探す。
+	// 3. SeamlessTravel 中に GC によってその UClass へのハードリファレンスがすべて消えると、
+	//    UClass がメモリからアンロードされてアーキタイプを見つけられず、アクターのスポーンに失敗する。
+	// 4. これを防ぐために、GameInstance で該当クラスを直接ロードしてハードリファレンスを保持する。
+	//    こうすることで GC が UClass を破棄するのを防ぎ、ネットワーク経由でのキャラクタースポーンを常に保証する。
 	//
-	// - 참고: UClass는 CDO를 포함하고 있고, 클라이언트 스폰 시엔 NetGUID로 찾은 UClass의 CDO를 통해 스폰
+	// - 参考: UClass は CDO を含んでおり、クライアントスポーン時には NetGUID で見つけた UClass の CDO を通じてスポーンされる。
 	PreloadedCharacterClass1 = LoadClass<ACharacter>(nullptr, TEXT("/Game/ISeeMe/Blueprints/BP_Boy.BP_Boy_C"));
 	PreloadedCharacterClass2 = LoadClass<ACharacter>(nullptr, TEXT("/Game/ISeeMe/Blueprints/BP_Mimi.BP_Mimi_C"));
 
@@ -58,7 +58,7 @@ void UISMGameInstance::SetSelectedPawnClass(TSubclassOf<ACharacter> ServerCharac
 		return;
 	}
 
-	// 서버에서만 실행
+	// サーバーのみで実行
 	if (World->GetNetMode() < ENetMode::NM_Client)
 	{
 		SelectedPawnClass = ServerCharacter;

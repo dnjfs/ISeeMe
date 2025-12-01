@@ -26,7 +26,7 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	int CurrChapterNo;
 
-	// 클리어한 최대 챕터
+	// クリアした最大チャプター
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	int MaxChapterNo;
 

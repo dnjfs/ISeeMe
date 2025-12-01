@@ -11,15 +11,15 @@ class UISMSaveGame;
 UCLASS()
 class ISEEME_API UISMGameInstance : public UGameInstance
 {
-	GENERATED_BODY()
-	
+    GENERATED_BODY()
+
 public:
     virtual void Init() override;
 
-    // GI에 저장된 데이터를 로컬 SaveGame으로 저장
+    // GI に保存されたデータをローカル SaveGame に保存
     void SaveGame();
 
-    // 로컬 SaveGame에 저장된 데이터를 GI로 불러오기
+    // ローカル SaveGame に保存されたデータを GI に読み込む
     void LoadGame(UISMSaveGame* LoadedGame);
 
     UFUNCTION(BlueprintCallable)
@@ -33,7 +33,7 @@ public:
 
     int CurrChapterNo;
 
-    // 클리어한 최대 챕터
+    // クリア済みの最大チャプター
     int MaxChapterNo;
 
     // Have been Tutorial?
@@ -43,7 +43,7 @@ public:
 
     TArray<FName> AcquiredRecollectionIDs;
 
-    // 첫 실행 여부
+    // 初回起動フラグ
     bool bIsFirstLaunch = false;
 
     void SoundPlay(USoundBase* Sound);

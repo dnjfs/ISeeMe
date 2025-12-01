@@ -57,28 +57,29 @@ void AISMPlayerController::OnPossess(APawn* aPawn)
 			DesiredClass = GameInstance->ClientPawnClass;
 		}
 	}
-	
+
 	// if statement with initializer (C++17)
 	if (UClass* PossessedClass = aPawn->GetClass(); DesiredClass && PossessedClass != DesiredClass)
 	{
 		if (GM->ChangePawn(this, DesiredClass))
 		{
-			// 정상적으로 새로운 캐릭터를 스폰한 경우 OnPossess()가 한 번 더 호출됨
+			// 正常に新しいキャラクターをスポーンできた場合は OnPossess() がもう一度呼び出される
 			return;
 		}
 	}
 
-	// [NOTE] 레이스 컨디션 완화를 위해 1프레임 딜레이 발생
-	// ChangePawn() 함수 내에서 스폰된 캐릭터의 정보가 클라이언트에 아직 반영되지 않은 상태에서
-	// SwapCamera() 함수 내에서 SetViewTarget()의 인자로 사용되면 리플리케이션 시 nullptr로 받을 수 있음
+	// [NOTE] レースコンディションを緩和するために 1 フレームのディレイを入れる
+	// ChangePawn() 関数内でスポーンされたキャラクターの情報がクライアントにまだ反映されていない状態で
+	// SwapCamera() 関数内で SetViewTarget() の引数として使用されると、レプリケーション時に nullptr を受け取る可能性がある
 	TWeakObjectPtr<AISeeMeGameMode> WeakWorld(GM);
 	FTimerHandle TimerHandle;
-	GetWorld()->GetTimerManager().SetTimerForNextTick([WeakWorld]() {
-		if (TStrongObjectPtr<AISeeMeGameMode> StrongWorld = WeakWorld.Pin(false))
+	GetWorld()->GetTimerManager().SetTimerForNextTick([WeakWorld]()
 		{
-			StrongWorld->SwapCamera();
-		}
-	});
+			if (TStrongObjectPtr<AISeeMeGameMode> StrongWorld = WeakWorld.Pin(false))
+			{
+				StrongWorld->SwapCamera();
+			}
+		});
 }
 
 void AISMPlayerController::GetLifetimeReplicatedProps(TArray< FLifetimeProperty >& OutLifetimeProps) const
@@ -97,7 +98,7 @@ void AISMPlayerController::SetPawn(APawn* InPawn)
 		return;
 	}
 
-	// 내 캐릭터 강조를 위해 '커스텀 뎁스 패스 렌더(bRenderCustomDepth)' 켜기
+	// 自キャラクターを強調表示するために「カスタムデプスパスレンダー (bRenderCustomDepth)」を有効にする
 	if (GetCharacter())
 	{
 		if (USkeletalMeshComponent* LocalMesh = GetCharacter()->GetMesh())
@@ -130,7 +131,7 @@ void AISMPlayerController::SwapCamera()
 		if (GS->SwapViewItem == nullptr)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Cannot swap camera"));
-			return; // 조건에 맞지 않으면 종료
+			return; // 条件を満たさない場合は終了
 		}
 
 		if (HasAuthority()) // 서버에서 실행
@@ -185,13 +186,13 @@ void AISMPlayerController::EndPlay(const EEndPlayReason::Type EndPlayReason)
 
 void AISMPlayerController::SwapAspect()
 {
-	bFirstAspect = !bFirstAspect;  
-	UpdateAspect();               
+	bFirstAspect = !bFirstAspect;
+	UpdateAspect();
 }
 
 void AISMPlayerController::CurrentAspect()
 {
-	UpdateAspect(); 
+	UpdateAspect();
 }
 
 void AISMPlayerController::ClientGoToLevel_Implementation()

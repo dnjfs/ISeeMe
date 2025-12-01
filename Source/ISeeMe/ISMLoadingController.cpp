@@ -47,7 +47,7 @@ void AISMLoadingController::BeginPlay()
 	SetInputMode(Mode);
 	SetShowMouseCursor(true);
 
-	//현재 첫 실행이라면, 언어 설정
+	// 現在が初回起動であれば、言語を設定
 	UE_LOG(LogTemp, Warning, TEXT("LANGUAGESET"));
 	if (UISMGameInstance* GI = GetGameInstance<UISMGameInstance>())
 	{

@@ -43,7 +43,7 @@ void AISMSwitch::BeginPlay()
 		}
 		SetActorTickEnabled(false);
 	}
-	else // TargetActor가 지정되어있지 않을 경우 이 액터 제거
+	else // TargetActor が指定されていない場合、このアクターを削除
 	{
 		Destroy();
 	}
@@ -67,7 +67,7 @@ void AISMSwitch::MulticastMove_Implementation(float DeltaTime)
 
 	TargetActor->SetActorLocation(WorldNextLocation);
 
-	if (bIsForward) // 정방향 이동
+	if (bIsForward) // 正方向に移動
 	{
 		CurrMovedTime += DeltaTime;
 
@@ -77,7 +77,7 @@ void AISMSwitch::MulticastMove_Implementation(float DeltaTime)
 			return;
 		}
 	}
-	else // 역방향 이동
+	else // 逆方向に移動
 	{
 		CurrMovedTime -= DeltaTime;
 
@@ -86,7 +86,7 @@ void AISMSwitch::MulticastMove_Implementation(float DeltaTime)
 			SetActorTickEnabled(false);
 			return;
 		}
-	}	
+	}
 }
 
 void AISMSwitch::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -157,7 +157,7 @@ void AISMSwitch::MulticastChangeMaterial_Implementation(bool bCheck)
 	}
 }
 
-// 부딪힐 때 사운드 + 따로 함수 만들어서 on/off 소리 다르게 하기
+// 衝突時にサウンド再生＋別の関数にして on/off で異なるサウンドを再生する
 	/*AISeeMeCharacter* OverlappingCharacter = Cast<AISeeMeCharacter>(OtherActor);
 	if (AudioComponent && OverlappingCharacter)
 	{
@@ -167,11 +167,10 @@ void AISMSwitch::MulticastChangeMaterial_Implementation(bool bCheck)
 		if (HasAuthority())
 		{
 			APlayerController* PC = Cast<APlayerController>(OverlappingCharacter->GetController());
-			if (AISMPlayerController* MyPC = Cast<AISMPlayerController>(PC)) // 우리가 만든 컨트롤러 클래스로 캐스팅
+			if (AISMPlayerController* MyPC = Cast<AISMPlayerController>(PC)) // 自作のコントローラークラスにキャスト
 			{
-				// 3. 그 특정 플레이어 컨트롤러에게만 소리를 재생하라고 RPC 명령을 내립니다.
-				MyPC->ClientPlayLocalSound(AudioComponent->Sound); // SoundToPlay는 재생할 사운드 애셋
+				// 3. その特定のプレイヤーコントローラーにだけサウンドを再生するよう RPC を送る
+				MyPC->ClientPlayLocalSound(AudioComponent->Sound); // SoundToPlay は再生するサウンドアセット
 			}
 		}
 	}*/
-

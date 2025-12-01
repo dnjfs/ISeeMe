@@ -66,7 +66,7 @@ public:
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastSetCameraRestore(bool bInIsRestored);
 
-	// **항상 상대방 캐릭터에 대해 적용되어야 함
+	// **常に相手キャラクターに対して適用されなければならない
 	void SetSmoothCharacterMovement(bool bEnable);
 
 protected:

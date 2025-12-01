@@ -12,7 +12,7 @@
 // Sets default values
 AISMRollingObstacle::AISMRollingObstacle()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	bReplicates = true;
@@ -66,16 +66,16 @@ void AISMRollingObstacle::SetRelativeObjectLocation()
 {
 	FVector ObjectOffset = FVector::Zero();
 
-	if (RotationSpeed.Pitch != 0) // Y축 기준 회전
+	if (RotationSpeed.Pitch != 0) // Y 軸を基準に回転
 		ObjectOffset.Z += 1.f;
 
-	if (RotationSpeed.Yaw != 0) // Z축 기준 회전
+	if (RotationSpeed.Yaw != 0) // Z 軸を基準に回転
 		ObjectOffset.X += 1.f;
 
-	if (RotationSpeed.Roll != 0) // X축 기준 회전
+	if (RotationSpeed.Roll != 0) // X 軸を基準に回転
 		ObjectOffset.Y += 1.f;
 
-	//정규화
+	// 正規化
 	ObjectOffset.Normalize();
 	ObjectOffset *= RotatorArmLength;
 

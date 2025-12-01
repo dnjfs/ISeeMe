@@ -145,7 +145,7 @@ void AISMLobbyController::CallChangeCharacterButton(FString CharacterSelect)
 		if (AISMLobbyGameMode* GM = Cast<AISMLobbyGameMode>(GetWorld()->GetAuthGameMode()))
 		{
 			// Host
-			GM->ChangeCharacterButton(CharacterSelect,0); 
+			GM->ChangeCharacterButton(CharacterSelect, 0);
 		}
 	}
 }
@@ -170,7 +170,7 @@ void AISMLobbyController::MulticastChangeCharacterButton_Implementation(const FS
 		{
 			UISMCharacterSelect* CharacterSelectWidget = Cast<UISMCharacterSelect>(ActiveWidget);
 			if (CharacterSelectWidget && IsLocalController())
-			{				
+			{
 				if (CharacterSelect == "Hojin")
 				{
 					CharacterSelectWidget->HojinButton->SetBackgroundColor(Color);
@@ -265,7 +265,7 @@ bool AISMLobbyController::GetSessionInterface()
 	IOnlineSubsystem* OSS = IOnlineSubsystem::Get();
 	if (OSS == nullptr)
 		return false;
-	
+
 	LOG_SCREEN("SubsystemName: %s", *OSS->GetSubsystemName().ToString());
 
 	OnlineSessionInterface = OSS->GetSessionInterface();
@@ -273,7 +273,7 @@ bool AISMLobbyController::GetSessionInterface()
 		return false;
 
 
-	// 델리게이트 등록
+	// デリゲートを登録
 	if (const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController())
 		OnlineSessionInterface->AddOnFindFriendSessionCompleteDelegate_Handle(LocalPlayer->GetControllerId(), FindFriendSessionCompleteDelegate);
 	else
@@ -294,16 +294,16 @@ void AISMLobbyController::FindSession()
 		return;
 	}
 
-	// 델리게이트 연결
+	// デリゲートをバインド
 	OnlineSessionInterface->AddOnFindSessionsCompleteDelegate_Handle(FindSessionCompleteDelegate);
 
 	// Find Game Session
 	SessionSearch = MakeShareable(new FOnlineSessionSearch());
-	SessionSearch->MaxSearchResults = 100;	// 검색 결과로 나오는 세션 수 최대값
-	SessionSearch->bIsLanQuery = false;		// LAN 사용 여부
-	SessionSearch->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals); // 찾을 세션 쿼리를 Presence로 설정
+	SessionSearch->MaxSearchResults = 100;	// 検索結果として取得するセッション数の最大値
+	SessionSearch->bIsLanQuery = false;		// LAN を使用するかどうか
+	SessionSearch->QuerySettings.Set(SEARCH_PRESENCE, true, EOnlineComparisonOp::Equals); // 検索するセッションのクエリを Presence に設定
 
-	// 세션 검색
+	// セッション検索
 	if (const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController())
 		OnlineSessionInterface->FindSessions(*LocalPlayer->GetPreferredUniqueNetId(), SessionSearch.ToSharedRef());
 }
@@ -313,7 +313,7 @@ void AISMLobbyController::OnFindSessionComplete(bool bWasSuccessful)
 	if (OnlineSessionInterface.IsValid() == false)
 	{
 		LOG_SCREEN("Session Interface is Invalid");
-			return;
+		return;
 	}
 
 	if (!bWasSuccessful)
@@ -329,14 +329,14 @@ void AISMLobbyController::OnFindSessionComplete(bool bWasSuccessful)
 		FString Id = Result.GetSessionIdStr();
 		FString User = Result.Session.OwningUserName;
 
-		// 매치 타입 확인하기
+		// マッチタイプを確認
 		FString MatchType;
 		Result.Session.SessionSettings.Get(FName("MatchType"), MatchType);
 
-		// 찾은 세션의 정보 출력하기
+		// 見つかったセッション情報を出力
 		LOG_SCREEN("Session ID: %s / Owner: %s", *Id, *User);
 
-		// 세션의 매치 타입이 "FreeForAll"일 경우 세션 참가
+		// マッチタイプが "FreeForAll" のセッションに参加
 		if (MatchType == FString("FreeForAll"))
 		{
 			LOG_SCREEN("Joining Match Type: %s", *MatchType);
@@ -351,7 +351,7 @@ void AISMLobbyController::OnFindSessionComplete(bool bWasSuccessful)
 			else
 			{
 				OnlineSessionInterface->AddOnJoinSessionCompleteDelegate_Handle(JoinSessionCompleteDelegate);
-				// 세션 참가
+				// セッションに参加
 				if (const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController())
 					OnlineSessionInterface->JoinSession(*LocalPlayer->GetPreferredUniqueNetId(), NAME_GameSession, Result);
 			}
@@ -368,7 +368,7 @@ void AISMLobbyController::OnFindFriendSessionComplete(int32 LocalUserNum, bool b
 		LOG_SCREEN("Session Interface is Invalid");
 		return;
 	}
-		
+
 	if (!bWasSuccessful)
 	{
 		LOG_SCREEN("Failed to find friend session");
@@ -379,7 +379,7 @@ void AISMLobbyController::OnFindFriendSessionComplete(int32 LocalUserNum, bool b
 
 	FName SessionName = NAME_GameSession;
 
-	// 세션이 존재하는지 확인 후 삭제
+	// セッションが存在するか確認してから削除
 	if (OnlineSessionInterface->GetNamedSession(SessionName))
 	{
 		OnlineSessionInterface->DestroySession(SessionName);
@@ -394,7 +394,7 @@ void AISMLobbyController::OnFindFriendSessionComplete(int32 LocalUserNum, bool b
 
 	LOG_SCREEN("======== Search Result ========");
 
-	check(SearchResult.Num() == 1); // 세션이 1개여야 정상
+	check(SearchResult.Num() == 1); // セッションが 1 つであるのが正常
 
 	CachedInviteResult = SearchResult[0];
 	if (OnlineSessionInterface->GetNamedSession(NAME_GameSession))
@@ -405,7 +405,7 @@ void AISMLobbyController::OnFindFriendSessionComplete(int32 LocalUserNum, bool b
 	}
 	else
 	{
-		// 세션 참가
+		// セッションに参加
 		JoinSession(CachedInviteResult);
 	}
 }
@@ -435,7 +435,7 @@ void AISMLobbyController::OnSessionUserInviteAccepted(const bool bWasSuccessful,
 	}
 	else
 	{
-		// 세션 참가
+		// セッションに参加
 		JoinSession(CachedInviteResult);
 	}
 }
@@ -461,10 +461,10 @@ void AISMLobbyController::JoinSession(const FOnlineSessionSearchResult& Result)
 		return;
 	}
 
-	// 델리게이트 연결
+	// デリゲートをバインド
 	OnlineSessionInterface->AddOnJoinSessionCompleteDelegate_Handle(JoinSessionCompleteDelegate);
-	
-	// 세션 참가
+
+	// セッションに参加
 	if (const ULocalPlayer* LocalPlayer = GetWorld()->GetFirstLocalPlayerFromController())
 		OnlineSessionInterface->JoinSession(*LocalPlayer->GetPreferredUniqueNetId(), NAME_GameSession, Result);
 }
@@ -483,7 +483,7 @@ void AISMLobbyController::OnJoinSessionComplate(FName SessionName, EOnJoinSessio
 		return;
 	}
 
-	// 세션에 정상적으로 참가하면 IP Address 얻어와서 해당 서버에 접속
+	// セッションに正常に参加できたら IP アドレスを取得してそのサーバーに接続する
 	FString Address;
 	if (OnlineSessionInterface->GetResolvedConnectString(NAME_GameSession, Address))
 	{

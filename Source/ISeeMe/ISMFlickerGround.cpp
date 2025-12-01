@@ -9,7 +9,7 @@
 // Sets default values
 AISMFlickerGround::AISMFlickerGround()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 	GroundMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Ground"));
@@ -25,14 +25,14 @@ void AISMFlickerGround::BeginPlay()
 	if (!HasAuthority())
 		SetActorTickEnabled(false);
 
-	// 액터의 스태틱 메시 컴포넌트를 가져옵니다.
+	// アクターのスタティックメッシュコンポーネントを取得する
 	UStaticMeshComponent* Mesh = FindComponentByClass<UStaticMeshComponent>();
 	if (Mesh && BaseMaterial)
 	{
-		// 머티리얼 인스턴스 다이나믹 생성
+		// マテリアルインスタンスダイナミックを作成
 		DynamicMaterial = UMaterialInstanceDynamic::Create(BaseMaterial, this);
 
-		// 메시에 머티리얼 인스턴스 적용
+		// メッシュにマテリアルインスタンスを適用
 		Mesh->SetMaterial(0, DynamicMaterial);
 	}
 
@@ -51,8 +51,8 @@ void AISMFlickerGround::Tick(float DeltaTime)
 
 	RemainTime -= DeltaTime;
 
-	// 남은시간 30% 남을 때부터 투명도 세팅
-	if (RemainTime/FlickerInterval < 0.3f)
+	// 残り時間が 30% になったタイミングから透明度を設定
+	if (RemainTime / FlickerInterval < 0.3f)
 		MulticastSetTransparency((RemainTime / FlickerInterval) / 0.3f);
 
 	if (RemainTime <= 0.f)
@@ -60,12 +60,13 @@ void AISMFlickerGround::Tick(float DeltaTime)
 		MulticastAwake(false);
 
 		TWeakObjectPtr<AISMFlickerGround> WeakThis(this);
-		GetWorld()->GetTimerManager().SetTimer(TimerHandle, [WeakThis]() {
-			if (TStrongObjectPtr<AISMFlickerGround> StrongThis = WeakThis.Pin(false))
+		GetWorld()->GetTimerManager().SetTimer(TimerHandle, [WeakThis]()
 			{
-				StrongThis->ResetTimer();
-			}
-		}, DormantTime, false);
+				if (TStrongObjectPtr<AISMFlickerGround> StrongThis = WeakThis.Pin(false))
+				{
+					StrongThis->ResetTimer();
+				}
+			}, DormantTime, false);
 	}
 }
 
@@ -102,7 +103,7 @@ void AISMFlickerGround::MulticastSetTransparency_Implementation(float InOpacity)
 {
 	InOpacity = FMath::Clamp(InOpacity, 0.f, 1.f);
 
-	// 머티리얼 인스턴스의 "Opacity"라는 이름의 파라미터를 설정
+	// マテリアルインスタンスの「Opacity」という名前のパラメータを設定
 	if (DynamicMaterial)
 		DynamicMaterial->SetScalarParameterValue(TEXT("Opacity"), InOpacity);
 }

@@ -10,9 +10,9 @@ void AISMTutorialController::SetPawn(APawn* aPawn)
 {
 	Super::SetPawn(aPawn);
 
-	// 클라이언트가 늦게 접속되었을 때 서버까지 입력이 되지 않는 문제가 발생함
-	// 분명 각자 처리하는데 왜 영항을 주는지 모르겠음..
-	// 결국 PossessedBy() / OnRep_Controller() 에서 서버 클라 구분해서 처리
+	// クライアントが遅れて接続されたとき、サーバーまで入力が届かない問題が発生する
+	// 明らかにそれぞれ処理しているのに、なぜ影響を与えるのか分からない…
+	// 結局 PossessedBy() / OnRep_Controller() でサーバーとクライアントを区別して処理
 	//if (IsLocalController() && aPawn)
 	//{
 	//	aPawn->DisableInput(this);
@@ -23,9 +23,9 @@ void AISMTutorialController::SwapCamera()
 {
 	if (AISMTutorialGameState* GS = Cast<AISMTutorialGameState>(UGameplayStatics::GetGameState(this)))
 	{
-		if(!GS->bInformation && GS->TutorialStep==2)
+		if (!GS->bInformation && GS->TutorialStep == 2)
 		{
-			Super::SwapCamera(); 
+			Super::SwapCamera();
 			GS->MulticastInformation();
 		}
 	}

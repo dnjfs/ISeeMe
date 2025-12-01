@@ -110,7 +110,7 @@ void AISMChapterClearTrigger::MulticastSaveChapterNo_Implementation()
 
 		if (GI->CurrChapterNo == 3 && NextChapterNo == 3)
 		{
-			// 마지막 챕터일 경우 체크포인트 유지
+			// 最終チャプターの場合はチェックポイントを維持
 			// Do Nothing
 		}
 		else

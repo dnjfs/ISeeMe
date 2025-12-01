@@ -17,13 +17,13 @@ void UISMChapterSelect::NativeConstruct()
 
 	if (UISMGameInstance* GI = GetGameInstance<UISMGameInstance>())
 	{
-		// 세이브 파일 존재
+		// セーブファイルが存在
 		if (UISMSaveGame* LoadedGame = Cast<UISMSaveGame>(UGameplayStatics::LoadGameFromSlot("SaveSlot", 0)))
 		{
 			ContinueButton->SetIsEnabled(true);
 			GI->LoadGame(LoadedGame);
 		}
-		else // 세이브 파일 없음
+		else // セーブファイルが存在しない
 		{
 			ContinueButton->SetIsEnabled(false);
 			GI->CurrChapterNo = 0;
@@ -43,7 +43,7 @@ void UISMChapterSelect::NewGame()
 {
 	if (UISMGameInstance* GI = GetGameInstance<UISMGameInstance>())
 	{
-		// 현재 챕터, 체크포인트 정보 초기화 후 저장
+		// 現在のチャプターとチェックポイント情報を初期化して保存
 		GI->CurrChapterNo = 0;
 		GI->SavedCheckPointID = FName("None");
 
@@ -61,7 +61,7 @@ void UISMChapterSelect::NewGame()
 void UISMChapterSelect::Continue()
 {
 	if (UISMGameInstance* GI = GetGameInstance<UISMGameInstance>())
-	{ 
+	{
 		FString ChapterName = FString::Printf(TEXT("Chapter%d"), GI->CurrChapterNo);
 		GI->bTutorial = true;
 		if (AISMLobbyGameMode* GM = Cast<AISMLobbyGameMode>(GetWorld()->GetAuthGameMode()))

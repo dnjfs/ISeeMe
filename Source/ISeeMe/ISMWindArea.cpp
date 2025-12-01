@@ -111,7 +111,7 @@ void AISMWindArea::MulticastApplyWindForce_Implementation(float DeltaTime)
 {
 	for (int32 i = 0; i < Targets.Num(); i++)
 	{
-		if (i >= Targets.Num()) return; // array changed during iteration 예외 방지
+		if (i >= Targets.Num()) return; // 反復中に配列が変更される場合の例外防止
 
 		ACharacter* Target = Targets[i];
 

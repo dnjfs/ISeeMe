@@ -68,7 +68,7 @@ void AISMCrackGround::OnStep(UPrimitiveComponent* HitComp, AActor* OtherActor, U
 
 	if (IsActorTickEnabled())
 	{
-		// 한 번 밟히고 나면 이미 틱이 활성화 된 상태임
+		// 一度踏まれた後はすでに Tick が有効な状態
 		return;
 	}
 
@@ -158,7 +158,7 @@ void AISMCrackGround::MulticastSpawnCrackPart_Implementation()
 		GeometryCacheComp->SetGeometryCache(FallingGeometry);
 		GeometryCacheComp->PlayFromStart();
 
-		// 애니메이션 길이보다 대기시간이 더 길면 애니메이션 종료 시 제거
+		// アニメーションの長さより待機時間が長い場合、アニメーション終了時に削除
 		float AnimDuration = FallingGeometry->CalculateDuration();
 		if (AnimDuration < DormantTime)
 		{

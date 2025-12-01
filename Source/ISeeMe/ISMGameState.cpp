@@ -67,7 +67,7 @@ void AISMGameState::MulticastReturnSwapViewItem_Implementation()
 
 void AISMGameState::OnItemUsed(AISMSwapViewItem* InItem)
 {
-	// 서버에서만 실행되는 함수
+	// サーバーでのみ実行される関数
 	if (GetNetMode() == ENetMode::NM_Client)
 		return;
 

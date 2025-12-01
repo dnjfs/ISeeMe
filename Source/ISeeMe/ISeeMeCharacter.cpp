@@ -44,7 +44,7 @@ AISeeMeCharacter::AISeeMeCharacter()
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
 
 	// Configure character movement
-	GetCharacterMovement()->bOrientRotationToMovement = false; // 캐릭터의 방향은 항상 시점 방향으로 고정이므로, false
+	GetCharacterMovement()->bOrientRotationToMovement = false; // キャラクターの向きは常に視点の方向に固定するため false
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 500.0f, 0.0f); // ...at this rotation rate
 
 	// Note: For faster iteration times these variables, and many more, can be tweaked in the Character Blueprint
@@ -56,7 +56,7 @@ AISeeMeCharacter::AISeeMeCharacter()
 	GetCharacterMovement()->BrakingDecelerationWalking = 2000.f;
 	GetCharacterMovement()->BrakingDecelerationFalling = 1500.0f;
 
-	// 네트워크 보간처리 시간
+	// ネットワーク補間処理時間
 	GetCharacterMovement()->NetworkSimulatedSmoothLocationTime = 0.1f;
 	GetCharacterMovement()->ListenServerNetworkSimulatedSmoothLocationTime = 0.04f;
 
@@ -68,7 +68,7 @@ AISeeMeCharacter::AISeeMeCharacter()
 	CameraBoom->SetRelativeRotation(FRotator(-20.f, 0.f, 0.f));
 	CameraBoom->bInheritPitch = false;
 
-	// 카메라 부드럽게 움직이도록
+	// カメラが滑らかに動くようにする
 	CameraBoom->bEnableCameraLag = true;
 
 	// Create a follow camera
@@ -87,7 +87,7 @@ AISeeMeCharacter::AISeeMeCharacter()
 	// Note: The skeletal mesh and anim blueprint references on the Mesh component (inherited from Character) 
 	// are set in the derived blueprint asset named ThirdPersonCharacter (to avoid direct content references in C++)
 
-	// 캐릭터가 회전하는 바닥 위에서 바닥과 함께 회전하지 않도록 함
+	// キャラクターが回転する床の上でも床と一緒に回転しないようにする
 	if (UCharacterMovementComponent* MovementComponent = GetCharacterMovement())
 	{
 		MovementComponent->bIgnoreBaseRotation = true;
@@ -100,7 +100,7 @@ void AISeeMeCharacter::BeginPlay()
 	Super::BeginPlay();
 
 	// Save Transform 
-	if (HasAuthority()) 
+	if (HasAuthority())
 	{
 		GetWorld()->GetTimerManager().SetTimerForNextTick([this]()
 			{
@@ -114,7 +114,7 @@ void AISeeMeCharacter::BeginPlay()
 					UE_LOG(LogTemp, Warning, TEXT("Fail: PlayerState is not initialized yet."));
 				}
 
-				// 호스트에 체크포인트가 저장되어있을 경우 작동
+				// ホストにチェックポイントが保存されている場合に動作
 				if (UISMGameInstance* GI = GetGameInstance<UISMGameInstance>())
 				{
 					if (GI->SavedCheckPointID != FName("None"))
@@ -123,18 +123,18 @@ void AISeeMeCharacter::BeginPlay()
 						UGameplayStatics::GetAllActorsOfClass(GetWorld(), AISMCheckPoint::StaticClass(), CheckPoints);
 						for (AActor* ACheckPoint : CheckPoints)
 						{
-							// GetAllActorsOfClass()는 nullptr을 반환할 수 있음 (EGetWorldErrorMode::LogAndReturnNull)
+							// GetAllActorsOfClass() は nullptr を返す可能性がある (EGetWorldErrorMode::LogAndReturnNull)
 							if (!ACheckPoint)
 							{
 								continue;
 							}
 
-							if (GI->SavedCheckPointID == ACheckPoint->GetFName()) // 체크포인트 찾음
+							if (GI->SavedCheckPointID == ACheckPoint->GetFName()) // チェックポイントを見つけた
 							{
 								AISMCheckPoint* ISMCheckPoint = Cast<AISMCheckPoint>(ACheckPoint);
 
-								// IsValid(): nullptr + Pending Kill 검사
-								// IsValidLowLevel: Dangling Pointer 검사
+								// IsValid(): nullptr + Pending Kill をチェック
+								// IsValidLowLevel: ダングリングポインタをチェック
 								if (!IsValid(ISMCheckPoint) || !ISMCheckPoint->IsValidLowLevel())
 								{
 									continue;
@@ -198,7 +198,7 @@ void AISeeMeCharacter::PossessedBy(AController* NewController)
 		}
 	}
 
-	// 애니메이션 업데이트가 네트워크 업데이트에 의해서가 아닌, 메쉬 tick에 의해 이루어지도록 함
+	// アニメーション更新がネットワーク更新ではなくメッシュの tick によって行われるようにする
 	GetMesh()->bOnlyAllowAutonomousTickPose = false;
 }
 
@@ -230,10 +230,10 @@ void AISeeMeCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 			Subsystem->AddMappingContext(DefaultMappingContext, 0);
 		}
 	}
-	
+
 	// Set up action bindings
 	if (UEnhancedInputComponent* EnhancedInputComponent = Cast<UEnhancedInputComponent>(PlayerInputComponent)) {
-		
+
 		// Jumping
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ACharacter::Jump);
 		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ACharacter::StopJumping);
@@ -246,7 +246,7 @@ void AISeeMeCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 
 		// Focus
 		EnhancedInputComponent->BindAction(FocusAction, ETriggerEvent::Triggered, this, &AISeeMeCharacter::Focus);
-	
+
 		EnhancedInputComponent->BindAction(SwapCameraAction, ETriggerEvent::Started, this, &AISeeMeCharacter::SwapCamera);
 		EnhancedInputComponent->BindAction(SwapAspectAction, ETriggerEvent::Started, this, &AISeeMeCharacter::SwapAspect);
 
@@ -333,7 +333,7 @@ void AISeeMeCharacter::Move(const FInputActionValue& Value)
 
 		// get forward vector
 		const FVector ForwardDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
-	
+
 		// get right vector 
 		const FVector RightDirection = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
@@ -407,7 +407,7 @@ void AISeeMeCharacter::CallGoCheckPoint()
 	if (HasAuthority()) // Call Go Check Point Function on the server
 	{
 		GoCheckPoint();
-	} 
+	}
 	else // Call Go Check Point Function on the client
 	{
 		ServerCallGoCheckPoint();
@@ -480,7 +480,7 @@ void AISeeMeCharacter::EnableAudio()
 {
 	if (AudioComponent)
 	{
-		AudioComponent->FadeIn(0.5f); 
+		AudioComponent->FadeIn(0.5f);
 	}
 }
 
@@ -488,7 +488,7 @@ void AISeeMeCharacter::DisableAudio()
 {
 	if (AudioComponent)
 	{
-		AudioComponent->FadeOut(0.5f, 0.0f); 
+		AudioComponent->FadeOut(0.5f, 0.0f);
 	}
 }
 

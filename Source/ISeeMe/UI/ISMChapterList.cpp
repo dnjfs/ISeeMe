@@ -24,7 +24,7 @@ void UISMChapterList::SelectChapter(int ChapterNo)
 {
 	if (UISMGameInstance* GI = GetGameInstance<UISMGameInstance>())
 	{
-		// 현재 챕터, 체크포인트 정보 초기화 후 저장
+		// 現在のチャプターとチェックポイント情報を初期化して保存
 		GI->CurrChapterNo = ChapterNo;
 		GI->SavedCheckPointID = FName("None");
 
@@ -36,5 +36,5 @@ void UISMChapterList::SelectChapter(int ChapterNo)
 		{
 			GM->SelectCharacterUI();
 		}
-	}	
+	}
 }

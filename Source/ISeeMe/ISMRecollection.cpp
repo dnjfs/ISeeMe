@@ -51,7 +51,7 @@ void AISMRecollection::MulticastAcquireRecollection_Implementation()
 		GI->AcquiredRecollectionIDs.AddUnique(this->GetFName());
 		GI->SaveGame();
 
-		// 도전과제 달성
+		// 実績達成
 		if (UAchievementManager* AM = GI->GetSubsystem<UAchievementManager>())
 		{
 			AM->UpdateAchievementProgress(FString::Printf(TEXT("Recollection_%d"), RecollectionID), 1.f);

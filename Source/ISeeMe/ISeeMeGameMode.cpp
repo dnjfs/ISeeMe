@@ -65,7 +65,7 @@ void AISeeMeGameMode::PostLogin(APlayerController* NewPlayer)
 					UGameplayStatics::GetAllActorsOfClass(GetWorld(), AISMCheckPoint::StaticClass(), CheckPoints);
 					for (AActor* ACheckPoint : CheckPoints)
 					{
-						if (GI->SavedCheckPointID == ACheckPoint->GetFName()) // 체크포인트 찾음
+						if (GI->SavedCheckPointID == ACheckPoint->GetFName()) // チェックポイントを見つけた
 						{
 							AISMCheckPoint* ISMCheckPoint = Cast<AISMCheckPoint>(ACheckPoint);
 
@@ -118,13 +118,13 @@ void AISeeMeGameMode::SwapCamera()
 		Characters.Add(Character);
 	}
 
-	// 카메라 스왑
+	// カメラをスワップ
 	int PlayerNum = PCs.Num();
 	for (int i = 0; i < PlayerNum; i++)
 	{
-		int TargetIndex = (i+1 < PlayerNum) ? i+1 : 0;
+		int TargetIndex = (i + 1 < PlayerNum) ? i + 1 : 0;
 		AISeeMeCharacter* Character = Characters[TargetIndex];
-		check(Character); // nullptr이 아닐거라 가정
+		check(Character); // nullptr ではないと仮定
 
 		PCs[i]->SetViewTarget(Character);
 		PCs[i]->SetOtherCharacter(Character);
@@ -143,7 +143,7 @@ void AISeeMeGameMode::RestoreCamera()
 	TArray<AISMPlayerController*> PCs;
 	TArray<AISeeMeCharacter*> Characters;
 
-	// 카메라 복구
+	// カメラ復旧
 	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
 	{
 		AISMPlayerController* PC = Cast<AISMPlayerController>(Iterator->Get());
