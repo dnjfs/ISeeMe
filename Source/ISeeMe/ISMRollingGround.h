@@ -17,17 +17,10 @@ public:
 	// Sets default values for this actor's properties
 	AISMRollingGround();
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
 private:
 	UPROPERTY(EditAnywhere)
 	TObjectPtr<UStaticMeshComponent> GroundMesh;
 
 	UPROPERTY(VisibleAnywhere)
 	TObjectPtr<URotatingMovementComponent> Movement;
-
-	UPROPERTY(EditInstanceOnly, Category = GroundOption)
-	float RotateSpeed = 100.f;
 };
