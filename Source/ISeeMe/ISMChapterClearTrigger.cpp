@@ -105,9 +105,6 @@ void AISMChapterClearTrigger::MulticastSaveChapterNo_Implementation()
 {
 	if (UISMGameInstance* GI = GetGameInstance<UISMGameInstance>())
 	{
-		GI->MaxChapterNo = FMath::Max(GI->MaxChapterNo, NextChapterNo);
-		GI->CurrChapterNo = NextChapterNo;
-
 		if (GI->CurrChapterNo == 3 && NextChapterNo == 3)
 		{
 			// 마지막 챕터일 경우 체크포인트 유지
@@ -117,7 +114,9 @@ void AISMChapterClearTrigger::MulticastSaveChapterNo_Implementation()
 		{
 			GI->SavedCheckPointID = FName("None");
 		}
-		
+
+		GI->MaxChapterNo = FMath::Max(GI->MaxChapterNo, NextChapterNo);
+		GI->CurrChapterNo = NextChapterNo;
 
 		GI->SaveGame();
 	}
