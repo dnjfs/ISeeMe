@@ -17,15 +17,19 @@ class ISEEME_API UISMPrologue : public UUserWidget
 	GENERATED_BODY()
 
 public:
-	UPROPERTY(meta = (BindWidget))
-	UWidgetSwitcher* PrologueSwitcher;
+	UFUNCTION(BlueprintCallable)
+	void SwitchDialogue(int InIndex);
 
-	UPROPERTY(meta = (BindWidget))
-	UTextBlock* SkipText;
-	
 	UFUNCTION(BlueprintCallable)
 	void ShowPrologue();
 
 	UFUNCTION(BlueprintCallable)
 	void ReadPrologue();
+
+private:
+	UPROPERTY(meta = (BindWidget))
+	UWidgetSwitcher* PrologueSwitcher;
+
+	UPROPERTY(meta = (BindWidget))
+	UTextBlock* SkipText;
 };

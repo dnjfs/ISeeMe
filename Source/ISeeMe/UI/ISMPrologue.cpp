@@ -6,24 +6,13 @@
 #include <ISeeMe/ISMLobbyController.h>
 #include <ISeeMe/ISMPlayerController.h>
 
+void UISMPrologue::SwitchDialogue(int InIndex)
+{
+	PrologueSwitcher->SetActiveWidgetIndex(InIndex);
+}
+
 void UISMPrologue::ShowPrologue()
 {
-	if (UISMGameInstance* GI = GetGameInstance<UISMGameInstance>())
-	{
-		if (GI->SelectedPawnClass)
-		{
-			FString ClassName = GI->SelectedPawnClass->GetName();
-			if (ClassName == "BP_Mimi_C")
-			{
-				PrologueSwitcher->SetActiveWidgetIndex(0);
-			}
-			else if(ClassName == "BP_Boy_C")
-			{
-				PrologueSwitcher->SetActiveWidgetIndex(1);
-			}
-		}
-	}
-
 	if (AISMLobbyController* LobbyController = Cast<AISMLobbyController>(GetOwningPlayer()))
 	{
 		FInputModeUIOnly Mode;
