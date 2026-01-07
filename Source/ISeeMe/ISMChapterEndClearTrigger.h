@@ -9,7 +9,7 @@
 /**
  * 
  */
-DECLARE_DELEGATE_OneParam(OnClearEndUpdated, bool);
+DECLARE_DELEGATE(FOnClearEndUpdated);
 
 UCLASS()
 class ISEEME_API AISMChapterEndClearTrigger : public AISMChapterClearTrigger
@@ -17,7 +17,12 @@ class ISEEME_API AISMChapterEndClearTrigger : public AISMChapterClearTrigger
 	GENERATED_BODY()
 	
 public:
-	FOnClearUpdated OnClearEndUpdated;
+	FOnClearEndUpdated OnClearEndUpdated;
+
 protected:
 	void CompleteChapter() override;
+
+private:
+	UFUNCTION(NetMulticast, Reliable)
+	void MulticastShowEpilogue();
 };

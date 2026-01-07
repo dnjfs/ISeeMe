@@ -19,8 +19,11 @@
 // Sets default values
 AISMChapterClearTrigger::AISMChapterClearTrigger()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
-	PrimaryActorTick.bCanEverTick = true;
+	PrimaryActorTick.bCanEverTick = false;
+	// Multicast RPC를 위해 액터 리플리케이트 활성화
+	SetReplicates(true);
+	// 오너가 없는 액터이므로 오너에게만 연관성이 있으면 안됨
+	bOnlyRelevantToOwner = false;
 
 	TriggerBox = CreateDefaultSubobject<UBoxComponent>(TEXT("TriggerBox"));
 }
@@ -31,16 +34,12 @@ void AISMChapterClearTrigger::BeginPlay()
 	Super::BeginPlay();
 
 	DetectedPlayerCount = 0;
-	
-	TriggerBox->OnComponentBeginOverlap.AddDynamic(this, &AISMChapterClearTrigger::OnOverlapBegin);
-	TriggerBox->OnComponentEndOverlap.AddDynamic(this, &AISMChapterClearTrigger::OnOverlapEnd);
-}
 
-// Called every frame
-void AISMChapterClearTrigger::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-
+	if (HasAuthority())
+	{
+		TriggerBox->OnComponentBeginOverlap.AddDynamic(this, &AISMChapterClearTrigger::OnOverlapBegin);
+		TriggerBox->OnComponentEndOverlap.AddDynamic(this, &AISMChapterClearTrigger::OnOverlapEnd);
+	}
 }
 
 void AISMChapterClearTrigger::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
@@ -105,18 +104,9 @@ void AISMChapterClearTrigger::MulticastSaveChapterNo_Implementation()
 {
 	if (UISMGameInstance* GI = GetGameInstance<UISMGameInstance>())
 	{
-		if (GI->CurrChapterNo == 3 && NextChapterNo == 3)
-		{
-			// 마지막 챕터일 경우 체크포인트 유지
-			// Do Nothing
-		}
-		else
-		{
-			GI->SavedCheckPointID = FName("None");
-		}
-
 		GI->MaxChapterNo = FMath::Max(GI->MaxChapterNo, NextChapterNo);
 		GI->CurrChapterNo = NextChapterNo;
+		GI->SavedCheckPointID = FName("None");
 
 		GI->SaveGame();
 	}

@@ -17,9 +17,6 @@ public:
 	// Sets default values for this actor's properties
 	AISMChapterClearTrigger();
 
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
 	FOnClearUpdated OnClearUpdated;
 
 	UPROPERTY(EditAnywhere, Category = "Sound")

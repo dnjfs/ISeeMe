@@ -5,10 +5,11 @@
 
 void AISMChapterEndClearTrigger::CompleteChapter()
 {
-	if (OnClearEndUpdated.IsBound())
-	{
-		OnClearEndUpdated.Execute(true);
-	}
-	MulticastSaveChapterNo();
 	MulticastPlaySound();
+	MulticastShowEpilogue();
+}
+
+void AISMChapterEndClearTrigger::MulticastShowEpilogue_Implementation()
+{
+	OnClearEndUpdated.ExecuteIfBound();
 }

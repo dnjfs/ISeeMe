@@ -54,17 +54,14 @@ void UISMOverlay::HandleClearUpdated(bool bLoading)
 	}
 }
 
-void UISMOverlay::HandleEndClearUpdated(bool bEnding)
+void UISMOverlay::HandleEndClearUpdated()
 {
 	if(GetOwningLocalPlayer() && LoadingSwitcher)
 	{
-		if (bEnding)
+		LoadingSwitcher->SetActiveWidgetIndex(2);
+		if (UISMPrologue* PrologueWidget = Cast<UISMPrologue>(LoadingSwitcher->GetActiveWidget()))
 		{
-			LoadingSwitcher->SetActiveWidgetIndex(2);
-			if (UISMPrologue* PrologueWidget = Cast<UISMPrologue>(LoadingSwitcher->GetActiveWidget()))
-			{
-				PrologueWidget->ShowPrologue();
-			}
+			PrologueWidget->ShowPrologue();
 		}
 	}
 }
