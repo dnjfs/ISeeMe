@@ -44,7 +44,11 @@ void AISMChapterClearTrigger::BeginPlay()
 
 void AISMChapterClearTrigger::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
-	MulticastDetectPlayer(true, OtherActor);
+	if (ACharacter* Character = Cast<ACharacter>(OtherActor))
+	{
+		DetectedPlayerCount++;
+	}
+
 	// When all detect
 	if (DetectedPlayerCount == 2)
 	{
@@ -54,50 +58,18 @@ void AISMChapterClearTrigger::OnOverlapBegin(UPrimitiveComponent* OverlappedComp
 
 void AISMChapterClearTrigger::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
-	MulticastDetectPlayer(false,OtherActor);
-}
-
-void AISMChapterClearTrigger::MulticastDetectPlayer_Implementation(bool bAdd, AActor* OtherActor)
-{
 	if (ACharacter* Character = Cast<ACharacter>(OtherActor))
 	{
-		if (bAdd)
-			DetectedPlayerCount++;
-		else
-			DetectedPlayerCount--;
+		DetectedPlayerCount--;
 	}
 }
 
 void AISMChapterClearTrigger::CompleteChapter()
 {
-	if (OnClearUpdated.IsBound())
-	{
-		OnClearUpdated.Execute(true);
-	} // Delegate Execute (Loading UI)
-
-	MulticastPlaySound();
-	MoveToNextChapter();
-	if (GEngine)
-		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Cyan, TEXT("Chapter Clear"));
 	MulticastSaveChapterNo();
-}
-
-void AISMChapterClearTrigger::MulticastPlaySound_Implementation()
-{
-	if (UISMGameInstance* GI = GetGameInstance<UISMGameInstance>())
-	{
-		GI->SoundPlay(ClearSound);
-	}
-}
-
-void AISMChapterClearTrigger::MoveToNextChapter()
-{
-	UWorld* World = GetWorld(); 
-
-	if (HasAuthority())
-	{
-		World->ServerTravel("/Game/ISeeMe/Maps/" + NextChapter + "?listen", true);
-	}
+	MulticastPlaySound();
+	MulticastShowLoadingWidget();
+	MoveToNextChapter();
 }
 
 void AISMChapterClearTrigger::MulticastSaveChapterNo_Implementation()
@@ -112,4 +84,26 @@ void AISMChapterClearTrigger::MulticastSaveChapterNo_Implementation()
 	}
 }
 
+void AISMChapterClearTrigger::MulticastPlaySound_Implementation()
+{
+	if (UISMGameInstance* GI = GetGameInstance<UISMGameInstance>())
+	{
+		GI->SoundPlay(ClearSound);
+	}
+}
 
+void AISMChapterClearTrigger::MulticastShowLoadingWidget_Implementation()
+{
+	// Delegate Execute (Loading UI)
+	OnClearUpdated.ExecuteIfBound(true);
+}
+
+void AISMChapterClearTrigger::MoveToNextChapter()
+{
+	UWorld* World = GetWorld(); 
+
+	if (HasAuthority())
+	{
+		World->ServerTravel("/Game/ISeeMe/Maps/" + NextChapter + "?listen", true);
+	}
+}

@@ -41,8 +41,6 @@ public:
 
     FName SavedCheckPointID;
 
-    TArray<FName> AcquiredRecollectionIDs;
-
     // 첫 실행 여부
     bool bIsFirstLaunch = false;
 

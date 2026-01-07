@@ -31,7 +31,6 @@ void UISMGameInstance::SaveGame()
 		SaveGameInstance->CurrChapterNo = this->CurrChapterNo;
 		SaveGameInstance->MaxChapterNo = this->MaxChapterNo;
 		SaveGameInstance->CheckPointID = this->SavedCheckPointID;
-		SaveGameInstance->AcquiredRecollectionIDs = this->AcquiredRecollectionIDs;
 		SaveGameInstance->bIsFirstLaunch = this->bIsFirstLaunch;
 		SaveGameInstance->bEnableSmoothCharacterMovement = this->bEnableSmoothCharacterMovement;
 
@@ -45,7 +44,6 @@ void UISMGameInstance::LoadGame(UISMSaveGame* LoadedGame)
 	CurrChapterNo = LoadedGame->CurrChapterNo;
 	MaxChapterNo = LoadedGame->MaxChapterNo;
 	SavedCheckPointID = LoadedGame->CheckPointID;
-	AcquiredRecollectionIDs = LoadedGame->AcquiredRecollectionIDs;
 	bIsFirstLaunch = LoadedGame->bIsFirstLaunch;
 	bEnableSmoothCharacterMovement = LoadedGame->bEnableSmoothCharacterMovement;
 }

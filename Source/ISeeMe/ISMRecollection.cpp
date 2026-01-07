@@ -48,7 +48,6 @@ void AISMRecollection::MulticastAcquireRecollection_Implementation()
 	// save recollection info
 	if (UISMGameInstance* GI = GetGameInstance<UISMGameInstance>())
 	{
-		GI->AcquiredRecollectionIDs.AddUnique(this->GetFName());
 		GI->SaveGame();
 
 		// 도전과제 달성

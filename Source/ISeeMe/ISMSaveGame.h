@@ -31,10 +31,7 @@ public:
 	int MaxChapterNo;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	FName CheckPointID; 
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
-	TArray<FName> AcquiredRecollectionIDs;
+	FName CheckPointID;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadWrite)
 	bool bIsFirstLaunch;

@@ -22,9 +22,6 @@ public:
 	UPROPERTY(EditAnywhere, Category = "Sound")
 	USoundBase* ClearSound;
 
-	UFUNCTION(NetMulticast, Unreliable)
-	void MulticastPlaySound();
-
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -35,13 +32,17 @@ protected:
 	UFUNCTION()
 	void OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
-	UFUNCTION()
 	virtual void CompleteChapter();
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastSaveChapterNo();
 
-	UFUNCTION()
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastPlaySound();
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void MulticastShowLoadingWidget();
+
 	void MoveToNextChapter();
 
 	UPROPERTY(BlueprintReadWrite, EditAnywhere, Category="Move")
@@ -54,9 +55,5 @@ private:
 	UPROPERTY(EditDefaultsOnly)
 	class UBoxComponent* TriggerBox;
 
-	UPROPERTY()
 	int DetectedPlayerCount;
-
-	UFUNCTION(NetMulticast, Reliable)
-	void MulticastDetectPlayer(bool bAdd, AActor* OtherActor);
 };
