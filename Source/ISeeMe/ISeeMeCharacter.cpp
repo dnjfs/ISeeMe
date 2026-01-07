@@ -416,16 +416,25 @@ void AISeeMeCharacter::CallGoCheckPoint()
 
 void AISeeMeCharacter::ControlPitch(const FInputActionValue& Value)
 {
+	// 카메라 복구 상태
 	if (CameraBoom->bInheritPitch)
 		return;
 
 	const float Axis = Value.Get<float>();
+	const float ViewPitchMin = -70.f;
+	const float ViewPitchMax = 40.f;
 
 	if (AISMPlayerController* ISMPlayerController = GetController<AISMPlayerController>())
 	{
 		if (AISeeMeCharacter* OtherCharacter = ISMPlayerController->GetOtherCharacter())
 		{
-			OtherCharacter->GetCameraBoom()->AddRelativeRotation(FRotator(Axis, 0.f, 0.f));
+			if (USpringArmComponent* OtherCameraBoom = OtherCharacter->GetCameraBoom())
+			{
+				FRotator NewRotation = OtherCameraBoom->GetRelativeRotation();
+				NewRotation.Pitch = FMath::Clamp(NewRotation.Pitch + Axis, ViewPitchMin, ViewPitchMax);
+
+				OtherCameraBoom->SetRelativeRotation(NewRotation);
+			}
 		}
 	}
 }

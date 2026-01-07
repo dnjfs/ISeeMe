@@ -31,6 +31,12 @@ void AISMPlayerController::BeginPlay()
 	SetInputMode(FInputModeGameOnly());
 	SetShowMouseCursor(false);
 	SetControlRotation(FRotator(-20.f, 0.f, 0.f));
+
+	if (PlayerCameraManager)
+	{
+		PlayerCameraManager->ViewPitchMin = -70.f;
+		PlayerCameraManager->ViewPitchMax = 40.f;
+	}
 }
 
 void AISMPlayerController::OnPossess(APawn* aPawn)
