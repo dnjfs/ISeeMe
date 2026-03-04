@@ -32,12 +32,8 @@ public:
 	FORCEINLINE class UCameraComponent* GetFollowCamera() const { return FollowCamera; }
 
 	/** When first perspective, Camera Location */
-	UPROPERTY(EditAnywhere, Category = "Bone")
-	FVector FirstAspectLocation;
-
-	/**  How high to dead */
 	UPROPERTY(EditAnywhere)
-	float DeadHeight=1000;
+	FVector FirstAspectLocation;
 
 	/** Call Go Check Point Function from client to the server **/
 	UFUNCTION(Server, Reliable)
@@ -45,8 +41,6 @@ public:
 
 	/** Called for swap camera */
 	void SwapCamera();
-
-	virtual void Tick(float DeltaTime) override;
 
 	UPROPERTY(EditAnywhere, Category = "Sound")
 	USoundBase* CheckPointSound;

@@ -38,7 +38,8 @@ DEFINE_LOG_CATEGORY(LogTemplateCharacter);
 
 AISeeMeCharacter::AISeeMeCharacter()
 {
-	PrimaryActorTick.bCanEverTick = true;
+	// 액터 자체 틱은 불필요
+	PrimaryActorTick.bCanEverTick = false;
 
 	// Set size for collision capsule
 	GetCapsuleComponent()->InitCapsuleSize(42.f, 96.0f);
@@ -260,36 +261,6 @@ void AISeeMeCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 	{
 		UE_LOG(LogTemplateCharacter, Error, TEXT("'%s' Failed to find an Enhanced Input component! This template is built to use the Enhanced Input system. If you intend to use the legacy system, then you will need to update this C++ file."), *GetNameSafe(this));
 	}
-}
-
-void AISeeMeCharacter::Tick(float DeltaTime)
-{
-	Super::Tick(DeltaTime);
-	/*
-	if (GetCharacterMovement()->IsFalling())
-	{
-		if (!bIsFalling)
-		{
-			FirstHeight = GetActorLocation().Z;
-			bIsFalling = true;
-		}
-	}
-	else
-	{
-		if (!bIsFalling)
-			return;
-
-		if (FirstHeight - GetActorLocation().Z >= DeadHeight)
-		{
-			if (AISMCharacterState* State = Cast<AISMCharacterState>(this->GetPlayerState()))
-			{
-				SetActorLocation(State->InitSpawnPointLocation);
-				SetActorRotation(State->InitialSpawnPointRotator);
-			}
-		}
-		bIsFalling = false;
-	}
-	*/
 }
 
 void AISeeMeCharacter::SetSmoothCharacterMovement(bool bEnable)

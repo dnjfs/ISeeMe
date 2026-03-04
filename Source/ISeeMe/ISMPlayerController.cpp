@@ -244,21 +244,28 @@ void AISMPlayerController::UpdateAspect()
 
 void AISMPlayerController::ChangeThirdAspect()
 {
+	if (!OtherCharacter)
+		return;
+
 	if (class USpringArmComponent* OtherCameraBoom = OtherCharacter->GetCameraBoom())
 	{
 		OtherCameraBoom->SetRelativeLocation(FVector(0, 0, 0));
 		OtherCameraBoom->TargetArmLength = 600.0f;
+		OtherCameraBoom->bEnableCameraLag = true;
 	}
 }
 
 void AISMPlayerController::ChangeFirstAspect()
 {
-	if (OtherCharacter && OtherCharacter->GetMesh())
-		if (class USpringArmComponent* OtherCameraBoom = OtherCharacter->GetCameraBoom())
-		{
-			OtherCameraBoom->SetRelativeLocation(OtherCharacter->FirstAspectLocation);
-			OtherCameraBoom->TargetArmLength = 0;
-		}
+	if (!OtherCharacter)
+		return;
+
+	if (class USpringArmComponent* OtherCameraBoom = OtherCharacter->GetCameraBoom())
+	{
+		OtherCameraBoom->SetRelativeLocation(OtherCharacter->FirstAspectLocation);
+		OtherCameraBoom->TargetArmLength = 0;
+		OtherCameraBoom->bEnableCameraLag = false; // 카메라 랙으로 인한 얼굴 침범 방지
+	}
 }
 
 void AISMPlayerController::DeadCharacter()
