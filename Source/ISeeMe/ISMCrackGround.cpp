@@ -44,17 +44,27 @@ void AISMCrackGround::Tick(float DeltaTime)
 
 	if (RemainTime <= 0.f)
 	{
-		OnCracked();
+		if (CrackState < ECrackState::Cracked)
+		{
+			CrackState = ECrackState::Cracked;
+			OnCracked();
+		}
 	}
 	else if (RemainTime / CrackTime <= 0.2f)
 	{
-		if (GeometryCacheComp && GeometryCacheComp->GetGeometryCache() == HalfCrack)
+		if (CrackState < ECrackState::Most)
+		{
+			CrackState = ECrackState::Most;
 			MulticastChangeCrack(MostCrack);
+		}
 	}
 	else if (RemainTime / CrackTime <= 0.5f)
 	{
-		if (GeometryCacheComp && GeometryCacheComp->GetGeometryCache() == FirstCrack)
+		if (CrackState < ECrackState::Half)
+		{
+			CrackState = ECrackState::Half;
 			MulticastChangeCrack(HalfCrack);
+		}
 	}
 }
 
@@ -77,8 +87,10 @@ void AISMCrackGround::OnStep(UPrimitiveComponent* HitComp, AActor* OtherActor, U
 		return;
 	}
 
+	CrackState = ECrackState::Start;
+
+	MulticastSetCracking(CrackState);
 	SetActorTickEnabled(true);
-	MulticastSetCracking(true);
 }
 
 void AISMCrackGround::OnCracked()
@@ -91,8 +103,7 @@ void AISMCrackGround::OnCracked()
 			this->ResetTimer();
 	});
 
-	FTimerHandle TimerHandle;
-	GetWorld()->GetTimerManager().SetTimer(TimerHandle, TimerDelegate, DormantTime, false);
+	GetWorld()->GetTimerManager().SetTimer(CrackTimerHandle, TimerDelegate, DormantTime, false);
 
 	MulticastAwake(false);
 }
@@ -100,21 +111,22 @@ void AISMCrackGround::OnCracked()
 void AISMCrackGround::ResetTimer()
 {
 	RemainTime = CrackTime;
+	CrackState = ECrackState::Idle;
 
 	MulticastAwake(true);
-	MulticastSetCracking(false);
-	
+	MulticastSetCracking(CrackState);
+	SetActorTickEnabled(false);
+
 	if (AudioComponent)
 	{
 		AudioComponent->Stop();
-		AudioComponent->SetSound(CrackingSound);
 	}
+
+	GetWorld()->GetTimerManager().ClearTimer(CrackTimerHandle);
 }
 
 void AISMCrackGround::MulticastAwake_Implementation(bool bInAwake)
 {
-	SetActorTickEnabled(false);
-
 	if (GroundMesh)
 		GroundMesh->SetCollisionEnabled(bInAwake ? ECollisionEnabled::QueryOnly : ECollisionEnabled::NoCollision);
 
@@ -122,21 +134,22 @@ void AISMCrackGround::MulticastAwake_Implementation(bool bInAwake)
 		BoxCollision->SetCollisionEnabled(bInAwake ? ECollisionEnabled::QueryOnly : ECollisionEnabled::NoCollision);
 }
 
-void AISMCrackGround::MulticastSetCracking_Implementation(bool bInCracking)
+void AISMCrackGround::MulticastSetCracking_Implementation(ECrackState InCrackState)
 {
+	bool bIsCracking = InCrackState > ECrackState::Idle;
 	if (GroundMesh)
-		GroundMesh->SetVisibility(!bInCracking);
+		GroundMesh->SetVisibility(!bIsCracking);
 
 	if (GeometryCacheComp)
 	{
-		GeometryCacheComp->SetVisibility(bInCracking);
+		GeometryCacheComp->SetVisibility(bIsCracking);
 		GeometryCacheComp->Stop();
 		GeometryCacheComp->SetLooping(true);
-		GeometryCacheComp->SetGeometryCache(bInCracking ? FirstCrack : nullptr);
+		GeometryCacheComp->SetGeometryCache(bIsCracking ? FirstCrack : nullptr);
 		GeometryCacheComp->PlayFromStart();
 	}
 
-	if (bInCracking && AudioComponent)
+	if (bIsCracking && AudioComponent)
 	{
 		AudioComponent->SetSound(CrackingSound);
 		AudioComponent->Play();

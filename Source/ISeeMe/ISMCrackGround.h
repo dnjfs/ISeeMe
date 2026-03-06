@@ -11,6 +11,16 @@ class UGeometryCache;
 class UGeometryCacheComponent;
 class UAudioComponent;
 
+UENUM(BlueprintType)
+enum class ECrackState : uint8
+{
+	Idle,
+	Start,
+	Half,
+	Most,
+	Cracked,
+};
+
 UCLASS()
 class ISEEME_API AISMCrackGround : public AResetableActor
 {
@@ -21,6 +31,8 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+
+	virtual void Tick(float DeltaTime) override;
 
 	virtual void OnReset() override;
 
@@ -38,13 +50,10 @@ protected:
 	void MulticastChangeCrack(UGeometryCache* ChangeMesh);
 
 	UFUNCTION(NetMulticast, Unreliable)
-	void MulticastSetCracking(bool bInCracking);
+	void MulticastSetCracking(ECrackState InCrackState);
 
 	UFUNCTION(NetMulticast, Unreliable)
 	void MulticastSpawnCrackPart();
-
-public:
-	virtual void Tick(float DeltaTime) override;
 
 private:
 	UPROPERTY(EditAnywhere)
@@ -76,6 +85,8 @@ private:
 
 	float RemainTime = 0.f;
 
+	ECrackState CrackState = ECrackState::Idle;
+
 	UPROPERTY(EditAnywhere, Category = "Sound")
 	TObjectPtr<UAudioComponent> AudioComponent;
 
@@ -84,4 +95,6 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "Sound")
 	TObjectPtr<USoundWave> BrokenSound;
+
+	FTimerHandle CrackTimerHandle;
 };
