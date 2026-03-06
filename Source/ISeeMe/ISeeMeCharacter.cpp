@@ -198,11 +198,6 @@ void AISeeMeCharacter::PossessedBy(AController* NewController)
 			//DisableInput(TutorialController);
 		}
 	}
-
-	// 애니메이션 업데이트가 네트워크 업데이트에 의해서가 아닌, 메쉬 tick에 의해 이루어지도록 함
-	//GetMesh()->bOnlyAllowAutonomousTickPose = false;
-	// 2026/03/04 : 서버에서의 클라이언트 캐릭터의 애니메이션이 2배속되는 문제 발생, true로 원상복구
-	GetMesh()->bOnlyAllowAutonomousTickPose = true;
 }
 
 void AISeeMeCharacter::OnRep_Controller()
