@@ -412,25 +412,10 @@ void AISeeMeCharacter::GoCheckPoint()
 	// Return Swap Camera State
 	if (AISeeMeGameMode* GM = Cast<AISeeMeGameMode>(GetWorld()->GetAuthGameMode()))
 	{
-		if (!GM->bSwapCamera)
-		{
-			GetWorldTimerManager().ClearTimer(GM->SwapTimerHandle);
-			GM->SwapCamera();
-		}
+		GM->ReturnCharacters();
 	}
 
 	MulticastPlaySound();
-
-	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
-	{
-		if (AISMPlayerController* PC = Cast<AISMPlayerController>(Iterator->Get()))
-			PC->DeadCharacter();
-	}
-
-	if (AISMGameState* GS = Cast<AISMGameState>(UGameplayStatics::GetGameState(this)))
-	{
-		GS->MulticastReturnSwapViewItem();
-	}
 }
 
 void AISeeMeCharacter::ServerCallGoCheckPoint_Implementation()

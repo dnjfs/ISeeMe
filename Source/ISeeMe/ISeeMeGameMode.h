@@ -7,6 +7,8 @@
 #include <Interfaces/OnlineSessionDelegates.h>
 #include "ISeeMeGameMode.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnCharacterReturned);
+
 UCLASS(minimalapi)
 class AISeeMeGameMode : public AGameModeBase
 {
@@ -21,6 +23,8 @@ public:
 	/*For swap camera*/
 	void SwapCamera();
 	void RestoreCamera();
+
+	void ReturnCharacters();
 
 	bool bSwapCamera = true;
 
@@ -42,6 +46,9 @@ public:
 
 	UFUNCTION()
 	virtual void OnDestroySessionComplete(FName SessionName, bool bWasSuccessful);
+
+	UPROPERTY(BlueprintAssignable)
+	FOnCharacterReturned OnCharacterReturned;
 
 private:
 	FOnDestroySessionCompleteDelegate OnDestroySessionCompleteDelegate;

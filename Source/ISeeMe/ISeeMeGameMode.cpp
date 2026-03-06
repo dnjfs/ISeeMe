@@ -164,6 +164,28 @@ void AISeeMeGameMode::RestoreCamera()
 	bSwapCamera = false;
 }
 
+void AISeeMeGameMode::ReturnCharacters()
+{
+	OnCharacterReturned.Broadcast();
+
+	if (!bSwapCamera)
+	{
+		GetWorldTimerManager().ClearTimer(SwapTimerHandle);
+		SwapCamera();
+	}
+
+	for (FConstPlayerControllerIterator Iterator = GetWorld()->GetPlayerControllerIterator(); Iterator; ++Iterator)
+	{
+		if (AISMPlayerController* PC = Cast<AISMPlayerController>(Iterator->Get()))
+			PC->DeadCharacter();
+	}
+
+	if (AISMGameState* GS = Cast<AISMGameState>(UGameplayStatics::GetGameState(this)))
+	{
+		GS->MulticastReturnSwapViewItem();
+	}
+}
+
 bool AISeeMeGameMode::ChangePawn(APlayerController* Controller, TSubclassOf<APawn> SelectedPawnClass)
 {
 	if (!IsValid(Controller))
