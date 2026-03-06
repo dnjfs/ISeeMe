@@ -117,11 +117,6 @@ void AISMCrackGround::ResetTimer()
 	MulticastSetCracking(CrackState);
 	SetActorTickEnabled(false);
 
-	if (AudioComponent)
-	{
-		AudioComponent->Stop();
-	}
-
 	GetWorld()->GetTimerManager().ClearTimer(CrackTimerHandle);
 }
 
@@ -132,6 +127,12 @@ void AISMCrackGround::MulticastAwake_Implementation(bool bInAwake)
 
 	if (BoxCollision)
 		BoxCollision->SetCollisionEnabled(bInAwake ? ECollisionEnabled::QueryOnly : ECollisionEnabled::NoCollision);
+
+	if (bInAwake)
+	{
+		if (AudioComponent)
+			AudioComponent->Stop();
+	}
 }
 
 void AISMCrackGround::MulticastSetCracking_Implementation(ECrackState InCrackState)

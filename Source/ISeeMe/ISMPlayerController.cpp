@@ -4,6 +4,7 @@
 #include "ISMPlayerController.h"
 #include "Components/AudioComponent.h"
 #include "Net/UnrealNetwork.h"
+#include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Camera/CameraComponent.h"
 #include "ISeeMeGameMode.h"
@@ -16,7 +17,6 @@
 #include "ISMLobbyController.h"
 #include "ISMGameInstance.h"
 #include "TimerManager.h"
-#include "Kismet/GameplayStatics.h"
 
 AISMPlayerController::AISMPlayerController()
 {
@@ -277,6 +277,9 @@ void AISMPlayerController::DeadCharacter()
 	ACharacter* MyCharacter = GetCharacter();
 	if (MyCharacter == nullptr)
 		return;
+
+	if (UCharacterMovementComponent* CMC = MyCharacter->GetCharacterMovement())
+		CMC->StopMovementImmediately();
 
 	int RespawnIndex = IsLocalController() ? 1 : 2;
 	if (USceneComponent* RespawnPoint = State->GetRespawnPoint(RespawnIndex)) // When get check point
