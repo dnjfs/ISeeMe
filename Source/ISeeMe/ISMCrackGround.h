@@ -3,7 +3,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "Abstract/ResetableActor.h"
 #include "Components/BoxComponent.h"
 #include "ISMCrackGround.generated.h"
 
@@ -12,7 +12,7 @@ class UGeometryCacheComponent;
 class UAudioComponent;
 
 UCLASS()
-class ISEEME_API AISMCrackGround : public AActor
+class ISEEME_API AISMCrackGround : public AResetableActor
 {
 	GENERATED_BODY()
 	
@@ -21,6 +21,8 @@ public:
 
 protected:
 	virtual void BeginPlay() override;
+
+	virtual void OnReset() override;
 
 	UFUNCTION()
 	void OnStep(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);

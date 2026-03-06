@@ -3,11 +3,11 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "Abstract/ResetableActor.h"
 #include "ISMFlickerGround.generated.h"
 
 UCLASS()
-class ISEEME_API AISMFlickerGround : public AActor
+class ISEEME_API AISMFlickerGround : public AResetableActor
 {
 	GENERATED_BODY()
 	
@@ -22,6 +22,8 @@ protected:
 	virtual void Tick(float DeltaSeconds) override;
 
 	virtual void EndPlay(EEndPlayReason::Type EndPlayReason) override;
+
+	virtual void OnReset() override;
 
 	void ResetTimer();
 

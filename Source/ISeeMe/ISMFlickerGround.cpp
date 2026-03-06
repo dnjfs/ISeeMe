@@ -84,6 +84,11 @@ void AISMFlickerGround::ResetTimer()
 	MulticastSetTransparency(RemainTime);
 }
 
+void AISMFlickerGround::OnReset()
+{
+	ResetTimer();
+}
+
 void AISMFlickerGround::MulticastAwake_Implementation(bool bInAwake)
 {
 	if (GroundMesh)

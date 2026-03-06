@@ -58,6 +58,11 @@ void AISMCrackGround::Tick(float DeltaTime)
 	}
 }
 
+void AISMCrackGround::OnReset()
+{
+	ResetTimer();
+}
+
 void AISMCrackGround::OnStep(UPrimitiveComponent* HitComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (!HasAuthority())
