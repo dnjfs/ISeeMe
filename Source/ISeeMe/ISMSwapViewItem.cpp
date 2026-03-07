@@ -51,9 +51,9 @@ void AISMSwapViewItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActo
 	{
 		if (AISMGameState* GS = Cast<AISMGameState>(UGameplayStatics::GetGameState(this)))
 		{
-			if (GS->SwapViewItem == nullptr)
+			if (!GS->HasSwapViewItem())
 			{
-				GS->MulticastSetSwapViewItem(this);
+				GS->OnItemAcquired(this);
 				MulticastVisibleMesh(false);
 				MulticastPlaySound();
 			}
@@ -64,16 +64,7 @@ void AISMSwapViewItem::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AActo
 void AISMSwapViewItem::MulticastVisibleMesh_Implementation(bool bVisible)
 {
 	ItemMesh->SetVisibility(bVisible);
-	if (!bVisible)
-	{
-		TriggerVolume->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-		ItemMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	}
-	else
-	{
-		TriggerVolume->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-		ItemMesh->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	}
+	TriggerVolume->SetCollisionEnabled(bVisible ? ECollisionEnabled::QueryAndPhysics : ECollisionEnabled::NoCollision);
 }
 
 void AISMSwapViewItem::MulticastPlaySound_Implementation()

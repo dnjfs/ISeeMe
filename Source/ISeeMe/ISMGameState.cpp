@@ -29,16 +29,7 @@ void AISMGameState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLif
 	DOREPLIFETIME(AISMGameState, UsedSwapViewItems);
 }
 
-void AISMGameState::MulticastSetSwapViewItem_Implementation(AISMSwapViewItem* AcqSwapViewItem)
-{
-	SwapViewItem = AcqSwapViewItem;
-
-	bool bShowIcon = (SwapViewItem != nullptr);
-	if (OnSwapItemUpdated.IsBound())
-		OnSwapItemUpdated.Execute(bShowIcon); // Call Delegate
-}
-
-void AISMGameState::MulticastReturnSwapViewItem_Implementation()
+void AISMGameState::OnCharacterReturned()
 {
 	// Used Item Empty
 	for (auto& Item : UsedSwapViewItems)
@@ -52,28 +43,42 @@ void AISMGameState::MulticastReturnSwapViewItem_Implementation()
 	if (SwapViewItem != nullptr)
 	{
 		SwapViewItem->MulticastVisibleMesh(true);
-		MulticastSetSwapViewItem(nullptr);
+		SwapViewItem = nullptr;
 	}
 
 	// Return Check point state
 	if (SaveSwapViewItem != nullptr)
 	{
 		SaveSwapViewItem->MulticastVisibleMesh(false);
-		MulticastSetSwapViewItem(SaveSwapViewItem);
+		SwapViewItem = SaveSwapViewItem;
 	}
 
 	MulticastPlayItemSound(false);
+	UpdateItemUIState();
 }
 
-void AISMGameState::OnItemUsed(AISMSwapViewItem* InItem)
+void AISMGameState::OnCheckPointSaved()
 {
-	// 서버에서만 실행되는 함수
-	if (GetNetMode() == ENetMode::NM_Client)
-		return;
+	SaveSwapViewItem = SwapViewItem; // 현재 소지한 아이템은 저장
+	UsedSwapViewItems.Empty(); // 사용한 아이템은 초기화 
 
-	UsedSwapViewItems.Add(InItem);
-	MulticastSetSwapViewItem(nullptr);
+	UpdateItemUIState();
+}
+
+void AISMGameState::OnItemAcquired(AISMSwapViewItem* AcqSwapViewItem)
+{
+	SwapViewItem = AcqSwapViewItem;
+
+	UpdateItemUIState();
+}
+
+void AISMGameState::OnItemUsed()
+{
+	UsedSwapViewItems.Add(SwapViewItem);
+	SwapViewItem = nullptr;
+
 	MulticastPlayItemSound(true);
+	UpdateItemUIState();
 }
 
 void AISMGameState::MulticastPlayItemSound_Implementation(bool bIsPlay)
@@ -89,3 +94,26 @@ void AISMGameState::MulticastPlayItemSound_Implementation(bool bIsPlay)
 	}
 }
 
+void AISMGameState::UpdateItemUIState()
+{
+	bool bCanUseItem = (SwapViewItem != nullptr);
+	bool bCanRestoreItem = SaveSwapViewItem != nullptr || UsedSwapViewItems.Num() > 0;
+
+	if (OnSwapItemUpdated.IsBound())
+		OnSwapItemUpdated.Execute(bCanUseItem, bCanRestoreItem); // Call Delegate
+}
+
+void AISMGameState::OnRep_SwapViewItem()
+{
+	// Replicate 시점과 RPC 호출 시점이 달라 레이스 컨디션이 발생할 수 있음
+	// UpdateItemUIState() 함수는 서버에서 갱신 직후 실행하고, 클라이언트에선 OnRep() 함수를 통해 UI 반영
+	UpdateItemUIState();
+}
+
+bool AISMGameState::HasSwapViewItem() const
+{
+	if (!HasAuthority())
+		return false;
+
+	return SwapViewItem != nullptr;
+}

@@ -16,10 +16,24 @@ void UISMOverlay::NativeConstruct()
 
 	if (AISMGameState* GS = GetWorld()->GetGameState<AISMGameState>())
 	{
-		GS->OnSwapItemUpdated.BindLambda([this](bool bHasItem) {
+		GS->OnSwapItemUpdated.BindLambda([this](bool bHasItem, bool bCanRestoreItem) {
 			if (ItemWidgetSwitcher)
 			{
-				ItemWidgetSwitcher->SetActiveWidgetIndex(bHasItem ? 1 : 0);
+				int ItemWidgetIndex;
+				if (bHasItem)
+				{
+					ItemWidgetIndex = 2;
+				}
+				else if (bCanRestoreItem)
+				{
+					ItemWidgetIndex = 1;
+				}
+				else
+				{
+					ItemWidgetIndex = 0;
+				}
+
+				ItemWidgetSwitcher->SetActiveWidgetIndex(ItemWidgetIndex);
 			}
 		});
 	}

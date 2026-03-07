@@ -13,8 +13,6 @@ UStaticMeshComponent* AISMCharacterState::GetRespawnPoint(int InCustomPlayerId)
 {
 	if (!CurCheckPoint.IsValid())
 		return nullptr;
-	
-	UE_LOG(LogTemp, Warning, TEXT("%d"), InCustomPlayerId);
 
 	if (InCustomPlayerId == 1)
 		return CurCheckPoint->Spawn1PPlayer;

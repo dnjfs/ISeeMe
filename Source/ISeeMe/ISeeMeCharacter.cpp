@@ -143,8 +143,7 @@ void AISeeMeCharacter::BeginPlay()
 
 								if (AISMGameState* GS = Cast<AISMGameState>(UGameplayStatics::GetGameState(this)))
 								{
-									GS->SaveSwapViewItem = GS->SwapViewItem;
-									GS->UsedSwapViewItems.Empty();
+									GS->OnCheckPointSaved();
 
 									ISMCheckPoint->MulticastChangeMaterial(2);
 									ISMCheckPoint->InitCheckPoint();

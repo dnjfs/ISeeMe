@@ -10,7 +10,7 @@
 /**
  * 
  */
-DECLARE_DELEGATE_OneParam(FOnSwapItemUpdated, bool);
+DECLARE_DELEGATE_TwoParams(FOnSwapItemUpdated, bool, bool);
 
 UCLASS()
 class ISEEME_API AISMGameState : public AGameStateBase
@@ -21,34 +21,38 @@ protected:
 	AISMGameState();
 
 public:
-	FOnSwapItemUpdated OnSwapItemUpdated; 
-
-	UPROPERTY(Replicated, BlueprintReadWrite, EditAnywhere)
-	AISMSwapViewItem* SwapViewItem; // Current Own
-
-	UPROPERTY(Replicated)
-	TArray<AISMSwapViewItem*> UsedSwapViewItems; // Before return items, used item
-
-	UPROPERTY(Replicated)
-	AISMSwapViewItem* SaveSwapViewItem; // When check point, save item
+	FOnSwapItemUpdated OnSwapItemUpdated;
 
 	void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
-	UFUNCTION(NetMulticast, Reliable)
-	void MulticastSetSwapViewItem(AISMSwapViewItem* AcqSwapViewItem);
-
-	UFUNCTION(NetMulticast, Reliable)
-	void MulticastReturnSwapViewItem();
-
-	void OnItemUsed(AISMSwapViewItem* InItem);
+	void OnCharacterReturned();
+	void OnCheckPointSaved();
+	void OnItemAcquired(AISMSwapViewItem* AcqSwapViewItem);
+	void OnItemUsed();
 
 	UFUNCTION(NetMulticast, Reliable)
 	void MulticastPlayItemSound(bool bIsPlay);
 
-	UPROPERTY()
-	TObjectPtr<USoundBase> ItemTimerSound;
+	void UpdateItemUIState();
+
+	UFUNCTION()
+	void OnRep_SwapViewItem();
+
+	bool HasSwapViewItem() const;
 
 private:
 	UPROPERTY(Transient)
+	TObjectPtr<USoundBase> ItemTimerSound;
+
+	UPROPERTY(Transient)
 	TObjectPtr<UAudioComponent> TimerAudioComponent;
+
+	UPROPERTY(ReplicatedUsing = OnRep_SwapViewItem)
+	AISMSwapViewItem* SwapViewItem; // Current Own
+
+	UPROPERTY(ReplicatedUsing = OnRep_SwapViewItem)
+	TArray<AISMSwapViewItem*> UsedSwapViewItems; // Before return items, used item
+
+	UPROPERTY(ReplicatedUsing = OnRep_SwapViewItem)
+	AISMSwapViewItem* SaveSwapViewItem; // When check point, save item
 };

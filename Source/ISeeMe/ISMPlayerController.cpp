@@ -133,7 +133,7 @@ void AISMPlayerController::SwapCamera()
 {
 	if (AISMGameState* GS = Cast<AISMGameState>(UGameplayStatics::GetGameState(this)))
 	{
-		if (GS->SwapViewItem == nullptr)
+		if (!GS->HasSwapViewItem())
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Cannot swap camera"));
 			return; // 조건에 맞지 않으면 종료
@@ -160,7 +160,7 @@ void AISMPlayerController::SwapCamera()
 					}), GM->SwapTime, false);
 				GM->RestoreCamera();
 
-				GS->OnItemUsed(GS->SwapViewItem);
+				GS->OnItemUsed();
 			}
 		}
 	}
